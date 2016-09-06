@@ -810,6 +810,7 @@ public OnItemSelect(Handle:menu, MenuAction:action, param1, param2)
 #define BUTTON_TOGGLE 4
 #define BUTTON_USE 5
 #define BUTTON_TRANSFER 6
+#define BUTTON_BACK 7
 #define BUTTON_BACK 8
 #define BUTTON_EXIT 10
 
@@ -1049,8 +1050,8 @@ bool:ShowItemInfo(client, item_id)
 		
 		DrawPanelItem(panel, " ", ITEMDRAW_SPACER|ITEMDRAW_RAWLINE);
 		
-		SetPanelCurrentKey(panel, 8);
-		iButton[client][8] = BUTTON_BACK;
+		SetPanelCurrentKey(panel, g_iExitButton-2);
+		iButton[client][g_iExitButton-2] = BUTTON_BACK;
 		FormatEx(sBuffer, sizeof(sBuffer), "%t", "Back");
 		DrawPanelItem(panel, sBuffer, ITEMDRAW_CONTROL);
 		
