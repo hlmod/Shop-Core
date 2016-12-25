@@ -3,32 +3,14 @@
 #include <sourcemod>
 #include <shop>
 
-//#define COLORS
-//#define MORECOLORS
-#define CSGOCOLORS
+#define GAME_UNDEFINED		0
+#define GAME_CSS_34			1
+#define GAME_CSS				2
+#define GAME_CSGO				3
 
-#if defined COLORS
-#include <colors>
-
-new g_iExitButton = 10;
-#endif
-
-#if defined MORECOLORS
-#include <morecolors>
+new Engine_Version = GAME_UNDEFINED;
 
 new g_iExitButton = 10;
-#endif
-
-#if defined CSGOCOLORS
-#include <csgo_colors>
-
-new g_iExitButton = 9;
-#endif
-
-
-/*#undef REQUIRE_PLUGIN
-#tryinclude <updater>
-#define REQUIRE_PLUGIN*/
 
 new global_timer;
 new Handle:panel_info;
@@ -47,6 +29,7 @@ new bool:is_started;
 new Handle:g_hAdminFlags, g_iAdminFlags;
 new Handle:g_hItemTransfer, g_iItemTransfer;
 
+#include "shop/colors.sp"
 #include "shop/admin.sp"
 #include "shop/commands.sp"
 #include "shop/db.sp"
@@ -60,7 +43,7 @@ public Plugin:myinfo =
 {
 	name = "[Shop] Core",
 	description = "An advanced in game market",
-	author = "FrozDark",
+	author = "FrozDark (Fork by R1KO)",
 	version = SHOP_VERSION,
 	url = "http://www.hlmod.ru/"
 };
@@ -74,7 +57,7 @@ public APLRes:AskPluginLoad2(Handle:myself, bool:late, String:error[], err_max)
 	CreateNative("Shop_ShowCategory", Native_ShowCategory);
 	CreateNative("Shop_ShowInventory", Native_ShowInventory);
 	CreateNative("Shop_ShowItemsOfCategory", Native_ShowItemsOfCategory);
-	
+
 	Admin_CreateNatives();
 	DB_CreateNatives();
 	Functions_CreateNatives();
@@ -84,6 +67,23 @@ public APLRes:AskPluginLoad2(Handle:myself, bool:late, String:error[], err_max)
 	RegPluginLibrary("shop");
 	MarkNativeAsOptional("GetUserMessageType");
 	MarkNativeAsOptional("SQL_SetCharset");
+
+	MarkNativeAsOptional("GuessSDKVersion"); 
+	MarkNativeAsOptional("GetEngineVersion");
+	MarkNativeAsOptional("GetUserMessageType");
+	MarkNativeAsOptional("BfWriteByte");
+	MarkNativeAsOptional("BfWriteString");
+	MarkNativeAsOptional("PbSetInt");
+	MarkNativeAsOptional("PbSetBool");
+	MarkNativeAsOptional("PbSetString");
+	MarkNativeAsOptional("PbAddString");
+
+	Engine_Version = Helpers_GetCSGame();
+
+	if (Engine_Version == GAME_CSGO)
+	{
+		g_iExitButton = 9;
+	}
 }
 
 public Native_IsStarted(Handle:plugin, params)
@@ -811,7 +811,6 @@ public OnItemSelect(Handle:menu, MenuAction:action, param1, param2)
 #define BUTTON_USE 5
 #define BUTTON_TRANSFER 6
 #define BUTTON_BACK 7
-#define BUTTON_BACK 8
 #define BUTTON_EXIT 10
 
 new iButton[MAXPLAYERS+1][11];
