@@ -547,7 +547,7 @@
 		"#format"   "{1:s}"
 		"ru"		"{green}[Shop] {default}Ваши данные магазина были загружены! Введите в чате {green}!{1}{default} для доступа к магазину!"
 		"ua"		"{green}[Shop] {default}Ваші дані магазину були завантажені! Введіть в чаті {green}!{1}{default} для доступу до магазину!"
-		"en"		"{green}[Shop] {default}You data of the shop has been loaded! Type {green}1{1}{default} to open the shop!"
+		"en"		"{green}[Shop] {default}You data of the shop has been loaded! Type {green}!{1}{default} to open the shop!"
 	}
 	"DataLoaded2"
 	{
