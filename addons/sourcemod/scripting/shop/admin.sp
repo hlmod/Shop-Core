@@ -159,12 +159,12 @@ public Admin_MenuCount_Handler(Handle:menu, MenuAction:action, param1, param2)
 			{
 				case GIVE_CREDITS :
 				{
-					GiveCredits(target, StringToInt(info), true);
+					GiveCredits(target, StringToInt(info), param1);
 					Admin_ShowCreditsAmount(param1, GetMenuSelectionPosition());
 				}
 				case TAKE_CREDITS :
 				{
-					RemoveCredits(target, StringToInt(info), true);
+					RemoveCredits(target, StringToInt(info), param1);
 					Admin_ShowCreditsAmount(param1, GetMenuSelectionPosition());
 				}
 				case SET_CREDITS :

@@ -1092,7 +1092,7 @@ public ItemManager_GetCategoryNameByIdNative(Handle:plugin, numParams)
 public ItemManager_FillArrayByItemsNative(Handle:plugin, numParams)
 {
 	new Handle:h_Array = GetNativeCell(1);
-	if (!IsValidHandle(h_Array))
+	if (!h_Array)
 	{
 		ThrowNativeError(SP_ERROR_NATIVE, "Handle is invalid!");
 	}
