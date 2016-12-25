@@ -46,7 +46,7 @@
 	"trans_credits_operation"
 	{
 		"ru"		"Введите в чате количество кредитов для отправки\nили \"cancel\" для отмены!"
-		"ua"		"Надрукуйте в чаті кількість кредитів для відправки\nабо \"cancel\" для відміни!"
+		"ua"		"Надрукуйте в чаті кількість кредитів для відправки\nабо \"cancel\" для скасування!"
 		"en"		"Type amount of credits to transfer in the chat\nor \"cancel\" to cancel the operation!"
 	}
 	"TransferSuccess"
@@ -255,7 +255,7 @@
 	"EmptyShop"
 	{
 		"ru"		"{green}[Shop]{default} Магазин пустой!"
-		"ua"		"{green}[Shop]{default} Магазин порожній!"
+		"ua"		"{green}[Shop]{default} Крамниця порожня!"
 		"en"		"{green}[Shop]{default} Shop is empty!"
 	}
 	"EmptyCategory"
@@ -447,13 +447,13 @@
 	"buy"
 	{
 		"ru"		"Купить"
-		"ua"		"Купити"
+		"ua"		"Придбати"
 		"en"		"Buy"
 	}
 	"buy_not"
 	{
 		"ru"		"Купить [Недостаточно кредитов]"
-		"ua"		"Купити [Недостатньо кредитів]"
+		"ua"		"Придбати [Недостатньо кредитів]"
 		"en"		"Buy [Insufficient credits]"
 	}
 	"sell"
@@ -477,7 +477,7 @@
 	"ToggleOn"
 	{
 		"ru"		"Включить"
-		"ua"		"Ввімкнути"
+		"ua"		"Увімкнути"
 		"en"		"Toggle On"
 	}
 	"ToggleOff"
