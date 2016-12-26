@@ -36,14 +36,14 @@ CPrintToChat(iClient, const String:sFormat[], any:...)
 	
 			if(!hColorsTrie)
 			{
-				InitColors(hColorsTrie);
+				hColorsTrie = InitColors();
 			}
 	
 			if(!hRegex)
 			{
 				hRegex = CompileRegex("{[a-zA-Z0-9]+}");
 			}
-			
+
 			decl String:sColorName[32], iCursor, iColor, String:sBuffer[32];
 			iCursor = 0;
 			while(MatchRegex(hRegex, sMessage[iCursor]))
@@ -177,9 +177,9 @@ SayText2(iClient, iAuthor = 0, const String:sMessage[])
 	EndMessage();
 }
 
-InitColors(Handle:hColorsTrie)
+Handle:InitColors()
 {
-	hColorsTrie = CreateTrie();
+	new Handle:hColorsTrie = CreateTrie();
 	SetTrieValue(hColorsTrie, "aliceblue", 0xF0F8FF);
 	SetTrieValue(hColorsTrie, "allies", 0x4D7942); // same as Allies team in DoD:S
 	SetTrieValue(hColorsTrie, "antiquewhite", 0xFAEBD7);
@@ -335,4 +335,6 @@ InitColors(Handle:hColorsTrie)
 	SetTrieValue(hColorsTrie, "whitesmoke", 0xF5F5F5);
 	SetTrieValue(hColorsTrie, "yellow", 0xFFFF00);
 	SetTrieValue(hColorsTrie, "yellowgreen", 0x9ACD32);
+	
+	return hColorsTrie;
 }
