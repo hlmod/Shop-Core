@@ -3,499 +3,593 @@
 	"NoAccessToCommand"
 	{
 		"ru"		"{green}[Shop]{default} У вас нет доступа к команде!"
+		"ua"		"{green}[Shop]{default} У вас немає доступу до цієї команди"
 		"en"		"{green}[Shop]{default} You have no access to this command!"
 	}
 	"TargetNotFound"
 	{
 		"#format"   "{1:s}"
 		"ru"		"{green}[Shop]{default} Цель {green}{1}{default} не найдена!"
+		"ua"		"{green}[Shop]{default} Ціль {green}{1}{default} не знайдена!"
 		"en"		"{green}[Shop]{default} Target {green}{1}{default} not found!"
 	}
 	"select_target"
 	{
 		"ru"		"Выберите игрока:"
+		"ua"		"Оберіть гравця:"
 		"en"		"Select player:"
 	}
 	"select_category"
 	{
 		"ru"		"Выберите категорию:"
+		"ua"		"Оберіть категорію:"
 		"en"		"Select category:"
 	}
 	"select_item"
 	{
 		"ru"		"Выберите предмет:"
+		"ua"		"Оберіть предмет:"
 		"en"		"Select item:"
 	}
 	"no_targets"
 	{
 		"ru"		"{green}[Shop]{default} Нет подходящих игроков!"
+		"ua"		"{green}[Shop]{default} Не знайдено відповідних гравців!"
 		"en"		"{green}[Shop]{default} No appropriate targets!"
 	}
 	"target_left_game"
 	{
 		"ru"		"{green}[Shop]{default} Игрок покинул игру!"
+		"ua"		"{green}[Shop]{default} Гравець покинув гру!"
 		"en"		"{green}[Shop]{default} Player has left the game!"
 	}
 	"trans_credits_operation"
 	{
 		"ru"		"Введите в чате количество кредитов для отправки\nили \"cancel\" для отмены!"
+		"ua"		"Надрукуйте в чаті кількість кредитів для відправки\nабо \"cancel\" для скасування!"
 		"en"		"Type amount of credits to transfer in the chat\nor \"cancel\" to cancel the operation!"
 	}
 	"TransferSuccess"
 	{
 		"#format"   "{1:i},{2:N}"
-		"ru"		"{green}[Shop]{default} Вы успешно отправили {green}{1}{default} кредит игроку {green}{2}{default}!"
+		"ru"		"{green}[Shop]{default} Вы успешно отправили {green}{1}{default} кредит(-ов) игроку {green}{2}{default}!"
+		"ua"		"{green}[Shop]{default} Ви успішно відправили {green}{1}{default} кредит(-ів) гравцю {green}{2}{default}!"
 		"en"		"{green}[Shop]{default} You have successfully sent {green}{1}{default} credits to {green}{2}{default}!"
 	}
 	"ReceiveSuccess"
 	{
 		"#format"   "{1:i},{2:N}"
-		"ru"		"{green}[Shop]{default} Вы успешно получили {green}{1}{default} кредит от игрока {green}{2}{default}!"
+		"ru"		"{green}[Shop]{default} Вы успешно получили {green}{1}{default} кредит(-ов) от игрока {green}{2}{default}!"
+		"ua"		"{green}[Shop]{default} Ви успішно отримали {green}{1}{default} кредит(-ів) від гравця {green}{2}{default}!"
 		"en"		"{green}[Shop]{default} You have successfully received {green}{1}{default} credits from {green}{2}{default}!"
 	}
 	"receive_item"
 	{
 		"#format"   "{1:N},{2:s},{3:s}"
 		"ru"		"{green}[Shop]{default} Вы получили предмет {green}\"{3}\"{default} в категорию {green}\"{2}\"{default} от игрока {green}{1}{default}!"
+		"ua"		"{green}[Shop]{default} Ви успішно отримали {green}\"{3}\"{default} в категорію {green}\"{2}\"{default} від гравця {green}{1}{default}!"
 		"en"		"{green}[Shop]{default} You have received {green}\"{3}\"{default} to the category {green}\"{2}\"{default} from {green}{1}{default}!"
 	}
 	"already_has"
 	{
 		"#format"   "{1:N}"
 		"ru"		"{green}[Shop]{default} Игрок {green}{1}{default} уже имеет этот предмет!"
+		"ua"		"{green}[Shop]{default} Гравець {green}{1}{default} вже має цей предмет!"
 		"en"		"{green}[Shop]{default} Player {green}{1}{default} already has the item!"
 	}
 	"no_item"
 	{
 		"ru"		"{green}[Shop]{default} Этот предмет отсутствует в вашем инвентаре!"
+		"ua"		"{green}[Shop]{default} Цей предмет відсутній в вашому інвентарі!"
 		"en"		"{green}[Shop]{default} The item isn't exists in your inventory!"
 	}
 	"IncorrectCredits"
 	{
 		"ru"		"Не верное количество кредитов!"
+		"ua"		"Не правильна кількість кредитів!"
 		"en"		"Not faithful amount of credits!"
 	}
 	"credits_being_transfered"
 	{
 		"#format"   "{1:i}"
 		"ru"		"Количество кредитов: {1}"
+		"ua"		"Кількість кредитів: {1}"
 		"en"		"Amount of credits: {1}"
 	}
 	"credits_to_transfer"
 	{
 		"#format"   "{1:i}"
 		"ru"		"Будет отправлено: {1}"
+		"ua"		"Буде відправлено: {1}"
 		"en"		"Being sent: {1}"
 	}
 	"credits_to_transfer_price"
 	{
 		"#format"   "{1:i}"
 		"ru"		"Цена отправки: {1}"
+		"ua"		"Ціна відправки: {1}"
 		"en"		"Transfer cost: {1}"
 	}
 	"credits_to_transfer_commission"
 	{
 		"#format"   "{1:i}"
 		"ru"		"Комиссия: {1} кредит"
+		"ua"		"Комісія: {1} кредит"
 		"en"		"Commission : {1} credits"
 	}
 	"transfer_credits_left"
 	{
 		"#format"   "{1:i}"
 		"ru"		"Останется: {1}"
+		"ua"		"Залишиться: {1}"
 		"en"		"Remain: {1}"
 	}
 	"need_positive"
 	{
 		"#format"   "{1:i}"
 		"ru"		"Нехватает {1} кредит"
+		"ua"		"Не вистачає {1} кредит"
 		"en"		"Need at least {1} credits"
 	}
 	"confirm"
 	{
 		"ru"		"Подтвердить"
+		"ua"		"Підтвердити"
 		"en"		"Confirm"
 	}
 	"cancel"
 	{
 		"ru"		"Отменить"
+		"ua"		"Скасувати"
 		"en"		"Cancel"
 	}
 	"transfer"
 	{
 		"ru"		"Передать"
+		"ua"		"Передати"
 		"en"		"Transfer"
 	}
 	"ItemTransferMenu"
 	{
 		"ru"		"Передать предмет"
+		"ua"		"Передати предмет"
 		"en"		"Transfer item"
 	}
 	"ItemTransferMenu2"
 	{
 		"#format"   "{1:N}"
 		"ru"		"Передать предмет\nигроку {1}"
+		"ua"		"Передати предмет\nгравцю {1}"
 		"en"		"Transfer item\nto {1}"
 	}
 	"give_credits"
 	{
 		"ru"		"Дать кредиты"
+		"ua"		"Дати кредити"
 		"en"		"Give credits"
 	}
 	"take_credits"
 	{
 		"ru"		"Забрать кредиты"
+		"ua"		"Забрати кредити"
 		"en"		"Take credits"
 	}
 	"set_credits"
 	{
 		"ru"		"Установить кредиты"
+		"ua"		"Встановити кредити"
 		"en"		"Set credits"
 	}
 	"give_items"
 	{
 		"ru"		"Дать предметы"
+		"ua"		"Дати предмети"
 		"en"		"Give items"
 	}
 	"take_items"
 	{
 		"ru"		"Забрать предметы"
+		"ua"		"Забрати предмети"
 		"en"		"Take items"
 	}
 	"give_item_success"
 	{
 		"ru"		"{green}[Shop]{default} Вы успешно дали предмет!"
+		"ua"		"{green}[Shop]{default} Ви успішно дали предмет!"
 		"en"		"{green}[Shop]{default} You have successfuly gave the item!"
 	}
 	"take_item_success"
 	{
 		"ru"		"{green}[Shop]{default} Вы успешно забрали предмет!"
+		"ua"		"{green}[Shop]{default} Ви успішно забрали предмет!"
 		"en"		"{green}[Shop]{default} You have successfuly took the item!"
 	}
 	"give_credits_success"
 	{
 		"#format"   "{1:i},{2:s}"
 		"ru"		"{green}[Shop]{default} {green}{2}{default} получил(и) {1} кредит!"
+		"ua"		"{green}[Shop]{default} {green}{2}{default} отримав {1} кредит!"
 		"en"		"{green}[Shop]{default} You have sent {1} credits to {green}{2}{default}!"
 	}
 	"remove_credits_success"
 	{
 		"#format"   "{1:i},{2:s}"
 		"ru"		"{green}[Shop]{default} Вы забрали {1} кредит у {green}{2}{default}!"
+		"ua"		"{green}[Shop]{default} Ви забрали {1} кредит у {green}{2}{default}!"
 		"en"		"{green}[Shop]{default} You have took {1} credits from {green}{2}{default}!"
 	}
 	"set_credits_success"
 	{
 		"#format"   "{1:i},{2:s}"
 		"ru"		"{green}[Shop]{default} Вы установили {1} кредит игроку {green}{2}{default}!"
+		"ua"		"{green}[Shop]{default} Ви встановили {1} кредит гравцеві {green}{2}{default}!"
 		"en"		"{green}[Shop]{default} You have set {1} credits to {green}{2}{default}!"
 	}
 	"set_you_credits"
 	{
 		"#format"   "{1:i}"
 		"ru"		"{green}[Shop]{default} Админ установил ваши кредиты на {green}{1}{default}!"
+		"ua"		"{green}[Shop]{default} Адмін встановив ваші кредити на {green}{1}{default}!"
 		"en"		"{green}[Shop]{default} Admin has set your credits to {green}{1}{default}!"
 	}
 	"take_you_credits"
 	{
 		"#format"   "{1:i}"
 		"ru"		"{green}[Shop]{default} Админ забрал ваши кредиты в количестве {green}{1}{default}!"
+		"ua"		"{green}[Shop]{default} Адмін забрав ваші кредити в кількості {green}{1}{default}!"
 		"en"		"{green}[Shop]{default} Admin has took {green}{1}{default} credits!"
 	}
 	"give_you_credits"
 	{
 		"#format"   "{1:i}"
 		"ru"		"{green}[Shop]{default} Админ дал вам кредиты в количестве {green}{1}{default}!"
+		"ua"		"{green}[Shop]{default} Адмін дав вам кредити в кількості {green}{1}{default}!"
 		"en"		"{green}[Shop]{default} Admin has gave you {green}{1}{default} credits!"
 	}
 	"EmptyInventory"
 	{
 		"ru"		"{green}[Shop]{default} Ваш инвентарь пуст!"
+		"ua"		"{green}[Shop]{default} Ваш інвентар порожній!"
 		"en"		"{green}[Shop]{default} Your inventory is empty!"
 	}
 	"EmptyShop"
 	{
 		"ru"		"{green}[Shop]{default} Магазин пустой!"
+		"ua"		"{green}[Shop]{default} Крамниця порожня!"
 		"en"		"{green}[Shop]{default} Shop is empty!"
 	}
 	"EmptyCategory"
 	{
 		"ru"		"{green}[Shop]{default} Категория пуста!"
+		"ua"		"{green}[Shop]{default} Категорія порожня!"
 		"en"		"{green}[Shop]{default} The category is empty!"
 	}
 	"NothingToLuck"
 	{
 		"ru"		"{green}[Shop]{default} Нет ничего, что вы могли бы выйграть!"
+		"ua"		"{green}[Shop]{default} Немає нічого, що ви могли б виграти!"
 		"en"		"{green}[Shop]{default} There is nothing that you can luck!"
 	}
 	"Looser"
 	{
 		"ru"		"{green}[Shop]{default} Неудача! Вы ничего не получили :("
+		"ua"		"{green}[Shop]{default} Невдача! Ви нічого не отримали :("
 		"en"		"{green}[Shop]{default} No luck! You have got nothing :("
 	}
 	"Lucker"
 	{
 		"#format"   "{1:s},{2:s}"
 		"ru"		"{green}[Shop]{default} У вас счастливый день :). Вы получили предмет {green}\"{2}\"{default} в категорию {green}\"{1}\"{default}."
+		"ua"		"{green}[Shop]{default} У вас щасливий день :). Ви отримали предмет {green}\"{2}\"{default} в категорію {green}\"{1}\"{default}."
 		"en"		"{green}[Shop]{default} You have a lucky day :). You have got {green}\"{2}\"{default} to the category {green}\"{1}\"{default}."
 	}
 	"ItemElapsed"
 	{
 		"#format"   "{1:s},{2:s}"
 		"ru"		"{green}[Shop]{default} Срок действия {green}\"{2}\"{default} из категории {green}\"{1}\"{default} истекло!"
+		"ua"		"{green}[Shop]{default} Термін дії {green}\"{2}\"{default} з категорії {green}\"{1}\"{default} минув!"
 		"en"		"{green}[Shop]{default} Item {green}\"{2}\"{default} from category {green}\"{1}\"{default} has been elapsed!"
 	}
 	"trans_credits"
 	{
 		"ru"		"Передать кредиты"
+		"ua"		"Передати кредити"
 		"en"		"Transfer credits"
 	}
 	"trans_credits_commision"
 	{
 		"#format"   "{1:i}"
 		"ru"		"[Комиссия: {1}%%]"
+		"ua"		"[Комісія: {1}%%]"
 		"en"		"[Commission: {1}%%]"
 	}
 	"trans_credits_cost"
 	{
 		"#format"   "{1:i}"
 		"ru"		"[Цена: {1}]"
+		"ua"		"[Ціна: {1}]"
 		"en"		"[Price: {1}]"
 	}
 	"trans_credits_disabled"
 	{
 		"ru"		"[Выключен]"
+		"ua"		"[Вимкнений]"
 		"en"		"[Disabled]"
 	}
 	"luck_disabled"
 	{
 		"ru"		"[Выключен]"
+		"ua"		"[Вимкнений]"
 		"en"		"[Disabled]"
 	}
 	"try_luck"
 	{
 		"ru"		"Испытать удачу"
+		"ua"		"Випробувати вдачу"
 		"en"		"Try a luck"
 	}
 	"luck_credits_chance"
 	{
 		"#format"   "{1:i},{2:i}"
 		"ru"		"[Шанс: {2}%%|Цена: {1}]"
+		"ua"		"[Шанс: {2}%%|Ціна: {1}]"
 		"en"		"[Chance: {2}%%|Price: {1}]"
 	}
 	"Type"
 	{
 		"ru"		"Тип"
+		"ua"		"Тип"
 		"en"		"Type"
 	}
 	"None"
 	{
 		"ru"		"Хранение"
+		"ua"		"Зберігання"
 		"en"		"None"
 	}
 	"Finite"
 	{
 		"ru"		"Количественный"
+		"ua"		"Кількісний"
 		"en"		"Finite"
 	}
 	"Togglable"
 	{
 		"ru"		"Включаемый"
+		"ua"		"Що включається" //IDK
 		"en"		"Togglable"
 	}
 	"BuyOnly"
 	{
 		"ru"		"Только покупка"
+		"ua"		"Тільки покупка"
 		"en"		"Buy only"
 	}
 	"Price"
 	{
 		"ru"		"Цена"
+		"ua"		"Ціна"
 		"en"		"Price"
 	}
 	"Sell Price"
 	{
 		"ru"		"Цена продажи"
+		"ua"		"Ціна продажу"
 		"en"		"Sell price"
 	}
 	"absolute_sellprice"
 	{
 		"ru"		"Цена б/у"
+		"ua"		"Ціна б/у"
 		"en"		"Timeleft's price"
 	}
 	"Free"
 	{
 		"ru"		"Бесплатно"
+		"ua"		"Безкоштовно"
 		"en"		"Free"
 	}
 	"Unsaleable"
 	{
 		"ru"		"Не продается"
+		"ua"		"Не продається"
 		"en"		"Unsaleable"
 	}
 	"Count"
 	{
 		"ru"		"Количество"
+		"ua"		"Кількість"
 		"en"		"Count"
 	}
 	"duration"
 	{
 		"ru"		"Длительность"
+		"ua"		"Тривалість"
 		"en"		"Duration"
 	}
 	"forever"
 	{
 		"ru"		"Навсегда"
+		"ua"		"Назавжди"
 		"en"		"Forever"
 	}
 	"timeleft"
 	{
 		"ru"		"Осталось"
+		"ua"		"Залишилось"
 		"en"		"Timeleft"
 	}
 	"You have"
 	{
 		"ru"		"У вас"
+		"ua"		"У вас є"
 		"en"		"You have"
 	}
 	"MainMenuTitle"
 	{
 		"ru"		"Магазин"
+		"ua"		"Магазин"
 		"en"		"Shop"
 	}
 	"Shop"
 	{
 		"ru"		"Магазин"
+		"ua"		"Магазин"
 		"en"		"Shop"
 	}
 	"credits"
 	{
 		"#format"   "{1:i}"
 		"ru"		"Кредитов: {1}"
+		"ua"		"Кредитів: {1}"
 		"en"		"Credits: {1}"
 	}
 	"buy"
 	{
 		"ru"		"Купить"
+		"ua"		"Придбати"
 		"en"		"Buy"
 	}
 	"buy_not"
 	{
 		"ru"		"Купить [Недостаточно кредитов]"
+		"ua"		"Придбати [Недостатньо кредитів]"
 		"en"		"Buy [Insufficient credits]"
 	}
 	"sell"
 	{
 		"ru"		"Продать"
+		"ua"		"Продати"
 		"en"		"Sell"
 	}
 	"inventory"
 	{
 		"ru"		"Инвентарь"
+		"ua"		"Інвентар"
 		"en"		"Inventory"
 	}
 	"use"
 	{
 		"ru"		"Использовать"
+		"ua"		"Використати"
 		"en"		"Use"
 	}
 	"ToggleOn"
 	{
 		"ru"		"Включить"
+		"ua"		"Увімкнути"
 		"en"		"Toggle On"
 	}
 	"ToggleOff"
 	{
 		"ru"		"Выключить"
+		"ua"		"Вимкнути"
 		"en"		"Toggle Off"
 	}
 	"preview"
 	{
 		"ru"		"Превью"
+		"ua"		"Прев'ю"
 		"en"		"Preview"
 	}
 	"preview_unavailable"
 	{
 		"ru"		"Превью недоступен"
+		"ua"		"Прев'ю недоступне"
 		"en"		"Preview unavailable"
 	}
 	"functions"
 	{
 		"ru"		"Функции"
+		"ua"		"Функції"
 		"en"		"Functions"
 	}
 	"info"
 	{
 		"ru"		"Информация"
+		"ua"		"Інформація"
 		"en"		"Info"
 	}
 	"admin_panel"
 	{
 		"ru"		"Панель администратора"
+		"ua"		"Панель Адміністратора"
 		"en"		"Admin panel"
 	}
 	"Back"
 	{
 		"ru"		"Назад"
+		"ua"		"Назад"
 		"en"		"Back"
 	}
 	"Exit"
 	{
 		"ru"		"Выход"
+		"ua"		"Вихід"
 		"en"		"Exit"
 	}
 	
 	"NotEnoughCredits"
 	{
 		"ru"		"{green}[Shop] {default}Недостаточно кредитов!"
+		"ua"		"{green}[Shop] {default}Недостатньо кредитів!"
 		"en"		"{green}[Shop] {default}Insufficient credits!"
 	}
 	"PreviewIn"
 	{
 		"#format"   "{1:i}"
 		"ru"		"{green}[Shop] {default}Превью будет доступен через {1} сек.!"
+		"ua"		"{green}[Shop] {default}Прев'ю буде доступне через {1} сек.!"
 		"en"		"{green}[Shop] {default}Preview will be available in {1} sec.!"
 	}
 	"DataLoaded"
 	{
 		"#format"   "{1:s}"
 		"ru"		"{green}[Shop] {default}Ваши данные магазина были загружены! Введите в чате {green}!{1}{default} для доступа к магазину!"
-		"en"		"{green}[Shop] {default}You data of the shop has been loaded! Type {green}1{1}{default} to open the shop!"
+		"ua"		"{green}[Shop] {default}Ваші дані магазину були завантажені! Введіть в чаті {green}!{1}{default} для доступу до магазину!"
+		"en"		"{green}[Shop] {default}You data of the shop has been loaded! Type {green}!{1}{default} to open the shop!"
 	}
 	"DataLoaded2"
 	{
 		"ru"		"{green}[Shop] {default}Ваши данные магазина были загружены!"
+		"ua"		"{green}[Shop] {default}Ваші дані магазину були завантажені!"
 		"en"		"{green}[Shop] {default}You data of the shop has been loaded!"
 	}
 	"DataLoading"
 	{
 		"ru"		"{green}[Shop] {default}Ваши данные загружаются!"
+		"ua"		"{green}[Shop] {default}Ваші дані завантажуються!"
 		"en"		"{green}[Shop] {default}Your data is being loaded!"
 	}
 
 	"y."
 	{
 		"en"		"y."
+		"ua"		"р."
 		"ru"		"г."
 	}
 	"d."
 	{
 		"en"		"d."
+		"ua"		"д."
 		"ru"		"д."
 	}
 	"h."
 	{
 		"en"		"h."
+		"ua"		"г."
 		"ru"		"ч."
 	}
 	"m."
 	{
 		"en"		"min."
+		"ua"		"хв."
 		"ru"		"мин."
 	}
 	"s."
 	{
 		"en"		"sec."
+		"ua"		"сек."
 		"ru"		"сек."
 	}
 }
