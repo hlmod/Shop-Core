@@ -44,7 +44,8 @@ public Plugin:myinfo =
 	name = "[Shop] Core",
 	description = "An advanced in game market",
 	author = "FrozDark (Fork by R1KO)",
-	version = SHOP_VERSION,
+	// version = SHOP_VERSION,
+	version = "3.0-[13-01-2017 Build]",
 	url = "http://www.hlmod.ru/"
 };
 
@@ -227,7 +228,7 @@ public Action:OnEverySecond(Handle:timer)
 
 CreateConfigs()
 {
-	CreateConVar("sm_advanced_shop_version", SHOP_VERSION, "Shop plugin version", FCVAR_PLUGIN|FCVAR_SPONLY|FCVAR_REPLICATED|FCVAR_NOTIFY|FCVAR_CHEAT|FCVAR_DONTRECORD);
+	CreateConVar("sm_advanced_shop_version", SHOP_VERSION, "Shop plugin version", FCVAR_SPONLY|FCVAR_REPLICATED|FCVAR_NOTIFY|FCVAR_CHEAT|FCVAR_DONTRECORD);
 	
 	decl String:sBuffer[PLATFORM_MAX_PATH];
 	g_hAdminFlags = CreateConVar("sm_shop_admin_flags", "z", "Set flags for admin panel access. Set several flags if necessary. Ex: \"abcz\"");

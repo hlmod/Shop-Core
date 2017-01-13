@@ -1191,7 +1191,7 @@ PlayerManager_OnClientPutInServer(client)
 	}
 	
 	decl String:auth[22];
-	GetClientAuthString(client, auth, sizeof(auth), false);
+	GetClientAuthId(client, AuthId_Steam2, auth, sizeof(auth), false);
 	
 	decl String:s_Query[256];
 	if (db_type == DB_MySQL)
@@ -1237,9 +1237,9 @@ public PlayerManager_AuthorizeClient(Handle:owner, Handle:hndl, const String:err
 	}
 	decl String:auth[22];
 	ReadPackString(dp, auth, sizeof(auth));
-	new try = ReadPackCell(dp);
+	new iTry = ReadPackCell(dp);
 	
-	switch (try)
+	switch (iTry)
 	{
 		case 0 :
 		{

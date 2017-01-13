@@ -524,13 +524,13 @@ DB_TQuery(SQLTCallback:callback, const String:query[], any:data = 0, DBPriority:
 {
 	if (h_db == INVALID_HANDLE)
 	{
-		new Handle:dp = CreateDataPack();
-		WritePackCell(dp, _:callback);
-		WritePackString(dp, query);
-		WritePackCell(dp, data);
-		WritePackCell(dp, _:prio);
+		DataPack dp = new DataPack();
+		dp.WriteFunction(callback);
+		dp.WriteString(query);
+		dp.WriteCell(data);
+		dp.WriteCell(prio);
 		
-		WritePackCell(backup_dp, _:dp);
+		WritePackCell(backup_dp, dp);
 		
 		return;
 	}
@@ -541,11 +541,11 @@ DB_TQueryEx(const String:query[], DBPriority:prio = DBPrio_Normal)
 {
 	if (h_db == INVALID_HANDLE)
 	{
-		new Handle:dp = CreateDataPack();
-		WritePackCell(dp, _:DB_ErrorCheck);
-		WritePackString(dp, query);
-		WritePackCell(dp, 0);
-		WritePackCell(dp, _:prio);
+		DataPack dp = new DataPack();
+		dp.WriteFunction(DB_ErrorCheck);
+		dp.WriteString(query);
+		dp.WriteCell(0);
+		dp.WriteCell(prio);
 		
 		WritePackCell(backup_dp, _:dp);
 		
@@ -568,7 +568,7 @@ DB_RunBackup()
 	{
 		dp = Handle:ReadPackCell(backup_dp);
 		
-		callback = SQLTCallback:ReadPackCell(dp);
+		callback = view_as<SQLTCallback>(ReadPackFunction(dp));
 		ReadPackString(dp, buffer, sizeof(buffer));
 		data = ReadPackCell(dp);
 		prio = DBPriority:ReadPackCell(dp);

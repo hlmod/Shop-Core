@@ -10,6 +10,16 @@ new Handle:h_KvItems;
 #define CAT_SIZE 5
 #define CAT_MAX 6
 
+#define ITEM_DATAPACKPOS_REGISTER 0
+#define ITEM_DATAPACKPOS_USE 9
+#define ITEM_DATAPACKPOS_SHOULD_DISPLAY 18
+#define ITEM_DATAPACKPOS_DISPLAY 27
+#define ITEM_DATAPACKPOS_DESC 36
+#define ITEM_DATAPACKPOS_COMMON 45
+#define ITEM_DATAPACKPOS_BUY 54
+#define ITEM_DATAPACKPOS_SELL 63
+#define ITEM_DATAPACKPOS_ELAPSE 72
+
 ItemManager_CreateNatives()
 {
 	h_arCategories = CreateArray(ByteCountToCells(SHOP_MAX_STRING_LENGTH));
@@ -94,13 +104,23 @@ ItemManager_UnregisterMe(Handle:plugin = INVALID_HANDLE)
 			
 			KvGetSectionName(h_KvItems, buffer, sizeof(buffer));
 			new item_id = StringToInt(buffer);
-			
 			//KvGetString(h_KvItems, "item", buffer, sizeof(buffer));
 			OnItemUnregistered(item_id);
 			
 			while (KvDeleteThis(h_KvItems) == 1)
 			{
-				if (plugin != INVALID_HANDLE && Handle:KvGetNum(h_KvItems, "plugin", _:INVALID_HANDLE) != plugin) break;
+				
+				if (plugin != INVALID_HANDLE && Handle:KvGetNum(h_KvItems, "plugin", _:INVALID_HANDLE) != plugin) break;				
+				
+				int iCallbacks = KvGetNum(h_KvItems, "callbacks", -1);
+				if (iCallbacks != -1)
+				{
+					DataPack dpCallback = view_as<DataPack>(iCallbacks);
+					delete dpCallback;
+					
+					// Bug found, not all rows deleted. Last one ignores...
+					// LogToFileEx("addons/sourcemod/logs/Shop3LogTree.log", "[%d] Datapack %d deleted", item_id, iCallbacks);
+				}
 				
 				KvGetSectionName(h_KvItems, buffer, sizeof(buffer));
 				item_id = StringToInt(buffer);
@@ -125,6 +145,11 @@ ItemManager_UnregisterMe(Handle:plugin = INVALID_HANDLE)
 		if (index == -1) continue;
 		
 		RemoveFromArray(array, index);
+		
+		// Delete datapack in category
+		DataPack dp = view_as<DataPack>(GetArrayCell(array, index+1));
+		delete dp;
+		RemoveFromArray(array, index+1);
 		
 		if (!GetArraySize(array))
 		{
@@ -168,7 +193,7 @@ public ItemManager_RegisterCategory(Handle:plugin, numParams)
 		trie = CreateTrie();
 		SetTrieValue(h_trieCategories, category, trie);
 		
-		array = CreateArray(CAT_MAX);
+		array = CreateArray(1);
 		
 		decl String:buffer[128];
 		GetNativeString(2, buffer, sizeof(buffer));
@@ -181,15 +206,17 @@ public ItemManager_RegisterCategory(Handle:plugin, numParams)
 		SetTrieString(trie, "description", buffer);
 	}
 	
-	decl any:tmp[CAT_MAX];
-	tmp[CAT_PLUGIN] = plugin;
-	tmp[CAT_DISPLAY] = GetNativeCell(4);
-	tmp[CAT_DESC] = GetNativeCell(5);
-	tmp[CAT_SHOULD] = GetNativeCell(6);
-	tmp[CAT_SELECT] = GetNativeCell(7);
-	tmp[CAT_SIZE] = 0;
+	DataPack dp = new DataPack();
 	
-	PushArrayArray(array, tmp);
+	dp.WriteCell(plugin); // Handle of plugin that created category
+	dp.WriteFunction(GetNativeFunction(4)); // Category display
+	dp.WriteFunction(GetNativeFunction(5)); // Category description
+	dp.WriteFunction(GetNativeFunction(6)); // Category should display
+	dp.WriteFunction(GetNativeFunction(7)); // Category select
+	dp.WriteCell(0); // Count of items in category
+	
+	PushArrayCell(array, plugin);
+	PushArrayCell(array, dp);
 
 	return index;
 }
@@ -199,13 +226,37 @@ bool:ItemManager_OnCategorySelect(client, category_id, ShopMenu:menu)
 	decl String:category[SHOP_MAX_STRING_LENGTH];
 	GetArrayString(h_arCategories, category_id, category, sizeof(category));
 	
-	decl Handle:trie, Handle:array, any:tmp[CAT_MAX];
+	decl Handle:trie, Handle:array;
 	
 	GetTrieValue(h_trieCategories, category, trie);
 	GetTrieValue(trie, "plugin_array", array);
 	
 	new bool:result = true;
-	for (new i = 0; i < GetArraySize(array); i++)
+	DataPack tmp = GetArrayCell(array, 1);// because on index 0 there are plugin handle
+	if (tmp != null)
+	{
+		tmp.Reset(); // Deleting of Datapack in Shop_UnregisterMe()...
+		
+		Handle plugin = tmp.ReadCell();
+		tmp.Position += view_as<DataPackPos>(27); // Skip 3 functions here, so 9 + 9 + 9
+		
+		Function func_Select = tmp.ReadFunction();
+		if (func_Select != INVALID_FUNCTION)
+		{
+			Call_StartFunction(plugin, func_Select);
+			Call_PushCell(client);
+			Call_PushCell(category_id);
+			Call_PushString(category);
+			Call_PushCell(menu);
+			Call_Finish(result);
+			
+			if (!result)
+			{
+				return false;
+			}
+		}
+	}
+	/* for (new i = 0; i < GetArraySize(array); i++)
 	{
 		GetArrayArray(array, i, tmp);
 		
@@ -223,7 +274,7 @@ bool:ItemManager_OnCategorySelect(client, category_id, ShopMenu:menu)
 				return false;
 			}
 		}
-	}
+	} */
 	
 	return true;
 }
@@ -409,16 +460,28 @@ public ItemManager_SetCallbacks(Handle:plugin, numParams)
 	{
 		ThrowNativeError(SP_ERROR_NATIVE, "No item is being registered");
 	}
+
+	DataPack hPack = new DataPack();
+	hPack.WriteFunction(GetNativeFunction(1));
+	hPack.WriteFunction(GetNativeFunction(2));
+	hPack.WriteFunction(GetNativeFunction(3));
+	hPack.WriteFunction(GetNativeFunction(4));
+	hPack.WriteFunction(GetNativeFunction(5));
+	hPack.WriteFunction(GetNativeFunction(6));
+	hPack.WriteFunction(GetNativeFunction(7));
+	hPack.WriteFunction(GetNativeFunction(8));
+	hPack.WriteFunction(GetNativeFunction(9));
 	
-	KvSetNum(plugin_kv, "callback_register", GetNativeCell(1));
-	KvSetNum(plugin_kv, "callback_use", GetNativeCell(2));
-	KvSetNum(plugin_kv, "callback_should", GetNativeCell(3));
-	KvSetNum(plugin_kv, "callback_display", GetNativeCell(4));
-	KvSetNum(plugin_kv, "callback_description", GetNativeCell(5));
-	KvSetNum(plugin_kv, "callback_preview", GetNativeCell(6));
-	KvSetNum(plugin_kv, "callback_buy", GetNativeCell(7));
-	KvSetNum(plugin_kv, "callback_sell", GetNativeCell(8));
-	KvSetNum(plugin_kv, "callback_elapse", GetNativeCell(9));
+	KvSetNum(plugin_kv, "callbacks", view_as<int>(hPack));
+/* 	KvSetNum(plugin_kv, "callback_register", view_as<int>(iDataPos[0]));
+	KvSetNum(plugin_kv, "callback_use", view_as<int>(iDataPos[1]));
+	KvSetNum(plugin_kv, "callback_should", view_as<int>(iDataPos[2]));
+	KvSetNum(plugin_kv, "callback_display", view_as<int>(iDataPos[3]));
+	KvSetNum(plugin_kv, "callback_description", view_as<int>(iDataPos[4]));
+	KvSetNum(plugin_kv, "callback_preview", view_as<int>(iDataPos[5]));
+	KvSetNum(plugin_kv, "callback_buy", view_as<int>(iDataPos[6]));
+	KvSetNum(plugin_kv, "callback_sell", view_as<int>(iDataPos[7]));
+	KvSetNum(plugin_kv, "callback_elapse", view_as<int>(iDataPos[8])); */
 }
 
 public ItemManager_SetCanLuck(Handle:plugin, numParams)
@@ -435,7 +498,17 @@ public ItemManager_EndItem(Handle:plugin, numParams)
 {
 	new ItemType:type = ItemType:KvGetNum(plugin_kv, "type", _:Item_None);
 	
-	if (type != Item_None && type != Item_BuyOnly && any:KvGetNum(plugin_kv, "callback_use", _:INVALID_FUNCTION) == INVALID_FUNCTION)
+	int iCallbacks = KvGetNum(plugin_kv, "callbacks", -1);
+	DataPack dpCallback = null;
+	if (iCallbacks != -1)
+		dpCallback = view_as<DataPack>(iCallbacks);
+	
+	if (dpCallback == null)
+		ThrowNativeError(SP_ERROR_NATIVE, "Callbacks for this item not found");
+	
+	dpCallback.Position = view_as<DataPackPos>(ITEM_DATAPACKPOS_USE);
+	Function func_use = dpCallback.ReadFunction();
+	if (type != Item_None && type != Item_BuyOnly && func_use == INVALID_FUNCTION)
 	{
 		CloseHandle(plugin_kv);
 		
@@ -447,7 +520,10 @@ public ItemManager_EndItem(Handle:plugin, numParams)
 		
 		ThrowNativeError(SP_ERROR_NATIVE, "Using item type other than none, ItemUseToggle callback must to be set");
 	}
-	if (type == Item_BuyOnly && any:KvGetNum(plugin_kv, "callback_buy", _:INVALID_FUNCTION) == INVALID_FUNCTION)
+	
+	dpCallback.Position = view_as<DataPackPos>(ITEM_DATAPACKPOS_BUY);
+	Function func_buy = dpCallback.ReadFunction();
+	if (type == Item_BuyOnly && func_buy == INVALID_FUNCTION)
 	{
 		CloseHandle(plugin_kv);
 		
@@ -460,10 +536,13 @@ public ItemManager_EndItem(Handle:plugin, numParams)
 		ThrowNativeError(SP_ERROR_NATIVE, "Using item type BuyOnly, OnBuy callback must to be set");
 	}
 	
+	dpCallback.Position = view_as<DataPackPos>(ITEM_DATAPACKPOS_REGISTER);
+	Function func_register = dpCallback.ReadFunction();
+	
 	new Handle:dp = CreateDataPack();
 	WritePackCell(dp, plugin_category_id);
 	WritePackCell(dp, KvGetNum(plugin_kv, "plugin", _:INVALID_HANDLE));
-	WritePackCell(dp, KvGetNum(plugin_kv, "callback_register", _:INVALID_FUNCTION));
+	WritePackFunction(dp, func_register);
 	WritePackString(dp, plugin_category);
 	WritePackString(dp, plugin_item);
 	WritePackCell(dp, _:plugin_kv);
@@ -491,14 +570,14 @@ public ItemManager_OnItemRegistered(Handle:owner, Handle:hndl, const String:erro
 	ResetPack(dp);
 	new category_id = ReadPackCell(dp);
 	new Handle:plugin = Handle:ReadPackCell(dp);
-	new Function:callback = Function:ReadPackCell(dp);
+	Function callback = ReadPackFunction(dp);
 	ReadPackString(dp, category, sizeof(category));
 	ReadPackString(dp, item, sizeof(item));
 	new Handle:kv = Handle:ReadPackCell(dp);
 	new Handle:array = Handle:ReadPackCell(dp);
-	new try = ReadPackCell(dp);
+	new iTry = ReadPackCell(dp);
 	
-	if (!try)
+	if (!iTry)
 	{
 		if (!IsPluginValid(plugin))
 		{
@@ -520,7 +599,7 @@ public ItemManager_OnItemRegistered(Handle:owner, Handle:hndl, const String:erro
 	}
 	
 	new id;
-	switch (try)
+	switch (iTry)
 	{
 		case 0 :
 		{
@@ -532,7 +611,7 @@ public ItemManager_OnItemRegistered(Handle:owner, Handle:hndl, const String:erro
 				ResetPack(dp, true);
 				WritePackCell(dp, category_id);
 				WritePackCell(dp, _:plugin);
-				WritePackCell(dp, _:callback);
+				WritePackFunction(dp, callback);
 				WritePackString(dp, category);
 				WritePackString(dp, item);
 				WritePackCell(dp, _:kv);
@@ -564,13 +643,25 @@ public ItemManager_OnItemRegistered(Handle:owner, Handle:hndl, const String:erro
 	CloseHandle(kv);
 	
 	new index = FindValueInArray(array, plugin);
+	DataPack tmp = view_as<DataPack>(GetArrayCell(array, index+1));
+	if (tmp != null)
+	{
+		tmp.Reset();
+		
+		DataPack new_tmp = new DataPack();
+		
+		new_tmp.WriteCell(tmp.ReadCell());
+		new_tmp.WriteFunction(tmp.ReadFunction());
+		new_tmp.WriteFunction(tmp.ReadFunction());
+		new_tmp.WriteFunction(tmp.ReadFunction());
+		new_tmp.WriteFunction(tmp.ReadFunction());
+		new_tmp.WriteCell(tmp.ReadCell() + 1);
+		
+		delete tmp;
+		
+		SetArrayCell(array, index+1, new_tmp);
+	}
 	
-	decl any:tmp[CAT_MAX];
-	GetArrayArray(array, index, tmp);
-	tmp[CAT_SIZE]++;
-	SetArrayArray(array, index, tmp);
-	
-	//OnItemRegistered(category_id, item, id);
 	OnItemRegistered(id);
 	
 	if (callback != INVALID_FUNCTION)
@@ -1134,7 +1225,13 @@ public ItemManager_FormatItemNative(Handle:plugin, numParams)
 	new Handle:h_plugin = Handle:KvGetNum(h_KvItems, "plugin");
 	
 	KvGetString(h_KvItems, "name", display, sizeof(display));
-	new Function:callback_display = Function:KvGetNum(h_KvItems, "callback_display", _:INVALID_FUNCTION);
+	DataPack dpCallback = view_as<DataPack>(KvGetNum(h_KvItems, "callbacks"));
+	
+	if (dpCallback == null)
+		ThrowNativeError(SP_ERROR_NATIVE, "Can't format, callbacks for this item not found");
+	
+	dpCallback.Position = view_as<DataPackPos>(ITEM_DATAPACKPOS_DISPLAY);
+	Function callback_display = dpCallback.ReadFunction();
 	
 	KvRewind(h_KvItems);
 	
@@ -1163,7 +1260,7 @@ bool:ItemManager_GetCanLuck(item_id)
 bool:ItemManager_FillCategories(Handle:menu, source_client, bool:inventory = false)
 {
 	decl String:category[SHOP_MAX_STRING_LENGTH], String:display[128], String:buffer[SHOP_MAX_STRING_LENGTH], String:description[SHOP_MAX_STRING_LENGTH],
-	Handle:trie, Handle:array, Handle:hCategoriesArray, any:tmp[CAT_MAX], String:sCatId[16], iSize, x, i, index;
+	Handle:trie, Handle:array, Handle:hCategoriesArray, /* any:tmp[CAT_MAX], */ String:sCatId[16], iSize, x, i, index;
 	
 	new bool:result = false;
 	
@@ -1210,14 +1307,26 @@ bool:ItemManager_FillCategories(Handle:menu, source_client, bool:inventory = fal
 
 		GetTrieValue(trie, "plugin_array", array);
 		
-		new bool:should_display = true, any:on_display[2] = {INVALID_FUNCTION, ...}, any:on_desc[2] = {INVALID_FUNCTION, ...};
-		for (new s = 0; s < GetArraySize(array); s++)
+		new bool:should_display = true;
+		Handle on_display_hndl = INVALID_HANDLE, on_desc_hndl = INVALID_HANDLE;
+		Function on_display_func = INVALID_FUNCTION, on_desc_func = INVALID_FUNCTION;
+		DataPack dp = GetArrayCell(array, 1);
+		
+		if (dp != null)
 		{
-			GetArrayArray(array, s, tmp);
+			// TODO make this easier via DataPack.Position
+			dp.Reset();
 			
-			if (tmp[CAT_SHOULD] != INVALID_FUNCTION)
+			Handle cat_plugin = dp.ReadCell(); // Handle of plugin that created category
+			Function func_display = dp.ReadFunction(); // Category display
+			Function func_desc = dp.ReadFunction(); // Category description
+			Function func_should = dp.ReadFunction(); // Category should display
+			dp.ReadFunction(); // Category select
+			int icat_size = dp.ReadCell(); // Count of items in category
+		
+			if (func_should != INVALID_FUNCTION)
 			{
-				Call_StartFunction(tmp[CAT_PLUGIN], tmp[CAT_SHOULD]);
+				Call_StartFunction(cat_plugin, func_should);
 				Call_PushCell(source_client);
 				Call_PushCell(i);
 				Call_PushString(category);
@@ -1227,20 +1336,20 @@ bool:ItemManager_FillCategories(Handle:menu, source_client, bool:inventory = fal
 					break;
 				}
 			}
-			if (on_display[0] == INVALID_FUNCTION)
+			if (on_display_hndl == INVALID_HANDLE)
 			{
-				on_display[0] = tmp[CAT_PLUGIN];
-				on_display[1] = tmp[CAT_DISPLAY];
+				on_display_hndl = cat_plugin;
+				on_display_func = func_display;
 			}
-			if (on_desc[0] == INVALID_FUNCTION)
+			if (on_desc_hndl == INVALID_HANDLE)
 			{
-				on_desc[0] = tmp[CAT_PLUGIN];
-				on_desc[1] = tmp[CAT_DESC];
+				on_desc_hndl = cat_plugin;
+				on_desc_func = func_desc;
 			}
 			
 			if (!inventory)
 			{
-				x += tmp[CAT_SIZE];
+				x += icat_size;
 			}
 		}
 		if (!should_display)
@@ -1249,11 +1358,11 @@ bool:ItemManager_FillCategories(Handle:menu, source_client, bool:inventory = fal
 		}
 		
 		GetTrieString(trie, "name", buffer, sizeof(buffer));
-		ItemManager_OnCategoryDisplay(on_display[0], on_display[1], source_client, index, category, buffer, display, sizeof(display));
+		ItemManager_OnCategoryDisplay(on_display_hndl, on_display_func, source_client, index, category, buffer, display, sizeof(display));
 		
 		description[0] = '\0';
 		GetTrieString(trie, "description", buffer, sizeof(buffer));
-		ItemManager_OnCategoryDescription(on_desc[0], on_desc[1], source_client, index, category, buffer, description, sizeof(description));
+		ItemManager_OnCategoryDescription(on_desc_hndl, on_desc_func, source_client, index, category, buffer, description, sizeof(description));
 		
 		if (description[0])
 		{
@@ -1276,7 +1385,7 @@ bool:ItemManager_FillCategories(Handle:menu, source_client, bool:inventory = fal
 
 bool:ItemManager_GetCategoryDisplay(category_id, source_client, String:buffer[], maxlength)
 {
-	decl Handle:trie, Handle:array, any:tmp[CAT_MAX], String:category[SHOP_MAX_STRING_LENGTH];
+	decl Handle:trie, Handle:array, /* any:tmp[CAT_MAX], */ String:category[SHOP_MAX_STRING_LENGTH];
 	
 	GetArrayString(h_arCategories, category_id, category, sizeof(category));
 	if (!GetTrieValue(h_trieCategories, category, trie))
@@ -1285,20 +1394,27 @@ bool:ItemManager_GetCategoryDisplay(category_id, source_client, String:buffer[],
 	}
 	GetTrieValue(trie, "plugin_array", array);
 	
-	new any:on_display[2] = {INVALID_FUNCTION, ...};
-	for (new s = 0; s < GetArraySize(array); s++)
+	Handle on_display_hndl = INVALID_HANDLE;
+	Function on_display_func = INVALID_FUNCTION;
+	DataPack dp = GetArrayCell(array, 1);
+	
+	if (dp != null)
 	{
-		GetArrayArray(array, s, tmp);
+		// TODO make this easier via DataPack.Position
+		dp.Reset();
 		
-		if (on_display[0] == INVALID_FUNCTION)
+		Handle cat_plugin = dp.ReadCell(); // Handle of plugin that created category
+		Function func_display = dp.ReadFunction(); // Category display
+	
+		if (on_display_hndl == INVALID_HANDLE)
 		{
-			on_display[0] = tmp[CAT_PLUGIN];
-			on_display[1] = tmp[CAT_DISPLAY];
+			on_display_hndl = cat_plugin;
+			on_display_func = func_display;
 		}
 	}
 	
 	GetTrieString(trie, "name", buffer, maxlength);
-	ItemManager_OnCategoryDisplay(on_display[0], on_display[1], source_client, category_id, category, buffer, buffer, maxlength);
+	ItemManager_OnCategoryDisplay(on_display_hndl, on_display_func, source_client, category_id, category, buffer, buffer, maxlength);
 	
 	return true;
 }
@@ -1321,7 +1437,14 @@ bool:ItemManager_GetItemDisplay(item_id, source_client, String:buffer[], maxleng
 	GetArrayString(h_arCategories, category_id, category, sizeof(category));
 	KvGetString(h_KvItems, "item", item, sizeof(item));
 	KvGetString(h_KvItems, "name", buffer, maxlength);
-	new Function:callback_display = Function:KvGetNum(h_KvItems, "callback_display", _:INVALID_FUNCTION);
+	DataPack dpCallback = view_as<DataPack>(KvGetNum(h_KvItems, "callbacks"));
+	
+	if (dpCallback == null)
+		ThrowNativeError(SP_ERROR_NATIVE, "Callbacks for this item not found");
+	
+	dpCallback.Position = view_as<DataPackPos>(ITEM_DATAPACKPOS_DISPLAY);
+	Function callback_display = dpCallback.ReadFunction();
+	
 	KvRewind(h_KvItems);
 	
 	ItemManager_OnItemDisplay(plugin, callback_display, source_client, category_id, category, item_id, item, Menu_Buy, _, buffer, buffer, maxlength);
@@ -1350,8 +1473,22 @@ bool:ItemManager_FillItemsOfCategory(Handle:menu, client, source_client, categor
 			new Handle:plugin = Handle:KvGetNum(h_KvItems, "plugin");
 			
 			KvGetString(h_KvItems, "name", display, sizeof(display));
-			new Function:callback_display = Function:KvGetNum(h_KvItems, "callback_display", _:INVALID_FUNCTION);
-			new Function:callback_should = Function:KvGetNum(h_KvItems, "callback_should", _:INVALID_FUNCTION);
+			/* new Function:callback_display = Function:KvGetNum(h_KvItems, "callback_display", _:INVALID_FUNCTION);
+			new Function:callback_should = Function:KvGetNum(h_KvItems, "callback_should", _:INVALID_FUNCTION); */
+			
+			int iCallbacks = KvGetNum(h_KvItems, "callbacks", -1);
+			DataPack dpCallback = null;
+			if (iCallbacks != -1)
+				dpCallback = view_as<DataPack>(iCallbacks);
+			
+			if (dpCallback == null)
+				ThrowNativeError(SP_ERROR_NATIVE, "Callbacks for this item not found");
+			
+			dpCallback.Position = view_as<DataPackPos>(ITEM_DATAPACKPOS_DISPLAY);
+			Function callback_display = dpCallback.ReadFunction();
+			
+			dpCallback.Position = view_as<DataPackPos>(ITEM_DATAPACKPOS_SHOULD_DISPLAY);
+			Function callback_should = dpCallback.ReadFunction();
 			
 			KvRewind(h_KvItems);
 			
@@ -1397,7 +1534,13 @@ Handle:ItemManager_CreateItemPanelInfo(source_client, item_id, ShopMenu:menu_act
 	GetArrayString(h_arCategories, category_id, category, sizeof(category));
 	KvGetString(h_KvItems, "item", item, sizeof(item));
 	KvGetString(h_KvItems, "name", buffer, sizeof(buffer));
-	new Function:callback = Function:KvGetNum(h_KvItems, "callback_display", _:INVALID_FUNCTION);
+	DataPack dpCallback = view_as<DataPack>(KvGetNum(h_KvItems, "callbacks"));
+	
+	if (dpCallback == null)
+		ThrowNativeError(SP_ERROR_NATIVE, "Callbacks for this item not found");
+	
+	dpCallback.Position = view_as<DataPackPos>(ITEM_DATAPACKPOS_DISPLAY);
+	Function callback = dpCallback.ReadFunction();
 	
 	KvRewind(h_KvItems);
 	
@@ -1478,7 +1621,9 @@ Handle:ItemManager_CreateItemPanelInfo(source_client, item_id, ShopMenu:menu_act
 	}
 	
 	KvGetString(h_KvItems, "description", buffer, sizeof(buffer));
-	callback = Function:KvGetNum(h_KvItems, "callback_description", _:INVALID_FUNCTION);
+	
+	dpCallback.Position = view_as<DataPackPos>(ITEM_DATAPACKPOS_DESC);
+	callback = dpCallback.ReadFunction();
 	
 	KvRewind(h_KvItems);
 	
@@ -1679,8 +1824,24 @@ ItemManager_OnPlayerItemElapsed(client, item_id)
 	{
 		return;
 	}
-	new Function:callback_elapse = Function:KvGetNum(h_KvItems, "callback_elapse", _:INVALID_FUNCTION);
+	
+	/* new Function:callback_elapse = Function:KvGetNum(h_KvItems, "callback_elapse", _:INVALID_FUNCTION);
 	new Function:callback_use = Function:KvGetNum(h_KvItems, "callback_use", _:INVALID_FUNCTION);
+	 */
+	 
+	int iCallbacks = KvGetNum(h_KvItems, "callbacks", -1);
+	DataPack dpCallback = null;
+	if (iCallbacks != -1)
+		dpCallback = view_as<DataPack>(iCallbacks);
+	
+	if (dpCallback == null)
+		ThrowNativeError(SP_ERROR_NATIVE, "Callbacks for this item not found");
+	
+	dpCallback.Position = view_as<DataPackPos>(ITEM_DATAPACKPOS_ELAPSE);
+	Function callback_elapse = dpCallback.ReadFunction();
+	
+	dpCallback.Position = view_as<DataPackPos>(ITEM_DATAPACKPOS_USE);
+	Function callback_use = dpCallback.ReadFunction();
 	
 	new category_id = KvGetNum(h_KvItems, "category_id", -1);
 	decl String:category[SHOP_MAX_STRING_LENGTH], String:item[SHOP_MAX_STRING_LENGTH];
@@ -1789,7 +1950,14 @@ stock ShopAction:ItemManager_OnUseToggleItemEx(client, const String:sItemId[], b
 	
 	decl String:item[SHOP_MAX_STRING_LENGTH];
 	new Handle:plugin = Handle:KvGetNum(h_KvItems, "plugin", _:INVALID_HANDLE);
-	new Function:callback = Function:KvGetNum(h_KvItems, "callback_use", _:INVALID_FUNCTION);
+	DataPack dpCallback = view_as<DataPack>(KvGetNum(h_KvItems, "callbacks"));
+	
+	if (dpCallback == null)
+		ThrowNativeError(SP_ERROR_NATIVE, "Callbacks for this item not found");
+	
+	dpCallback.Position = view_as<DataPackPos>(ITEM_DATAPACKPOS_USE);
+	Function callback = dpCallback.ReadFunction();
+	
 	new category_id = KvGetNum(h_KvItems, "category_id", -1);
 	
 	KvGetString(h_KvItems, "item", item, sizeof(item));
@@ -1854,7 +2022,17 @@ bool:ItemManager_CanPreview(item_id)
 		return false;
 	}
 	
-	new bool:result = bool:(Function:KvGetNum(h_KvItems, "callback_preview", _:INVALID_FUNCTION) != INVALID_FUNCTION);
+	int iCallbacks = KvGetNum(h_KvItems, "callbacks", -1);
+	DataPack dpCallback = null;
+	if (iCallbacks != -1)
+		dpCallback = view_as<DataPack>(iCallbacks);
+	
+	if (dpCallback == null)
+		ThrowNativeError(SP_ERROR_NATIVE, "Callbacks for this item not found");
+	
+	dpCallback.Position = view_as<DataPackPos>(ITEM_DATAPACKPOS_COMMON);
+	
+	new bool:result = bool:(dpCallback.ReadFunction() != INVALID_FUNCTION);
 	
 	KvRewind(h_KvItems);
 	
@@ -1869,7 +2047,13 @@ ItemManager_SetupPreviewEx(client, const String:sItemId[])
 	}
 	
 	new Handle:plugin = Handle:KvGetNum(h_KvItems, "plugin", _:INVALID_HANDLE);
-	new Function:callback = Function:KvGetNum(h_KvItems, "callback_preview", _:INVALID_FUNCTION);
+
+	DataPack dpCallback = view_as<DataPack>(KvGetNum(h_KvItems, "callbacks"));
+	if (dpCallback == null)
+		ThrowNativeError(SP_ERROR_NATIVE, "Callbacks for this item not found");
+	
+	dpCallback.Position = view_as<DataPackPos>(ITEM_DATAPACKPOS_COMMON);
+	Function callback = dpCallback.ReadFunction();
 	
 	if (plugin != INVALID_HANDLE && callback != INVALID_FUNCTION)
 	{
@@ -1904,7 +2088,13 @@ bool:ItemManager_OnItemBuyEx(client, category_id, const String:category[], item_
 	}
 	
 	new Handle:plugin = Handle:KvGetNum(h_KvItems, "plugin", _:INVALID_HANDLE);
-	new Function:callback = Function:KvGetNum(h_KvItems, "callback_buy", _:INVALID_FUNCTION);
+	
+	DataPack dpCallback = view_as<DataPack>(KvGetNum(h_KvItems, "callbacks"));
+	if (dpCallback == null)
+		ThrowNativeError(SP_ERROR_NATIVE, "Callbacks for this item not found");
+	
+	dpCallback.Position = view_as<DataPackPos>(ITEM_DATAPACKPOS_BUY);
+	Function callback = dpCallback.ReadFunction();
 	
 	KvRewind(h_KvItems);
 	
@@ -1939,7 +2129,13 @@ bool:ItemManager_OnItemSellEx(client, category_id, const String:category[], item
 	}
 	
 	new Handle:plugin = Handle:KvGetNum(h_KvItems, "plugin", _:INVALID_HANDLE);
-	new Function:callback = Function:KvGetNum(h_KvItems, "callback_sell", _:INVALID_FUNCTION);
+
+	DataPack dpCallback = view_as<DataPack>(KvGetNum(h_KvItems, "callbacks"));
+	if (dpCallback == null)
+		ThrowNativeError(SP_ERROR_NATIVE, "Callbacks for this item not found");
+	
+	dpCallback.Position = view_as<DataPackPos>(ITEM_DATAPACKPOS_SELL);
+	Function callback = dpCallback.ReadFunction();
 	
 	KvRewind(h_KvItems);
 	
