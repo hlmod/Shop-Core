@@ -1,5 +1,5 @@
 /*
-	Library of the [Shop] Core v2
+	Library of the [Shop] Core v3
 	Author: FrozDark
 	www.hlmod.ru
 */
@@ -78,7 +78,7 @@ enum ShopMenu
  *	-
  *	@noreturn
 */
-forward Shop_Started();
+forward void Shop_Started();
 
 /**
  *	Called when the plugin has loaded the player's data
@@ -87,7 +87,7 @@ forward Shop_Started();
  *	-
  *	@noreturn
  */
-forward Shop_OnAuthorized(client);
+forward void Shop_OnAuthorized(int client);
 
 /**
  *	Called when a menu is being titled
@@ -100,7 +100,7 @@ forward Shop_OnAuthorized(client);
  *	-
  *	@return true to apply new value and false to ignore
 */
-forward bool:Shop_OnMenuTitle(client, ShopMenu:menu_action, const String:title[], String:buffer[], maxlength);
+forward bool Shop_OnMenuTitle(int client, ShopMenu menu_action, const char[] title, char[] buffer, int maxlength);
 
 /**
  *	Called when credits are being sent to a player
@@ -112,7 +112,7 @@ forward bool:Shop_OnMenuTitle(client, ShopMenu:menu_action, const String:title[]
  *	-
  *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block
 */
-forward Action:Shop_OnCreditsTransfer(client, target, &amount_give, &amount_remove);
+forward Action Shop_OnCreditsTransfer(int client, int target, int &amount_give, int &amount_remove);
 
 /**
  *	Called when credits has been sent to a player
@@ -124,7 +124,7 @@ forward Action:Shop_OnCreditsTransfer(client, target, &amount_give, &amount_remo
  *	-
  *	@noreturn
 */
-forward Shop_OnCreditsTransfered(client, target, amount_give, amount_remove);
+forward void Shop_OnCreditsTransfered(int client, int target, int amount_give, int amount_remove);
 
 /**
  *	Called when a player is being given credits to
@@ -135,7 +135,7 @@ forward Shop_OnCreditsTransfered(client, target, amount_give, amount_remove);
  *	-
  *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block
 */
-forward Action:Shop_OnCreditsGiven(client, &credits, by_who);
+forward Action Shop_OnCreditsGiven(int client, int &credits, int by_who);
 
 /**
  *	Called when a player is being taken credits from
@@ -146,7 +146,7 @@ forward Action:Shop_OnCreditsGiven(client, &credits, by_who);
  *	-
  *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block
 */
-forward Action:Shop_OnCreditsTaken(client, &credits, by_who);
+forward Action Shop_OnCreditsTaken(int client, int &credits, int by_who);
 
 /**
  *	Called when a player is trying to try a luck
@@ -155,7 +155,7 @@ forward Action:Shop_OnCreditsTaken(client, &credits, by_who);
  *	-
  *	@return true to allow performing and false to block
 */
-forward bool:Shop_OnLuckProcess(client);
+forward bool Shop_OnLuckProcess(int client);
 
 /**
  *	Called when a player is nearly to win an item
@@ -165,7 +165,7 @@ forward bool:Shop_OnLuckProcess(client);
  *	-
  *	@return true to allow and false to block
 */
-forward bool:Shop_OnItemLuck(client, ItemId:item_id);
+forward bool Shop_OnItemLuck(int client, ItemId item_id);
 
 /**
  *	Called when a player has won an item
@@ -175,7 +175,7 @@ forward bool:Shop_OnItemLuck(client, ItemId:item_id);
  *	-
  *	@noreturn
 */
-forward Shop_OnItemLucked(client, ItemId:item_id);
+forward void Shop_OnItemLucked(int client, ItemId item_id);
 
 /**
  *	Checks whether the shop has been started
@@ -184,7 +184,7 @@ forward Shop_OnItemLucked(client, ItemId:item_id);
  *	-
  *	@return	True if the shop is already started, false otherwise
 */
-native bool:Shop_IsStarted();
+native bool Shop_IsStarted();
 
 /**
  *	This must be called on PluginEnd. Fully unregisters the plugin. Unregisters items, categories and removes them from the shop and players' inventory
@@ -193,7 +193,7 @@ native bool:Shop_IsStarted();
  *	-
  *	@noreturn
 */
-native Shop_UnregisterMe();
+native void Shop_UnregisterMe();
 
 /**
  *	Shows a player an item's panel
@@ -203,7 +203,7 @@ native Shop_UnregisterMe();
  *	-
  *	@return true if a panel has been shown, false otherwise
 */
-native bool:Shop_ShowItemPanel(client, ItemId:item_id);
+native bool Shop_ShowItemPanel(int client, ItemId item_id);
 
 /**
  *	Opens main menu for a player
@@ -212,7 +212,7 @@ native bool:Shop_ShowItemPanel(client, ItemId:item_id);
  *	-
  *	@noreturn
 */
-native Shop_OpenMainMenu(client);
+native void Shop_OpenMainMenu(int client);
 
 /**
  *	Shows a player categories of the shop
@@ -221,7 +221,7 @@ native Shop_OpenMainMenu(client);
  *	-
  *	@return true if categories has been shown, false otherwise
 */
-native bool:Shop_ShowCategory(client);
+native bool Shop_ShowCategory(int client);
 
 /**
  *	Shows a player his inventory
@@ -230,7 +230,7 @@ native bool:Shop_ShowCategory(client);
  *	-
  *	@return true if the inventory has been shown, false otherwise
 */
-native bool:Shop_ShowInventory(client);
+native bool Shop_ShowInventory(int client);
 
 /**
  *	Shows a player items of a category
@@ -241,7 +241,7 @@ native bool:Shop_ShowInventory(client);
  *	-
  *	@return true if the items has been shown, false otherwise
 */
-native bool:Shop_ShowItemsOfCategory(client, CategoryId:category_id, bool:inventory = false);
+native bool Shop_ShowItemsOfCategory(int client, CategoryId category_id, bool inventory = false);
 
 /**
  *	Get path to the main config folder of the Shop
@@ -252,12 +252,12 @@ native bool:Shop_ShowItemsOfCategory(client, CategoryId:category_id, bool:invent
  *	-
  *	@noreturn
 */
-stock Shop_GetCfgFile(String:buffer[], size, const String:file[])
+stock Shop_GetCfgFile(char[] buffer, int size, const char[] file)
 {
 	BuildPath(Path_SM, buffer, size, "configs/shop/%s", file);
 }
 
-public SharedPlugin:__pl_shop = 
+public SharedPlugin __pl_shop = 
 {
 	name = "shop",
 	file = "shop.smx",
@@ -269,7 +269,7 @@ public SharedPlugin:__pl_shop =
 };
 
 #if !defined REQUIRE_PLUGIN
-public __pl_shop_SetNTVOptional()
+public void __pl_shop_SetNTVOptional()
 {
 	MarkNativeAsOptional("Shop_IsStarted");
 	MarkNativeAsOptional("Shop_UnregisterMe");

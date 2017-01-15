@@ -112,7 +112,7 @@ Admin_OnSettingsLoad(Handle:kv)
 	}
 }
 
-public Admin_MenuCount_Handler(Handle:menu, MenuAction:action, param1, param2)
+public int Admin_MenuCount_Handler(Menu menu, MenuAction action, int param1, int param2)
 {
 	switch (action)
 	{
@@ -129,15 +129,15 @@ public Admin_MenuCount_Handler(Handle:menu, MenuAction:action, param1, param2)
 			{
 				case GIVE_CREDITS :
 				{
-					SetMenuTitle(menu, "%T\n%N (%d)\n ", "give_credits", param1, target, GetCredits(target));
+					menu.SetTitle("%T\n%N (%d)\n ", "give_credits", param1, target, GetCredits(target));
 				}
 				case TAKE_CREDITS :
 				{
-					SetMenuTitle(menu, "%T\n%N (%d)\n ", "take_credits", param1, target, GetCredits(target));
+					menu.SetTitle("%T\n%N (%d)\n ", "take_credits", param1, target, GetCredits(target));
 				}
 				case SET_CREDITS :
 				{
-					SetMenuTitle(menu, "%T\n%N (%d)\n ", "set_credits", param1, target, GetCredits(target));
+					menu.SetTitle("%T\n%N (%d)\n ", "set_credits", param1, target, GetCredits(target));
 				}
 			}
 		}
@@ -188,26 +188,26 @@ Admin_ShowMenu(client, pos = 0)
 {
 	SetGlobalTransTarget(client);
 	
-	new Handle:menu = CreateMenu(Admin_Menu_Handler);
+	Menu menu = new Menu(Admin_Menu_Handler);
 	
 	decl String:title[128];
 	FormatEx(title, sizeof(title), "%t", "admin_panel");
 	OnMenuTitle(client, Menu_AdminPanel, title, title, sizeof(title));
-	SetMenuTitle(menu, title);
-	SetMenuExitButton(menu, true);
-	SetMenuExitBackButton(menu, true);
+	menu.SetTitle(title);
+	menu.ExitButton = true;
+	menu.ExitBackButton = true;
 	
-	decl String:buffer[SHOP_MAX_STRING_LENGTH];
+	char buffer[SHOP_MAX_STRING_LENGTH];
 	FormatEx(buffer, sizeof(buffer), "%t", "give_credits");
-	AddMenuItem(menu, "a", buffer);
+	menu.AddItem("a", buffer);
 	FormatEx(buffer, sizeof(buffer), "%t", "take_credits");
-	AddMenuItem(menu, "b", buffer);
+	menu.AddItem("b", buffer);
 	FormatEx(buffer, sizeof(buffer), "%t\n ", "set_credits");
-	AddMenuItem(menu, "c", buffer);
+	menu.AddItem("c", buffer);
 	FormatEx(buffer, sizeof(buffer), "%t", "give_items");
-	AddMenuItem(menu, "d", buffer);
+	menu.AddItem("d", buffer);
 	FormatEx(buffer, sizeof(buffer), "%t", "take_items");
-	AddMenuItem(menu, "e", buffer);
+	menu.AddItem("e", buffer);
 	
 	new size = GetArraySize(g_hAdminArray);
 	
@@ -232,14 +232,14 @@ Admin_ShowMenu(client, pos = 0)
 			
 			IntToString(i, id, sizeof(id));
 			
-			AddMenuItem(menu, id, display);
+			menu.AddItem(id, display);
 		}
 	}
 	
-	DisplayMenuAtItem(menu, client, pos, MENU_TIME_FOREVER);
+	menu.DisplayAt(client, pos, MENU_TIME_FOREVER);
 }
 
-public Admin_Menu_Handler(Handle:menu, MenuAction:action, param1, param2)
+public Admin_Menu_Handler(Menu menu, MenuAction action, int param1, int param2)
 {
 	switch (action)
 	{
@@ -306,32 +306,32 @@ public Admin_Menu_Handler(Handle:menu, MenuAction:action, param1, param2)
 		}
 		case MenuAction_End :
 		{
-			CloseHandle(menu);
+			delete menu;
 		}
 	}
 }
 
-bool:Admin_ShowTargetsMenu(client, pos = 0)
+bool Admin_ShowTargetsMenu(int client, int pos = 0)
 {
 	SetGlobalTransTarget(client);
 	
-	new Handle:menu = CreateMenu(Admin_TargetsMenu_Handler);
+	Menu menu = new Menu(Admin_TargetsMenu_Handler);
 	if (!AddTargetsToMenu(menu, client, (g_iOpt[client][AdminOption] != GIVE_ITEMS && g_iOpt[client][AdminOption] != TAKE_ITEMS)))
 	{
-		CloseHandle(menu);
+		delete menu;
 		return false;
 	}
 	
-	SetMenuTitle(menu, "%t\n ", "select_target");
-	SetMenuExitButton(menu, true);
-	SetMenuExitBackButton(menu, true);
+	menu.SetTitle("%t\n ", "select_target");
+	menu.ExitButton = true;
+	menu.ExitBackButton = true;
 	
-	DisplayMenuAtItem(menu, client, pos, MENU_TIME_FOREVER);
+	menu.DisplayAt(client, pos, MENU_TIME_FOREVER);
 	
 	return true;
 }
 
-public Admin_TargetsMenu_Handler(Handle:menu, MenuAction:action, param1, param2)
+public Admin_TargetsMenu_Handler(Menu menu, MenuAction action, int param1, int param2)
 {
 	switch (action)
 	{
@@ -373,7 +373,7 @@ public Admin_TargetsMenu_Handler(Handle:menu, MenuAction:action, param1, param2)
 		}
 		case MenuAction_End :
 		{
-			CloseHandle(menu);
+			delete menu;
 		}
 	}
 }
@@ -383,28 +383,28 @@ Admin_ShowCreditsAmount(client, pos = 0)
 	DisplayMenuAtItem(count_menu, client, pos, MENU_TIME_FOREVER);
 }
 
-bool:Admin_ShowCategories(client, pos = 0)
+bool Admin_ShowCategories(int client, int pos = 0)
 {
 	SetGlobalTransTarget(client);
 	
-	new Handle:menu = CreateMenu(Admin_CategoriesMenu_Handler);
+	Menu menu = new Menu(Admin_CategoriesMenu_Handler);
 	if (!FillCategories(menu, client))
 	{
 		CPrintToChat(client, "%t", "EmptyShop");
-		CloseHandle(menu);
+		delete menu;
 		return false;
 	}
 	
-	SetMenuTitle(menu, "%t\n ", "select_category");
-	SetMenuExitButton(menu, true);
-	SetMenuExitBackButton(menu, true);
+	menu.SetTitle("%t\n ", "select_category");
+	menu.ExitButton = true;
+	menu.ExitBackButton = true;
 	
-	DisplayMenuAtItem(menu, client, pos, MENU_TIME_FOREVER);
+	menu.DisplayAt(client, pos, MENU_TIME_FOREVER);
 	
 	return true;
 }
 
-public Admin_CategoriesMenu_Handler(Handle:menu, MenuAction:action, param1, param2)
+public Admin_CategoriesMenu_Handler(Menu menu, MenuAction action, int param1, int param2)
 {
 	switch (action)
 	{
@@ -435,32 +435,32 @@ public Admin_CategoriesMenu_Handler(Handle:menu, MenuAction:action, param1, para
 		}
 		case MenuAction_End :
 		{
-			CloseHandle(menu);
+			delete menu;
 		}
 	}
 }
 
-bool:Admin_ShowItemsOfCategory(client, category_id, pos = 0)
+bool Admin_ShowItemsOfCategory(int client, int category_id, int pos = 0)
 {
 	SetGlobalTransTarget(client);
 	
-	new Handle:menu = CreateMenu(Admin_ItemsMenu_Handler, MENU_ACTIONS_DEFAULT|MenuAction_Display|MenuAction_DrawItem|MenuAction_DisplayItem);
+	Menu menu = new Menu(Admin_ItemsMenu_Handler, MENU_ACTIONS_DEFAULT|MenuAction_Display|MenuAction_DrawItem|MenuAction_DisplayItem);
 	if (!FillItemsOfCategory(menu, client, client, category_id))
 	{
 		CPrintToChat(client, "%t", "EmptyCategory");
-		CloseHandle(menu);
+		delete menu;
 		return false;
 	}
 	
-	SetMenuExitButton(menu, true);
-	SetMenuExitBackButton(menu, true);
+	menu.ExitButton = true;
+	menu.ExitBackButton = true;
 	
-	DisplayMenuAtItem(menu, client, pos, MENU_TIME_FOREVER);
+	menu.DisplayAt(client, pos, MENU_TIME_FOREVER);
 	
 	return true;
 }
 
-public Admin_ItemsMenu_Handler(Handle:menu, MenuAction:action, param1, param2)
+public Admin_ItemsMenu_Handler(Menu menu, MenuAction action, int param1, int param2)
 {
 	switch (action)
 	{
@@ -470,11 +470,11 @@ public Admin_ItemsMenu_Handler(Handle:menu, MenuAction:action, param1, param2)
 			{
 				case GIVE_ITEMS :
 				{
-					SetMenuTitle(menu, "%t\n ", "give_items");
+					menu.SetTitle("%t\n ", "give_items");
 				}
 				case TAKE_ITEMS :
 				{
-					SetMenuTitle(menu, "%t\n ", "take_items");
+					menu.SetTitle("%t\n ", "take_items");
 				}
 			}
 		}
@@ -590,7 +590,7 @@ public Admin_ItemsMenu_Handler(Handle:menu, MenuAction:action, param1, param2)
 		}
 		case MenuAction_End :
 		{
-			CloseHandle(menu);
+			delete menu;
 		}
 	}
 	
