@@ -37,11 +37,10 @@ int g_iItemTransfer;
 #include "shop/db.sp"
 #include "shop/forwards.sp"
 #include "shop/functions.sp"
+#pragma newdecls required
 #include "shop/helpers.sp"
 #include "shop/item_manager.sp"
 #include "shop/player_manager.sp"
-
-#pragma newdecls required
 
 public Plugin myinfo =
 {

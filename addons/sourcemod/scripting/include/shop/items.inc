@@ -437,6 +437,7 @@ stock ItemId Shop_GetArrayItem(ArrayList array, int index)
  *	-
  *	@return Size of the array
 */
+#pragma deprecated
 stock int Shop_GetArrayItemSize(ArrayList array)
 {
 	return array.Length;

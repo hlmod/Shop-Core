@@ -1,15 +1,16 @@
-new Handle:h_KvClientItems[MAXPLAYERS+1];
+KeyValues h_KvClientItems[MAXPLAYERS+1];
 
-new Handle:kv_data;
-new String:data_path[PLATFORM_MAX_PATH];
+KeyValues kv_data;
+char data_path[PLATFORM_MAX_PATH];
 
-new i_Id[MAXPLAYERS+1];
-new iCredits[MAXPLAYERS+1];
+int i_Id[MAXPLAYERS+1];
+int iCredits[MAXPLAYERS+1];
 
-new Handle:g_hTimerMethod, g_iTimerMethod;
-new Handle:g_hStartCredits, g_iStartCredits;
+ConVar g_hTimerMethod, g_hStartCredits;
+bool g_bTimerMethod;
+int g_iStartCredits;
 
-PlayerManager_CreateNatives()
+void PlayerManager_CreateNatives()
 {
 	CreateNative("Shop_IsAuthorized", PlayerManager_IsAuthorized);
 	CreateNative("Shop_IsAdmin", PlayerManager_IsAdmin);
@@ -33,376 +34,329 @@ PlayerManager_CreateNatives()
 	CreateNative("Shop_ToggleClientCategoryOff", PlayerManager_ToggleClientCategoryOff);
 }
 
-public PlayerManager_IsAuthorized(Handle:plugin, numParams)
+public int PlayerManager_IsAuthorized(Handle plugin, int numParams)
 {
-	new client = GetNativeCell(1);
+	int client = GetNativeCell(1);
 	
-	decl String:error[64];
+	char error[64];
 	if (!CheckClient(client, error, sizeof(error)))
-	{
 		ThrowNativeError(SP_ERROR_NATIVE, error);
-	}
 	
 	return PlayerManager_IsAuthorizedIn(client);
 }
 
-public PlayerManager_IsAdmin(Handle:plugin, numParams)
+public int PlayerManager_IsAdmin(Handle plugin, int numParams)
 {
-	new client = GetNativeCell(1);
+	int client = GetNativeCell(1);
 	
-	decl String:error[64];
+	char error[64];
 	if (!CheckClient(client, error, sizeof(error)))
-	{
 		ThrowNativeError(SP_ERROR_NATIVE, error);
-	}
 	
 	return IsAdmin(client);
 }
 
-bool:PlayerManager_IsAuthorizedIn(client)
+bool PlayerManager_IsAuthorizedIn(int client)
 {
 	return i_Id[client] != 0;
 }
 
-public PlayerManager_GetClientId(Handle:plugin, numParams)
+public int PlayerManager_GetClientId(Handle plugin, int numParams)
 {
-	new client = GetNativeCell(1);
+	int client = GetNativeCell(1);
 	
-	decl String:error[64];
+	char error[64];
 	if (!CheckClient(client, error, sizeof(error)))
-	{
 		ThrowNativeError(SP_ERROR_NATIVE, error);
-	}
 	
 	return i_Id[client];
 }
 
-public PlayerManager_GetClientCredits(Handle:plugin, numParams)
+public int PlayerManager_GetClientCredits(Handle plugin, int numParams)
 {
-	new client = GetNativeCell(1);
+	int client = GetNativeCell(1);
 	
-	decl String:error[64];
+	char error[64];
 	if (!CheckClient(client, error, sizeof(error)))
-	{
 		ThrowNativeError(SP_ERROR_NATIVE, error);
-	}
 	
 	return PlayerManager_GetCredits(client);
 }
 
-public PlayerManager_SetClientCredits(Handle:plugin, numParams)
+public int PlayerManager_SetClientCredits(Handle plugin, int numParams)
 {
-	new client = GetNativeCell(1);
+	int client = GetNativeCell(1);
 	
-	decl String:error[64];
+	char error[64];
 	if (!CheckClient(client, error, sizeof(error)))
-	{
 		ThrowNativeError(SP_ERROR_NATIVE, error);
-	}
 	
 	PlayerManager_SetCredits(client, GetNativeCell(2));
 }
 
-public PlayerManager_GiveClientCredits(Handle:plugin, numParams)
+public int PlayerManager_GiveClientCredits(Handle plugin, int numParams)
 {
-	new client = GetNativeCell(1);
+	int client = GetNativeCell(1);
 	
-	decl String:error[64];
+	char error[64];
 	if (!CheckClient(client, error, sizeof(error)))
-	{
 		ThrowNativeError(SP_ERROR_NATIVE, error);
-	}
 	
 	return GiveCredits(client, GetNativeCell(2), GetNativeCell(3));
 }
 
-public PlayerManager_TakeClientCredits(Handle:plugin, numParams)
+public int PlayerManager_TakeClientCredits(Handle plugin, int numParams)
 {
-	new client = GetNativeCell(1);
+	int client = GetNativeCell(1);
 	
-	decl String:error[64];
+	char error[64];
 	if (!CheckClient(client, error, sizeof(error)))
-	{
 		ThrowNativeError(SP_ERROR_NATIVE, error);
-	}
 	
 	return RemoveCredits(client, GetNativeCell(2), GetNativeCell(3));
 }
 
-public PlayerManager_BuyClientItem(Handle:plugin, numParams)
+public int PlayerManager_BuyClientItem(Handle plugin, int numParams)
 {
-	new client = GetNativeCell(1);
+	int client = GetNativeCell(1);
 	
-	decl String:error[64];
+	char error[64];
 	if (!CheckClient(client, error, sizeof(error)))
-	{
 		ThrowNativeError(SP_ERROR_NATIVE, error);
-	}
 	
-	new item_id = GetNativeCell(2);
+	int item_id = GetNativeCell(2);
 	
 	return BuyItem(client, item_id, true);
 }
 
-public PlayerManager_UseClientItem(Handle:plugin, numParams)
+public int PlayerManager_UseClientItem(Handle plugin, int numParams)
 {
-	new client = GetNativeCell(1);
+	int client = GetNativeCell(1);
 	
-	decl String:error[64];
+	char error[64];
 	if (!CheckClient(client, error, sizeof(error)))
-	{
 		ThrowNativeError(SP_ERROR_NATIVE, error);
-	}
 	
-	new item_id = GetNativeCell(2);
+	int item_id = GetNativeCell(2);
 	
 	return UseItem(client, item_id, true);
 }
 
-public PlayerManager_RemoveClientItem(Handle:plugin, numParams)
+public int PlayerManager_RemoveClientItem(Handle plugin, int numParams)
 {
-	new client = GetNativeCell(1);
+	int client = GetNativeCell(1);
 	
-	decl String:error[64];
+	char error[64];
 	if (!CheckClient(client, error, sizeof(error)))
-	{
 		ThrowNativeError(SP_ERROR_NATIVE, error);
-	}
 	
-	new item_id = GetNativeCell(2);
-	new count = GetNativeCell(3);
+	int item_id = GetNativeCell(2);
+	int count = GetNativeCell(3);
 	
 	return PlayerManager_RemoveItem(client, item_id, count);
 }
 
-public PlayerManager_GiveClientItem(Handle:plugin, numParams)
+public int PlayerManager_GiveClientItem(Handle plugin, int numParams)
 {
-	decl client, String:item[SHOP_MAX_STRING_LENGTH];
+	int client;
+	char item[SHOP_MAX_STRING_LENGTH];
 	client = GetNativeCell(1);
 	if (!CheckClient(client, item, sizeof(item)))
-	{
 		ThrowNativeError(SP_ERROR_NATIVE, item);
-	}
 
-	decl item_id, String:sItemId[16], category_id, price, sell_price, count, duration, ItemType:type;
+	int item_id;
+	char sItemId[16];
+	int category_id, price, sell_price, count, duration;
+	ItemType type;
 	item_id = GetNativeCell(2);
 
 	IntToString(item_id, sItemId, sizeof(sItemId));
 
 	if (!ItemManager_GetItemInfoEx(sItemId, item, sizeof(item), category_id, price, sell_price, count, duration, type))
-	{
 		return false;
-	}
 
 	if(type == Item_Togglable)
-	{
 		duration = GetNativeCell(3);
-	}
 	else if(type == Item_Finite)
-	{
 		count = GetNativeCell(3);
-	}
 
 	PlayerManager_GiveItemEx(client, sItemId, category_id, price, sell_price, count, duration, type);
 
 	return true;
 }
 
-public PlayerManager_GetClientItemCount(Handle:plugin, numParams)
+public int PlayerManager_GetClientItemCount(Handle plugin, int numParams)
 {
-	new client = GetNativeCell(1);
+	int client = GetNativeCell(1);
 	
-	decl String:error[64];
+	char error[64];
 	if (!CheckClient(client, error, sizeof(error)))
-	{
 		ThrowNativeError(SP_ERROR_NATIVE, error);
-	}
 	
-	new item_id = GetNativeCell(2);
+	int item_id = GetNativeCell(2);
 	
 	return PlayerManager_GetItemCount(client, item_id);
 }
 
-public PlayerManager_SetClientItemCount(Handle:plugin, numParams)
+public int PlayerManager_SetClientItemCount(Handle plugin, int numParams)
 {
-	new client = GetNativeCell(1);
+	int client = GetNativeCell(1);
 	
-	decl String:error[64];
+	char error[64];
 	if (!CheckClient(client, error, sizeof(error)))
-	{
 		ThrowNativeError(SP_ERROR_NATIVE, error);
-	}
 	
-	new item_id = GetNativeCell(2);
+	int item_id = GetNativeCell(2);
 	
 	PlayerManager_SetItemCount(client, item_id, GetNativeCell(3));
 }
 
-public PlayerManager_GetClientItemSellPrice(Handle:plugin, numParams)
+public int PlayerManager_GetClientItemSellPrice(Handle plugin, int numParams)
 {
-	new client = GetNativeCell(1);
+	int client = GetNativeCell(1);
 	
-	decl String:error[64];
+	char error[64];
 	if (!CheckClient(client, error, sizeof(error)))
-	{
 		ThrowNativeError(SP_ERROR_NATIVE, error);
-	}
 	
-	new item_id = GetNativeCell(2);
+	int item_id = GetNativeCell(2);
 	
 	return PlayerManager_GetItemSellPrice(client, item_id);
 }
 
-public PlayerManager_SetClientItemTimeleft(Handle:plugin, numParams)
+public int PlayerManager_SetClientItemTimeleft(Handle plugin, int numParams)
 {
-	new client = GetNativeCell(1);
+	int client = GetNativeCell(1);
 	
-	decl String:error[64];
+	char error[64];
 	if (!CheckClient(client, error, sizeof(error)))
-	{
 		ThrowNativeError(SP_ERROR_NATIVE, error);
-	}
 	
-	new timeleft = GetNativeCell(3);
+	int timeleft = GetNativeCell(3);
 	if (timeleft < 0)
-	{
 		timeleft = 0;
-	}
 	
 	return PlayerManager_SetItemTimeleft(client, GetNativeCell(2), timeleft);
 }
 
-public PlayerManager_GetClientItemTimeleft(Handle:plugin, numParams)
+public int PlayerManager_GetClientItemTimeleft(Handle plugin, int numParams)
 {
-	new client = GetNativeCell(1);
+	int client = GetNativeCell(1);
 	
-	decl String:error[64];
+	char error[64];
 	if (!CheckClient(client, error, sizeof(error)))
-	{
 		ThrowNativeError(SP_ERROR_NATIVE, error);
-	}
 	
 	return PlayerManager_GetItemTimeleft(client, GetNativeCell(2));
 }
 
-public PlayerManager_IsClientItemToggled(Handle:plugin, numParams)
+public int PlayerManager_IsClientItemToggled(Handle plugin, int numParams)
 {
-	new client = GetNativeCell(1);
+	int client = GetNativeCell(1);
 	
-	decl String:error[64];
+	char error[64];
 	if (!CheckClient(client, error, sizeof(error)))
-	{
 		ThrowNativeError(SP_ERROR_NATIVE, error);
-	}
 	
-	new item_id = GetNativeCell(2);
+	int item_id = GetNativeCell(2);
 	
 	return PlayerManager_IsItemToggled(client, item_id);
 }
 
-public PlayerManager_IsClientHasItem(Handle:plugin, numParams)
+public int PlayerManager_IsClientHasItem(Handle plugin, int numParams)
 {
-	new client = GetNativeCell(1);
+	int client = GetNativeCell(1);
 	
-	decl String:error[64];
+	char error[64];
 	if (!CheckClient(client, error, sizeof(error)))
-	{
 		ThrowNativeError(SP_ERROR_NATIVE, error);
-	}
 	
-	new item_id = GetNativeCell(2);
+	int item_id = GetNativeCell(2);
 	
 	return PlayerManager_ClientHasItem(client, item_id);
 }
 
-public PlayerManager_ToggleClientItem(Handle:plugin, numParams)
+public int PlayerManager_ToggleClientItem(Handle plugin, int numParams)
 {
-	new client = GetNativeCell(1);
+	int client = GetNativeCell(1);
 	
-	decl String:error[64];
+	char error[64];
 	if (!CheckClient(client, error, sizeof(error)))
-	{
 		ThrowNativeError(SP_ERROR_NATIVE, error);
-	}
 	
-	new item_id = GetNativeCell(2);
-	new ToggleState:toggle = GetNativeCell(3);
+	int item_id = GetNativeCell(2);
+	ToggleState toggle = GetNativeCell(3);
 	
 	return ToggleItem(client, item_id, toggle, true);
 }
 
-PlayerManager_OnPluginStart()
+void PlayerManager_OnPluginStart()
 {
 	HookEventEx("player_changename", PlayerManager_OnPlayerName);
 	
 	BuildPath(Path_SM, data_path, sizeof(data_path), "data/shop.txt");
 	
-	kv_data = CreateKeyValues("ShopData");
-	if (FileToKeyValues(kv_data, data_path))
+	kv_data = new KeyValues("ShopData");
+	if (kv_data.ImportFromFile(data_path))
 	{
-		decl String:buffer[11];
-		KvGetString(kv_data, "version", buffer, sizeof(buffer));
+		char buffer[11];
+		kv_data.GetString("version", buffer, sizeof(buffer));
 		if (buffer[0])
 		{
-			if (bool:(buffer[0] == '1'))
+			if (buffer[0] == '1')
 			{
-				while (KvGotoFirstSubKey(kv_data))
+				while (kv_data.GotoFirstSubKey())
 				{
-					KvDeleteThis(kv_data);
-					KvRewind(kv_data);
+					kv_data.DeleteThis();
+					kv_data.Rewind();
 				}
-				KeyValuesToFile(kv_data, data_path);
+				kv_data.ExportToFile(data_path);
 			}
 		}
 	}
 	
 	g_hStartCredits = CreateConVar("sm_shop_start_credits", "0", "Start credits for a new player", 0, true, 0.0);
-	g_iStartCredits = GetConVarInt(g_hStartCredits);
-	HookConVarChange(g_hStartCredits, PlayerManager_OnConVarChange);
+	g_iStartCredits = g_hStartCredits.IntValue;
+	g_hStartCredits.AddChangeHook(PlayerManager_OnConVarChange);
 	
 	g_hTimerMethod = CreateConVar("sm_shop_timer_method", "0", "Timing method to use for timed items. 0 time while using and 1 is real time", 0, true, 0.0, true, 1.0);
-	g_iTimerMethod = GetConVarInt(g_hTimerMethod);
-	HookConVarChange(g_hTimerMethod, PlayerManager_OnConVarChange);
+	g_bTimerMethod = g_hTimerMethod.BoolValue;
+	g_hTimerMethod.AddChangeHook(PlayerManager_OnConVarChange);
 }
 
-PlayerManager_OnReadyToStart()
+void PlayerManager_OnReadyToStart()
 {
-	KvSetString(kv_data, "version", SHOP_VERSION);
-	KeyValuesToFile(kv_data, data_path);
+	kv_data.SetString("version", SHOP_VERSION);
+	kv_data.ExportToFile(data_path);
 }
 
-public PlayerManager_OnConVarChange(Handle:convar, const String:oldValue[], const String:newValue[])
+public void PlayerManager_OnConVarChange(ConVar convar, const char[] oldValue, const char[] newValue)
 {
 	if (convar == g_hStartCredits)
-	{
-		g_iStartCredits = StringToInt(newValue);
-	}
+		g_iStartCredits = convar.IntValue;
 	else if (convar == g_hTimerMethod)
-	{
-		g_iTimerMethod = StringToInt(newValue);
-	}
+		g_bTimerMethod = convar.BoolValue;
 }
 
-PlayerManager_OnMapEnd()
+void PlayerManager_OnMapEnd()
 {
-	KeyValuesToFile(kv_data, data_path);
+	kv_data.ExportToFile(data_path);
 }
 
-PlayerManager_OnPluginEnd()
+void PlayerManager_OnPluginEnd()
 {
-	for (new i = 1; i <= MaxClients; i++)
-	{
+	for (int i = 1; i <= MaxClients; i++)
 		PlayerManager_SaveInfo(i);
-	}
-	KeyValuesToFile(kv_data, data_path);
+	
+	kv_data.ExportToFile(data_path);
 }
 
-PlayerManager_TransferItem(client, target, item_id)
+void PlayerManager_TransferItem(int client, int target, int item_id)
 {
-	decl String:sItemId[16];
+	char sItemId[16];
 	IntToString(item_id, sItemId, sizeof(sItemId));
 	
-	new ItemType:type = GetItemTypeEx(sItemId);
+	ItemType type = GetItemTypeEx(sItemId);
 	
 	if (type == Item_Finite)
 	{
@@ -412,336 +366,314 @@ PlayerManager_TransferItem(client, target, item_id)
 	else
 	{
 		if (PlayerManager_IsItemToggledEx(client, sItemId))
-		{
 			PlayerManager_ToggleItemEx(client, sItemId, Shop_UseOff);
-		}
 		
-		if (!KvJumpToKey(h_KvClientItems[client], sItemId))
-		{
+		if (!h_KvClientItems[client].JumpToKey(sItemId))
 			return;
-		}
 		
-		KvJumpToKey(h_KvClientItems[target], sItemId, true);
+		h_KvClientItems[target].JumpToKey(sItemId, true);
 		KvCopySubkeys(h_KvClientItems[client], h_KvClientItems[target]);
-		KvRewind(h_KvClientItems[client]);
+		h_KvClientItems[client].Rewind();
 		
-		new timeleft = PlayerManager_GetItemTimeleftEx(client, sItemId);
+		int timeleft = PlayerManager_GetItemTimeleftEx(client, sItemId);
 		
 		RemoveItemEx(client, sItemId);
 		
-		if (KvGetNum(h_KvClientItems[target], "method") == 1)
+		if (h_KvClientItems[target].GetNum("method") == 1)
 		{
-			decl Handle:dp;
-			new Handle:timer = CreateDataTimer(float(timeleft), PlayerManager_OnPlayerItemElapsed, dp);
+			DataPack dp;
+			Handle timer = CreateDataTimer(float(timeleft), PlayerManager_OnPlayerItemElapsed, dp);
 			
-			KvSetNum(h_KvClientItems[target], "timer", _:timer);
-			WritePackCell(dp, target);
-			WritePackCell(dp, item_id);
+			h_KvClientItems[target].SetNum("timer", view_as<int>(timer));
+			dp.WriteCell(target);
+			dp.WriteCell(item_id);
 		}
 	
-		decl String:s_Query[256];
+		char s_Query[256];
 		FormatEx(s_Query, sizeof(s_Query), "INSERT INTO `%sboughts` (`player_id`, `item_id`, `count`, `duration`, `timeleft`, `buy_price`, `sell_price`, `buy_time`) VALUES \
-											('%d', '%s', '%d', '%d', '%d', '%d', '%d', '%d');", g_sDbPrefix, i_Id[target], sItemId, KvGetNum(h_KvClientItems[target], "count"), KvGetNum(h_KvClientItems[target], "duration"), timeleft, KvGetNum(h_KvClientItems[target], "price"), KvGetNum(h_KvClientItems[target], "sell_price"), KvGetNum(h_KvClientItems[target], "buy_time"));
+											('%d', '%s', '%d', '%d', '%d', '%d', '%d', '%d');", g_sDbPrefix, i_Id[target], sItemId, h_KvClientItems[target].GetNum("count"), h_KvClientItems[target].GetNum("duration"), timeleft, h_KvClientItems[target].GetNum("price"), h_KvClientItems[target].GetNum("sell_price"), h_KvClientItems[target].GetNum("buy_time"));
 		TQueryEx(s_Query, DBPrio_High);
 		
-		new category_id = KvGetNum(h_KvClientItems[target], "category_id");
+		int category_id = h_KvClientItems[target].GetNum("category_id");
 		
-		KvRewind(h_KvClientItems[target]);
+		h_KvClientItems[target].Rewind();
 		
-		decl String:sCat[16];
+		char sCat[16];
 		IntToString(category_id, sCat, sizeof(sCat));
 		StrCat(sCat, sizeof(sCat), "c");
-		KvSetNum(h_KvClientItems[target], sCat, KvGetNum(h_KvClientItems[target], sCat, 0)+1);
+		h_KvClientItems[target].SetNum(sCat, h_KvClientItems[target].GetNum(sCat, 0)+1);
 	}
 }
 
-bool:PlayerManager_IsItemToggled(client, item_id)
+bool PlayerManager_IsItemToggled(int client, int item_id)
 {
-	decl String:sItemId[16];
+	char sItemId[16];
 	IntToString(item_id, sItemId, sizeof(sItemId));
 	
 	return PlayerManager_IsItemToggledEx(client, sItemId);
 }
 
-bool:PlayerManager_IsItemToggledEx(client, const String:sItemId[])
+bool PlayerManager_IsItemToggledEx(int client, const char[] sItemId)
 {
-	decl String:sId[16];
+	char sId[16];
 	IntToString(i_Id[client], sId, sizeof(sId));
 	
-	new bool:result = false;
+	bool result = false;
 	
-	if (!KvJumpToKey(kv_data, sId))
-	{
+	if (!kv_data.JumpToKey(sId))
 		return result;
-	}
 	
-	result = bool:(KvGetNum(kv_data, sItemId, 0) != 0);
+	result = view_as<bool>(kv_data.GetNum(sItemId, 0) != 0);
 	
-	KvRewind(kv_data);
+	kv_data.Rewind();
 	
 	return result;
 }
 
-bool:PlayerManager_ToggleItem(client, item_id, ShopAction:action, bool:load = false)
+bool PlayerManager_ToggleItem(int client, int item_id, ShopAction action, bool load = false)
 {
-	decl String:sItemId[16];
+	char sItemId[16];
 	IntToString(item_id, sItemId, sizeof(sItemId));
 	
 	return PlayerManager_ToggleItemEx(client, sItemId, action, load);
 }
 
-bool:PlayerManager_ToggleItemEx(client, const String:sItemId[], ShopAction:action, bool:load = false, bool:ingore = false)
+bool PlayerManager_ToggleItemEx(int client, const char[] sItemId, ShopAction action, bool load = false, bool ingore = false)
 {
-	decl String:sId[16];
+	char sId[16];
 	IntToString(i_Id[client], sId, sizeof(sId));
 	
-	if (!KvJumpToKey(h_KvClientItems[client], sItemId))
-	{
+	if (!h_KvClientItems[client].JumpToKey(sItemId))
 		return false;
-	}
 	
-	new bool:result = false;
+	bool result = false;
 	
-	new item_id = StringToInt(sItemId);
+	int item_id = StringToInt(sItemId);
 	
-	KvJumpToKey(kv_data, sId, true);
+	kv_data.JumpToKey(sId, true);
 	switch (action)
 	{
 		case Shop_UseOn :
 		{
-			if (load || KvGetNum(kv_data, sItemId, 0) == 0)
+			if (load || kv_data.GetNum(sItemId, 0) == 0)
 			{
-				new duration = KvGetNum(h_KvClientItems[client], "duration");
+				int duration = h_KvClientItems[client].GetNum("duration");
 				if (duration > 0)
 				{
-					new timeleft;
-					if (KvGetNum(h_KvClientItems[client], "method") == 0)
+					int timeleft;
+					if (h_KvClientItems[client].GetNum("method") == 0)
 					{
-						timeleft = KvGetNum(h_KvClientItems[client], "timeleft");
+						timeleft = h_KvClientItems[client].GetNum("timeleft");
 						
-						new Handle:timer = Handle:KvGetNum(h_KvClientItems[client], "timer", _:INVALID_HANDLE);
-						if (timer != INVALID_HANDLE)
-						{
+						Handle timer = view_as<Handle>(h_KvClientItems[client].GetNum("timer", 0));
+						if (timer != null)
 							KillTimer(timer);
-						}
 						
-						decl Handle:dp;
+						DataPack dp;
 						timer = CreateDataTimer(float(timeleft), PlayerManager_OnPlayerItemElapsed, dp);
 						
-						KvSetNum(h_KvClientItems[client], "timer", _:timer);
-						WritePackCell(dp, client);
-						WritePackCell(dp, item_id);
+						h_KvClientItems[client].SetNum("timer", view_as<int>(timer));
+						dp.WriteCell(client);
+						dp.WriteCell(item_id);
 					}
-					KvSetNum(h_KvClientItems[client], "started", global_timer);
+					h_KvClientItems[client].SetNum("started", global_timer);
 					/*else
 					{
-						timeleft = KvGetNum(h_KvClientItems[client], "duration")+KvGetNum(h_KvClientItems[client], "buy_time")-global_timer;
+						timeleft = h_KvClientItems[client].GetNum("duration")+h_KvClientItems[client].GetNum("buy_time")-global_timer;
 					}*/
 				}
 				
-				KvSetNum(kv_data, sItemId, 1);
+				kv_data.SetNum(sItemId, 1);
 				
 				if (!ingore)
-				{
 					OnItemEquipped(client, item_id);
-				}
 				
 				result = true;
 			}
 		}
 		case Shop_UseOff :
 		{
-			if (load || KvGetNum(kv_data, sItemId, 0) != 0)
+			if (load || kv_data.GetNum(sItemId, 0) != 0)
 			{
-				new duration = KvGetNum(h_KvClientItems[client], "duration");
+				int duration = h_KvClientItems[client].GetNum("duration");
 				if (duration > 0)
 				{
-					if (KvGetNum(h_KvClientItems[client], "method") == 0)
+					if (h_KvClientItems[client].GetNum("method") == 0)
 					{
-						new Handle:timer = Handle:KvGetNum(h_KvClientItems[client], "timer", _:INVALID_HANDLE);
-						if (timer != INVALID_HANDLE)
+						Handle timer = view_as<Handle>(h_KvClientItems[client].GetNum("timer", 0));
+						if (timer != null)
 						{
 							KillTimer(timer);
-							KvSetNum(h_KvClientItems[client], "timer", _:INVALID_HANDLE);
+							h_KvClientItems[client].SetNum("timer", 0);
 						}
 					}
 					
-					new started = KvGetNum(h_KvClientItems[client], "started");
+					int started = h_KvClientItems[client].GetNum("started");
 					if (started)
 					{
-						new timeleft = KvGetNum(h_KvClientItems[client], "timeleft");
-						KvSetNum(h_KvClientItems[client], "timeleft", timeleft-(global_timer-started));
+						int timeleft = h_KvClientItems[client].GetNum("timeleft");
+						h_KvClientItems[client].SetNum("timeleft", timeleft-(global_timer-started));
 					}
-					KvSetNum(h_KvClientItems[client], "started", 0);
+					h_KvClientItems[client].SetNum("started", 0);
 				}
 				
-				KvDeleteKey(kv_data, sItemId);
+				kv_data.DeleteKey(sItemId);
 				if (!ingore)
-				{
 					OnItemDequipped(client, item_id);
-				}
 				
 				result = true;
 			}
 		}
 	}
 	
-	KvRewind(h_KvClientItems[client]);
-	KvRewind(kv_data);
+	h_KvClientItems[client].Rewind();
+	kv_data.Rewind();
 	
 	return result;
 }
 
-public PlayerManager_ToggleClientCategoryOff(Handle:plugin, numParams)
+public int PlayerManager_ToggleClientCategoryOff(Handle plugin, int numParams)
 {
-	new client = GetNativeCell(1);
+	int client = GetNativeCell(1);
 	
-	decl String:error[64];
+	char error[64];
 	if (!CheckClient(client, error, sizeof(error)))
-	{
 		ThrowNativeError(SP_ERROR_NATIVE, error);
-	}
 	
-	new category_id = GetNativeCell(2);
+	int category_id = GetNativeCell(2);
 	
-	if (!KvGotoFirstSubKey(h_KvClientItems[client]))
-	{
+	if (!h_KvClientItems[client].GotoFirstSubKey())
 		return;
-	}
 	
-	decl String:sId[16];
+	char sId[16];
 	IntToString(i_Id[client], sId, sizeof(sId));
-	KvJumpToKey(kv_data, sId, true);
+	kv_data.JumpToKey(sId, true);
 	
-	decl String:sItemId[16];
+	char sItemId[16];
 	do
 	{
-		if (KvGetNum(h_KvClientItems[client], "category_id", -1) != category_id || !KvGetSectionName(h_KvClientItems[client], sItemId, sizeof(sItemId)))
-		{
+		if (h_KvClientItems[client].GetNum("category_id", -1) != category_id || !KvGetSectionName(h_KvClientItems[client], sItemId, sizeof(sItemId)))
 			continue;
-		}
 		
-		new duration = KvGetNum(h_KvClientItems[client], "duration");
+		int duration = h_KvClientItems[client].GetNum("duration");
 		
 		if (duration > 0)
 		{
-			new Handle:timer = Handle:KvGetNum(h_KvClientItems[client], "timer", _:INVALID_HANDLE);
-			if (timer != INVALID_HANDLE)
+			Handle timer = view_as<Handle>(h_KvClientItems[client].GetNum("timer", 0));
+			if (timer != null)
 			{
-				if (KvGetNum(h_KvClientItems[client], "method") == 0)
+				if (h_KvClientItems[client].GetNum("method") == 0)
 				{
 					KillTimer(timer);
-					KvSetNum(h_KvClientItems[client], "timer", _:INVALID_HANDLE);
+					h_KvClientItems[client].SetNum("timer", 0);
 				}
 			}
-			new started = KvGetNum(h_KvClientItems[client], "started", 0);
+			int started = h_KvClientItems[client].GetNum("started", 0);
 			if (started)
 			{
-				new timeleft = KvGetNum(h_KvClientItems[client], "timeleft");
+				int timeleft = h_KvClientItems[client].GetNum("timeleft");
 				
-				KvSetNum(h_KvClientItems[client], "timeleft", timeleft-(global_timer-started));
-				KvSetNum(h_KvClientItems[client], "started", 0);
+				h_KvClientItems[client].SetNum("timeleft", timeleft-(global_timer-started));
+				h_KvClientItems[client].SetNum("started", 0);
 			}
 		}
 		
-		if (KvGetNum(kv_data, sItemId, 0) != 0)
+		if (kv_data.GetNum(sItemId, 0) != 0)
 		{
-			KvRewind(h_KvClientItems[client]);
+			h_KvClientItems[client].Rewind();
 			OnItemDequipped(client, StringToInt(sItemId));
-			KvJumpToKey(h_KvClientItems[client], sItemId);
+			h_KvClientItems[client].JumpToKey(sItemId);
 			
-			KvDeleteKey(kv_data, sItemId);
+			kv_data.DeleteKey(sItemId);
 		}
 	}
-	while (KvGotoNextKey(h_KvClientItems[client]));
+	while (h_KvClientItems[client].GotoNextKey());
 	
-	KvRewind(h_KvClientItems[client]);
-	KvRewind(kv_data);
+	h_KvClientItems[client].Rewind();
+	kv_data.Rewind();
 }
 
-public Action:PlayerManager_OnPlayerItemElapsed(Handle:timer, any:dp)
+public Action PlayerManager_OnPlayerItemElapsed(Handle timer, DataPack dp)
 {
-	ResetPack(dp);
-	new client = ReadPackCell(dp);
-	new item_id = ReadPackCell(dp);
+	dp.Reset();
+	int client = dp.ReadCell();
+	int item_id = dp.ReadCell();
 	
-	decl String:sItemId[16];
+	char sItemId[16];
 	IntToString(item_id, sItemId, sizeof(sItemId));
 	
-	decl String:s_Query[256];
+	char s_Query[256];
 	FormatEx(s_Query, sizeof(s_Query), "DELETE FROM `%sboughts` WHERE `player_id` = '%d' AND `item_id` = '%d';", g_sDbPrefix, i_Id[client], item_id);
 	TQueryEx(s_Query, DBPrio_High);
 	
-	if (KvJumpToKey(h_KvClientItems[client], sItemId))
+	if (h_KvClientItems[client].JumpToKey(sItemId))
 	{
-		new category_id = KvGetNum(h_KvClientItems[client], "category_id", -1);
-		KvDeleteThis(h_KvClientItems[client]);
+		int category_id = h_KvClientItems[client].GetNum("category_id", -1);
+		h_KvClientItems[client].DeleteThis();
 		
-		KvRewind(h_KvClientItems[client]);
+		h_KvClientItems[client].Rewind();
 		
 		IntToString(category_id, sItemId, sizeof(sItemId));
 		StrCat(sItemId, sizeof(sItemId), "c");
-		KvSetNum(h_KvClientItems[client], sItemId, KvGetNum(h_KvClientItems[client], sItemId, 0)-1);
+		h_KvClientItems[client].SetNum(sItemId, h_KvClientItems[client].GetNum(sItemId, 0)-1);
 	}
 	
 	OnPlayerItemElapsed(client, item_id);
 }
 
-stock bool:PlayerManager_CanPreviewEx(client, const String:sItemId[], &sec)
+stock bool PlayerManager_CanPreviewEx(int client, const char[] sItemId, int &sec)
 {
-	if (!KvJumpToKey(h_KvClientItems[client], sItemId))
-	{
+	if (!h_KvClientItems[client].JumpToKey(sItemId))
 		return false;
-	}
 	
-	new bool:result = false;
+	bool result = false;
 	
-	sec = global_timer - KvGetNum(h_KvClientItems[client], "next_preview", 0);
+	sec = global_timer - h_KvClientItems[client].GetNum("next_preview", 0);
 	
 	if (sec >= 0)
 	{
 		result = true;
 		sec = global_timer+5;
-		KvSetNum(h_KvClientItems[client], "next_preview", sec);
+		h_KvClientItems[client].SetNum("next_preview", sec);
 	}
 	
-	KvRewind(h_KvClientItems[client]);
+	h_KvClientItems[client].Rewind();
 	
 	return result;
 }
 
-PlayerManager_GiveItemEx(client, const String:sItemId[], category_id, price, sell_price, count, duration, ItemType:type)
+void PlayerManager_GiveItemEx(int client, const char[] sItemId, int category_id, int price, int sell_price, int count, int duration, ItemType type)
 {
-	KvJumpToKey(h_KvClientItems[client], sItemId, true);
-	KvSetNum(h_KvClientItems[client], "category_id", category_id);
-	KvSetNum(h_KvClientItems[client], "price", price);
-	KvSetNum(h_KvClientItems[client], "sell_price", sell_price);
-	new has = KvGetNum(h_KvClientItems[client], "count", 0);
-	KvSetNum(h_KvClientItems[client], "count", has+count);
-	KvSetNum(h_KvClientItems[client], "timeleft", duration);
-	KvSetNum(h_KvClientItems[client], "duration", duration);
-	KvSetNum(h_KvClientItems[client], "method", g_iTimerMethod);
-	if (duration > 0 && (g_iTimerMethod != 0 || type == Item_None))
+	h_KvClientItems[client].JumpToKey(sItemId, true);
+	h_KvClientItems[client].SetNum("category_id", category_id);
+	h_KvClientItems[client].SetNum("price", price);
+	h_KvClientItems[client].SetNum("sell_price", sell_price);
+	int has = h_KvClientItems[client].GetNum("count", 0);
+	h_KvClientItems[client].SetNum("count", has+count);
+	h_KvClientItems[client].SetNum("timeleft", duration);
+	h_KvClientItems[client].SetNum("duration", duration);
+	h_KvClientItems[client].SetNum("method", g_bTimerMethod);
+	if (duration > 0 && (g_bTimerMethod != false || type == Item_None))
 	{
-		decl Handle:dp;
-		new Handle:timer = CreateDataTimer(float(duration), PlayerManager_OnPlayerItemElapsed, dp);
+		DataPack dp;
+		Handle timer = CreateDataTimer(float(duration), PlayerManager_OnPlayerItemElapsed, dp);
 		
-		KvSetNum(h_KvClientItems[client], "timer", _:timer);
-		WritePackCell(dp, client);
-		WritePackCell(dp, StringToInt(sItemId));
+		h_KvClientItems[client].SetNum("timer", view_as<int>(timer));
+		dp.WriteCell(client);
+		dp.WriteCell(StringToInt(sItemId));
 	}
-	KvSetNum(h_KvClientItems[client], "buy_time", global_timer);
-	KvRewind(h_KvClientItems[client]);
+	h_KvClientItems[client].SetNum("buy_time", global_timer);
+	h_KvClientItems[client].Rewind();
 	
 	PlayerManager_ToggleItemEx(client, sItemId, Shop_UseOff, _, true);
 	
-	decl String:s_Query[256];
+	char s_Query[256];
 	if (has < 1)
 	{
-		decl String:sCat[16];
+		char sCat[16];
 		IntToString(category_id, sCat, sizeof(sCat));
 		StrCat(sCat, sizeof(sCat), "c");
-		KvSetNum(h_KvClientItems[client], sCat, KvGetNum(h_KvClientItems[client], sCat, 0)+1);
+		h_KvClientItems[client].SetNum(sCat, h_KvClientItems[client].GetNum(sCat, 0)+1);
 		
 		FormatEx(s_Query, sizeof(s_Query), "INSERT INTO `%sboughts` (`player_id`, `item_id`, `count`, `duration`, `timeleft`, `buy_price`, `sell_price`, `buy_time`) VALUES \
 											('%d', '%s', '%d', '%d', '%d', '%d', '%d', '%d');", g_sDbPrefix, i_Id[client], sItemId, count, duration, duration, price, sell_price, global_timer);
@@ -754,188 +686,98 @@ PlayerManager_GiveItemEx(client, const String:sItemId[], category_id, price, sel
 	}
 }
 
-/*
-PlayerManager_GiveItemEx(client, const String:sItemId[], category_id, price, sell_price, count, duration, ItemType:type)
+int PlayerManager_GetItemSellPrice(int client, int item_id)
 {
-	KvJumpToKey(h_KvClientItems[client], sItemId, true);
-	KvSetNum(h_KvClientItems[client], "category_id", category_id);
-	KvSetNum(h_KvClientItems[client], "price", price);
-	KvSetNum(h_KvClientItems[client], "sell_price", sell_price);
-
-	new has = KvGetNum(h_KvClientItems[client], "count", 0);
-	KvSetNum(h_KvClientItems[client], "count", has+count);
-
-	new has_timeleft = KvGetNum(h_KvClientItems[client], "timeleft", 0);
-	KvSetNum(h_KvClientItems[client], "timeleft", has_timeleft+duration);
-
-	new has_duration = KvGetNum(h_KvClientItems[client], "duration", 0);
-	KvSetNum(h_KvClientItems[client], "duration", has_duration+duration);
-
-	KvSetNum(h_KvClientItems[client], "method", g_iTimerMethod);
-	if (duration > 0 && (g_iTimerMethod != 0 || type == Item_None))
-	{
-		decl Handle:dp;
-		new Handle:timer = CreateDataTimer(float(duration), PlayerManager_OnPlayerItemElapsed, dp);
-		
-		KvSetNum(h_KvClientItems[client], "timer", _:timer);
-		WritePackCell(dp, client);
-		WritePackCell(dp, StringToInt(sItemId));
-	}
-
-	KvSetNum(h_KvClientItems[client], "buy_time", global_timer);
-	KvRewind(h_KvClientItems[client]);
-	
-	PlayerManager_ToggleItemEx(client, sItemId, Shop_UseOff, _, true);
-	
-	decl String:s_Query[256];
-
-	if(type == Item_Togglable)
-	{
-		if (has_timeleft)
-		{
-			FormatEx(s_Query, sizeof(s_Query), "UPDATE `%sboughts` SET `duration` = '%d', `timeleft` = '%d' WHERE `player_id` = '%d' AND `item_id` = '%s';", g_sDbPrefix, has_timeleft+duration, has_duration+duration, i_Id[client], sItemId);
-			TQueryEx(s_Query, DBPrio_High);
-		}
-		else
-		{
-			IntToString(category_id, s_Query, 16);
-			StrCat(s_Query, sizeof(s_Query), "c");
-			KvSetNum(h_KvClientItems[client], s_Query, KvGetNum(h_KvClientItems[client], s_Query, 0)+1);
-			
-			FormatEx(s_Query, sizeof(s_Query), "INSERT INTO `%sboughts` (`player_id`, `item_id`, `count`, `duration`, `timeleft`, `buy_price`, `sell_price`, `buy_time`) VALUES \
-												('%d', '%s', '%d', '%d', '%d', '%d', '%d', '%d');", g_sDbPrefix, i_Id[client], sItemId, count, duration, duration, price, sell_price, global_timer);
-			TQueryEx(s_Query, DBPrio_High);
-		}
-	}
-	else
-	{
-		if (has < 1)
-		{
-			IntToString(category_id, s_Query, 16);
-			StrCat(s_Query, sizeof(s_Query), "c");
-			KvSetNum(h_KvClientItems[client], s_Query, KvGetNum(h_KvClientItems[client], s_Query, 0)+1);
-
-			FormatEx(s_Query, sizeof(s_Query), "INSERT INTO `%sboughts` (`player_id`, `item_id`, `count`, `duration`, `timeleft`, `buy_price`, `sell_price`, `buy_time`) VALUES \
-												('%d', '%s', '%d', '%d', '%d', '%d', '%d', '%d');", g_sDbPrefix, i_Id[client], sItemId, count, duration, duration, price, sell_price, global_timer);
-			TQueryEx(s_Query, DBPrio_High);
-		}
-		else
-		{
-			FormatEx(s_Query, sizeof(s_Query), "UPDATE `%sboughts` SET `count` = '%d' WHERE `player_id` = '%d' AND `item_id` = '%s';", g_sDbPrefix, has+count, i_Id[client], sItemId);
-			TQueryEx(s_Query, DBPrio_High);
-		}
-	}
-}
-*/
-PlayerManager_GetItemSellPrice(client, item_id)
-{
-	decl String:sItemId[16];
+	char sItemId[16];
 	IntToString(item_id, sItemId, sizeof(sItemId));
 	
 	return PlayerManager_GetItemSellPriceEx(client, sItemId);
 }
 
-PlayerManager_GetItemSellPriceEx(client, const String:sItemId[])
+int PlayerManager_GetItemSellPriceEx(int client, const char[] sItemId)
 {
-	if (!KvJumpToKey(h_KvClientItems[client], sItemId))
-	{
+	if (!h_KvClientItems[client].JumpToKey(sItemId))
 		return -1;
-	}
 	
-	new method = KvGetNum(h_KvClientItems[client], "method");
+	bool method = view_as<bool>(h_KvClientItems[client].GetNum("method"));
 	
-	new sell_price = KvGetNum(h_KvClientItems[client], "sell_price", -1);
+	int sell_price = h_KvClientItems[client].GetNum("sell_price", -1);
 	if (sell_price < 0)
 	{
-		KvRewind(h_KvClientItems[client]);
+		h_KvClientItems[client].Rewind();
 		return -1;
 	}
-	new duration = KvGetNum(h_KvClientItems[client], "duration", 0);
+	int duration = h_KvClientItems[client].GetNum("duration", 0);
 	if (duration < 1)
 	{
-		KvRewind(h_KvClientItems[client]);
+		h_KvClientItems[client].Rewind();
 		return sell_price;
 	}
 	
-	new timeleft;
-	if (method == 0)
+	int timeleft;
+	if (method == false)
 	{
-		new started = KvGetNum(h_KvClientItems[client], "started", 0);
+		int started = h_KvClientItems[client].GetNum("started", 0);
 		if (started)
-		{
-			timeleft = KvGetNum(h_KvClientItems[client], "timeleft", 0)-(global_timer-started);
-		}
+			timeleft = h_KvClientItems[client].GetNum("timeleft", 0)-(global_timer-started);
 		else
-		{
-			timeleft = KvGetNum(h_KvClientItems[client], "timeleft", 0);
-		}
+			timeleft = h_KvClientItems[client].GetNum("timeleft", 0);
 	}
 	else
-	{
-		timeleft = KvGetNum(h_KvClientItems[client], "buy_time", 0)+duration-global_timer;
-	}
+		timeleft = h_KvClientItems[client].GetNum("buy_time", 0)+duration-global_timer;
 	
-	KvRewind(h_KvClientItems[client]);
+	h_KvClientItems[client].Rewind();
 
-	new credits = sell_price;
-	new dummy = credits;
+	int credits = sell_price;
+	int dummy = credits;
 	
 	if (timeleft > 0)
-	{
 		credits = RoundToNearest(float(credits) * float(timeleft) / float(duration));
-	}
 	
 	if (credits > sell_price)
-	{
 		credits = sell_price;
-	}
 	else if (credits < 0)
-	{
 		credits = RoundToNearest(float(dummy) / 2.0 * float(timeleft) / float(duration));
-	}
 	
 	return credits;
 }
 
-PlayerManager_GetClientCategorySize(client, category_id)
+int PlayerManager_GetClientCategorySize(int client, int category_id)
 {
-	decl String:sCat[16];
+	char sCat[16];
 	IntToString(category_id, sCat, sizeof(sCat));
 	StrCat(sCat, sizeof(sCat), "c");
 	
-	return KvGetNum(h_KvClientItems[client], sCat);
+	return h_KvClientItems[client].GetNum(sCat);
 }
 
-stock bool:PlayerManager_RemoveItem(client, item_id, count = 1)
+stock bool PlayerManager_RemoveItem(int client, int item_id, int count = 1)
 {
-	decl String:sItemId[16];
+	char sItemId[16];
 	IntToString(item_id, sItemId, sizeof(sItemId));
 	
 	return PlayerManager_RemoveItemEx(client, sItemId, count);
 }
 
-bool:PlayerManager_RemoveItemEx(client, const String:sItemId[], count = 1)
+bool PlayerManager_RemoveItemEx(int client, const char[] sItemId, int count = 1)
 {
-	if (!KvJumpToKey(h_KvClientItems[client], sItemId))
-	{
+	if (!h_KvClientItems[client].JumpToKey(sItemId))
 		return false;
-	}
 	
-	decl String:s_Query[256];
+	char s_Query[256];
 	
-	new bool:deleted = false, category_id;
+	bool deleted = false;
+	int category_id;
 	
-	new left = KvGetNum(h_KvClientItems[client], "count", 1)-count;
+	int left = h_KvClientItems[client].GetNum("count", 1)-count;
 	if (count < 1 || left < 1)
 	{
-		new Handle:timer = Handle:KvGetNum(h_KvClientItems[client], "timer", _:INVALID_HANDLE);
-		if (timer != INVALID_HANDLE)
-		{
+		Handle timer = view_as<Handle>(h_KvClientItems[client].GetNum("timer", 0));
+		if (timer != null)
 			KillTimer(timer);
-		}
 		
-		category_id = KvGetNum(h_KvClientItems[client], "category_id", -1);
-		KvDeleteThis(h_KvClientItems[client]);
+		category_id = h_KvClientItems[client].GetNum("category_id", -1);
+		h_KvClientItems[client].DeleteThis();
 		
 		deleted = true;
 		
@@ -944,224 +786,191 @@ bool:PlayerManager_RemoveItemEx(client, const String:sItemId[], count = 1)
 	}
 	else
 	{
-		KvSetNum(h_KvClientItems[client], "count", left);
+		h_KvClientItems[client].SetNum("count", left);
 		
 		FormatEx(s_Query, sizeof(s_Query), "UPDATE `%sboughts` SET `count` = '%d' WHERE `player_id` = '%d' AND `item_id` = '%s';", g_sDbPrefix, left, i_Id[client], sItemId);
 		TQueryEx(s_Query, DBPrio_High);
 	}
 	
-	KvRewind(h_KvClientItems[client]);
+	h_KvClientItems[client].Rewind();
 	
 	if (deleted)
 	{
-		decl String:sCat[16];
+		char sCat[16];
 		IntToString(category_id, sCat, sizeof(sCat));
 		StrCat(sCat, sizeof(sCat), "c");
-		KvSetNum(h_KvClientItems[client], sCat, KvGetNum(h_KvClientItems[client], sCat, 0)-1);
+		h_KvClientItems[client].SetNum(sCat, h_KvClientItems[client].GetNum(sCat, 0)-1);
 		
 		PlayerManager_ToggleItem(client, StringToInt(sItemId), Shop_UseOff);
 	}
 	
 	return true;
 }
-/*
-stock bool:PlayerManager_GiveItem(client, item_id, count = 1)
+
+stock bool PlayerManager_ClientHasItem(int client, int item_id)
 {
-	decl String:sItemId[16], category_id, price, sell_price, count2, duration, ItemType:type, String:item[SHOP_MAX_STRING_LENGTH];
-	IntToString(item_id, sItemId, sizeof(sItemId));
-
-	if (!ItemManager_GetItemInfoEx(sItemId, item, sizeof(item), category_id, price, sell_price, count2, duration, type))
-	{
-		return false;
-	}
-
-	PlayerManager_GiveItemEx(client, sItemId, category_id, price, sell_price, count, duration, type);
-
-	return true;
-}
-*/
-stock bool:PlayerManager_ClientHasItem(client, item_id)
-{
-	decl String:sItemId[16];
+	char sItemId[16];
 	IntToString(item_id, sItemId, sizeof(sItemId));
 	
 	return PlayerManager_ClientHasItemEx(client, sItemId);
 }
 
-stock bool:PlayerManager_ClientHasItemEx(client, const String:sItemId[])
+stock bool PlayerManager_ClientHasItemEx(int client, const char[] sItemId)
 {
-	new bool:result = KvJumpToKey(h_KvClientItems[client], sItemId);
-	KvRewind(h_KvClientItems[client]);
-	
-	/*if ()
-	{
-		result = bool:(KvGetNum(h_KvClientItems[client], "count", 0) > 0);
-		KvRewind(h_KvClientItems[client]);
-	}*/
+	bool result = h_KvClientItems[client].JumpToKey(sItemId);
+	h_KvClientItems[client].Rewind();
 	
 	return result;
 }
 
-bool:PlayerManager_SetItemTimeleft(client, item_id, timeleft)
+bool PlayerManager_SetItemTimeleft(int client, int item_id, int timeleft)
 {
-	decl String:sItemId[16];
+	char sItemId[16];
 	IntToString(item_id, sItemId, sizeof(sItemId));
 	
 	return PlayerManager_SetItemTimeleftEx(client, sItemId, timeleft);
 }
 
-bool:PlayerManager_SetItemTimeleftEx(client, const String:sItemId[], timeleft)
+bool PlayerManager_SetItemTimeleftEx(int client, const char[] sItemId, int timeleft)
 {
-	if (!KvJumpToKey(h_KvClientItems[client], sItemId))
-	{
+	if (!h_KvClientItems[client].JumpToKey(sItemId))
 		return false;
-	}
 	
-	new Handle:timer = Handle:KvGetNum(h_KvClientItems[client], "timer", _:INVALID_HANDLE);
-	if (timer != INVALID_HANDLE)
-	{
+	Handle timer = view_as<Handle>(h_KvClientItems[client].GetNum("timer", 0));
+	if (timer != null)
 		KillTimer(timer);
-	}
 	
 	if (timeleft < 1)
+		timer = null;
+	else if (timer != null)
 	{
-		timer = INVALID_HANDLE;
-	}
-	else if (timer != INVALID_HANDLE)
-	{
-		decl Handle:dp;
+		DataPack dp;
 		timer = CreateDataTimer(float(timeleft), PlayerManager_OnPlayerItemElapsed, dp);
-		WritePackCell(dp, client);
-		WritePackCell(dp, StringToInt(sItemId));
+		dp.WriteCell(client);
+		dp.WriteCell(StringToInt(sItemId));
 	}
 	else
-	{
-		timer = INVALID_HANDLE;
-	}
+		timer = null;
 	
-	KvSetNum(h_KvClientItems[client], "timer", _:timer);
+	h_KvClientItems[client].SetNum("timer", view_as<int>(timer));
 
-	new duration = KvGetNum(h_KvClientItems[client], "duration");
+	int duration = h_KvClientItems[client].GetNum("duration");
 	if(timeleft)
 	{
 		if (duration < timeleft)
 		{
 			duration = timeleft;
-			KvSetNum(h_KvClientItems[client], "duration", duration);
+			h_KvClientItems[client].SetNum("duration", duration);
 		}
 		
-		KvSetNum(h_KvClientItems[client], "timeleft", timeleft);
+		h_KvClientItems[client].SetNum("timeleft", timeleft);
 	}
 	else
 	{
 		duration = timeleft;
-		KvSetNum(h_KvClientItems[client], "duration", 0);
+		h_KvClientItems[client].SetNum("duration", 0);
 	}
 
-	KvSetNum(h_KvClientItems[client], "timeleft", timeleft);
+	h_KvClientItems[client].SetNum("timeleft", timeleft);
 
-	decl String:s_Query[512];
+	char s_Query[512];
 	FormatEx(s_Query, sizeof(s_Query), "UPDATE `%sboughts` SET `duration` = '%d', `timeleft` = '%d' WHERE `player_id` = '%d' AND `item_id` = '%s';", g_sDbPrefix, duration, timeleft, i_Id[client], sItemId);
 	TQueryEx(s_Query, DBPrio_High);
 	
-	KvRewind(h_KvClientItems[client]);
+	h_KvClientItems[client].Rewind();
 	
 	return true;
 }
 
-PlayerManager_GetItemTimeleft(client, item_id)
+int PlayerManager_GetItemTimeleft(int client, int item_id)
 {
-	decl String:sItemId[16];
+	char sItemId[16];
 	IntToString(item_id, sItemId, sizeof(sItemId));
 	
 	return PlayerManager_GetItemTimeleftEx(client, sItemId);
 }
 
-PlayerManager_GetItemTimeleftEx(client, const String:sItemId[])
+int PlayerManager_GetItemTimeleftEx(int client, const char[] sItemId)
 {
-	if (!KvJumpToKey(h_KvClientItems[client], sItemId))
-	{
+	if (!h_KvClientItems[client].JumpToKey(sItemId))
 		return 0;
-	}
 	
-	new timeleft = 0;
+	int timeleft = 0;
 	
-	new duration = KvGetNum(h_KvClientItems[client], "duration");
+	int duration = h_KvClientItems[client].GetNum("duration");
 	if (duration > 0)
 	{
-		new method = KvGetNum(h_KvClientItems[client], "method");
-		if (method == 0)
+		bool method = view_as<bool>(h_KvClientItems[client].GetNum("method"));
+		if (method == false)
 		{
-			timeleft = KvGetNum(h_KvClientItems[client], "timeleft");
-			new started = KvGetNum(h_KvClientItems[client], "started", 0);
+			timeleft = h_KvClientItems[client].GetNum("timeleft");
+			int started = h_KvClientItems[client].GetNum("started", 0);
 			if (started)
-			{
 				timeleft = timeleft-(global_timer-started);
-			}
 		}
 		else
 		{
-			timeleft = KvGetNum(h_KvClientItems[client], "buy_time", 0)+duration-global_timer;
+			timeleft = h_KvClientItems[client].GetNum("buy_time", 0)+duration-global_timer;
 		}
 	}
 	
-	KvRewind(h_KvClientItems[client]);
+	h_KvClientItems[client].Rewind();
 	
 	return timeleft;
 }
 
-PlayerManager_GetItemCount(client, item_id)
+int PlayerManager_GetItemCount(int client, int item_id)
 {
-	decl String:sItemId[16];
+	char sItemId[16];
 	IntToString(item_id, sItemId, sizeof(sItemId));
 	
 	return PlayerManager_GetItemCountEx(client, sItemId);
 }
 
-PlayerManager_GetItemCountEx(client, const String:sItemId[])
+int PlayerManager_GetItemCountEx(int client, const char[] sItemId)
 {
-	new result = 0;
+	int result = 0;
 	
-	if (KvJumpToKey(h_KvClientItems[client], sItemId))
+	if (h_KvClientItems[client].JumpToKey(sItemId))
 	{
-		result = KvGetNum(h_KvClientItems[client], "count");
-		KvRewind(h_KvClientItems[client]);
+		result = h_KvClientItems[client].GetNum("count");
+		h_KvClientItems[client].Rewind();
 	}
 	
 	return result;
 }
 
-PlayerManager_SetItemCount(client, item_id, count)
+void PlayerManager_SetItemCount(int client, int item_id, int count)
 {
-	decl String:sItemId[16];
+	char sItemId[16];
 	IntToString(item_id, sItemId, sizeof(sItemId));
-	KvRewind(h_KvClientItems[client]);
-	if (KvJumpToKey(h_KvClientItems[client], sItemId))
+	h_KvClientItems[client].Rewind();
+	if (h_KvClientItems[client].JumpToKey(sItemId))
 	{
-		KvSetNum(h_KvClientItems[client], "count", count);
-		KvRewind(h_KvClientItems[client]);
+		h_KvClientItems[client].SetNum("count", count);
+		h_KvClientItems[client].Rewind();
 		
-		decl String:s_Query[256];
+		char s_Query[256];
 		FormatEx(s_Query, sizeof(s_Query), "UPDATE `%sboughts` SET `count` = '%d' WHERE `player_id` = '%d' AND `item_id` = '%s';", g_sDbPrefix, count, i_Id[client], sItemId);
 		TQueryEx(s_Query, DBPrio_High);
 	}
 }
 
-public PlayerManager_OnPlayerName(Handle:event, const String:name[], bool:dontBroadcast)
+public void PlayerManager_OnPlayerName(Event event, const char[] name, bool dontBroadcast)
 {
-	new client = GetClientOfUserId(GetEventInt(event, "userid"));
+	int client = GetClientOfUserId(event.GetInt("userid"));
 	if (!client || !i_Id[client]) return;
 	
-	decl String:newname[MAX_NAME_LENGTH], String:buffer[65], String:s_Query[256];
-	GetEventString(event, "newname", newname, sizeof(newname));
+	char newname[MAX_NAME_LENGTH], buffer[65], s_Query[256];
+	event.GetString("newname", newname, sizeof(newname));
 	EscapeString(newname, buffer, sizeof(buffer));
 	FormatEx(s_Query, sizeof(s_Query), "UPDATE `%splayers` SET `name` = '%s' WHERE `id` = '%i';", g_sDbPrefix, buffer, i_Id[client]);
 	TQueryEx(s_Query, DBPrio_Low);
 }
 
-PlayerManager_DatabaseClear()
+void PlayerManager_DatabaseClear()
 {
-	for (new i = 1; i <= MaxClients; i++)
+	for (int i = 1; i <= MaxClients; i++)
 	{
 		if (i_Id[i] != 0)
 		{
@@ -1171,9 +980,9 @@ PlayerManager_DatabaseClear()
 	}
 }
 
-bool:PlayerManager_IsInGame(player_id)
+bool PlayerManager_IsInGame(int player_id)
 {
-	for (new i = 1; i <= MaxClients; i++)
+	for (int i = 1; i <= MaxClients; i++)
 	{
 		if (i_Id[i] != 0 && i_Id[i] == player_id)
 		{
@@ -1183,78 +992,72 @@ bool:PlayerManager_IsInGame(player_id)
 	return false;
 }
 
-PlayerManager_OnClientPutInServer(client)
+void PlayerManager_OnClientPutInServer(int client)
 {
-	if (h_KvClientItems[client] == INVALID_HANDLE)
-	{
-		h_KvClientItems[client] = CreateKeyValues("Items");
-	}
+	if (h_KvClientItems[client] == null)
+		h_KvClientItems[client] = new KeyValues("Items");
 	
-	decl String:auth[22];
+	char auth[22];
 	GetClientAuthId(client, AuthId_Steam2, auth, sizeof(auth), false);
 	
-	decl String:s_Query[256];
+	char s_Query[256];
 	if (db_type == DB_MySQL)
-	{
 		FormatEx(s_Query, sizeof(s_Query), "SELECT `money`, `id` FROM `%splayers` WHERE `auth` REGEXP '^STEAM_[0-9]:%s$';", g_sDbPrefix, auth[8]);
-	}
 	else
-	{
 		FormatEx(s_Query, sizeof(s_Query), "SELECT `money`, `id` FROM `%splayers` WHERE `auth` = '%s';", g_sDbPrefix, auth);
-	}
 	
-	new Handle:dp = CreateDataPack();
-	WritePackCell(dp, GetClientSerial(client));
-	WritePackString(dp, auth);
-	WritePackCell(dp, 0);
+	DataPack dp = new DataPack();
+	dp.WriteCell(GetClientSerial(client));
+	dp.WriteString(auth);
+	dp.WriteCell(0);
 	
 	TQuery(PlayerManager_AuthorizeClient, s_Query, dp, DBPrio_Low);
 }
 
-public PlayerManager_AuthorizeClient(Handle:owner, Handle:hndl, const String:error[], any:dp)
+public int PlayerManager_AuthorizeClient(Handle owner, Handle hndl, const char[] error, DataPack dp)
 {
-	if (owner == INVALID_HANDLE)
+	if (owner == null)
 	{
-		CloseHandle(dp);
+		delete dp;
 		TryConnect();
 		return;
 	}
 	
-	if (hndl == INVALID_HANDLE || error[0])
+	if (hndl == null || error[0])
 	{
-		CloseHandle(dp);
+		delete dp;
 		LogError("PlayerManager_AuthorizeClient: %s", error);
 		return;
 	}
 	
-	ResetPack(dp);
-	new serial = ReadPackCell(dp);
-	new client = GetClientFromSerial(serial);
+	dp.Reset();
+	int serial = dp.ReadCell();
+	int client = GetClientFromSerial(serial);
 	if (!client)
 	{
-		CloseHandle(dp);
+		delete dp;
 		return;
 	}
-	decl String:auth[22];
-	ReadPackString(dp, auth, sizeof(auth));
-	new iTry = ReadPackCell(dp);
+	char auth[22];
+	dp.ReadString(auth, sizeof(auth));
+	int iTry = dp.ReadCell();
 	
 	switch (iTry)
 	{
 		case 0 :
 		{
-			decl String:name[MAX_NAME_LENGTH], String:buffer[65];
+			char name[MAX_NAME_LENGTH], buffer[65];
 			GetClientName(client, name, sizeof(name));
 			EscapeString(name, buffer, sizeof(buffer));
 			
-			decl String:s_Query[256];
+			char s_Query[256];
 			if (!SQL_FetchRow(hndl))
 			{
 				ResetPack(dp, true);
-				WritePackCell(dp, serial);
-				WritePackString(dp, auth);
-				WritePackCell(dp, 1);
-				WritePackCell(dp, g_iStartCredits);
+				dp.WriteCell(serial);
+				dp.WriteString(auth);
+				dp.WriteCell(1);
+				dp.WriteCell(g_iStartCredits);
 				
 				FormatEx(s_Query, sizeof(s_Query), "INSERT INTO `%splayers` (`name`, `auth`, `money`, `lastconnect`) VALUES ('%s', '%s', '%d', '%d');", g_sDbPrefix, buffer, auth, g_iStartCredits, global_timer);
 				TQuery(PlayerManager_AuthorizeClient, s_Query, dp, DBPrio_Low);
@@ -1271,51 +1074,49 @@ public PlayerManager_AuthorizeClient(Handle:owner, Handle:hndl, const String:err
 		}
 		case 1 :
 		{
-			iCredits[client] = ReadPackCell(dp);
+			iCredits[client] = dp.ReadCell();
 			i_Id[client] = SQL_GetInsertId(hndl);
 		}
 	}
-	CloseHandle(dp);
+	delete dp;
 	
 	OnAuthorized(client);
 }
 
-PlayerManager_LoadClientItems(client)
+void PlayerManager_LoadClientItems(int client)
 {
-	decl String:s_Query[256];
+	char s_Query[256];
 	FormatEx(s_Query, sizeof(s_Query), "SELECT `item_id`, `count`, `duration`, `timeleft`, `buy_price`, `sell_price`, `buy_time` FROM `%sboughts`, `%sitems` WHERE `id` = `item_id` AND `player_id` = '%i';", g_sDbPrefix, g_sDbPrefix, i_Id[client]);
 	TQuery(PlayerManager_GetItemsFromDB, s_Query, GetClientSerial(client), DBPrio_Low);
 }
 
-public PlayerManager_GetItemsFromDB(Handle:owner, Handle:hndl, const String:error[], any:serial)
+public int PlayerManager_GetItemsFromDB(Handle owner, Handle hndl, const char[] error, any serial)
 {
-	if (owner == INVALID_HANDLE)
+	if (owner == null)
 	{
 		TryConnect();
 		return;
 	}
 	
-	if (hndl == INVALID_HANDLE || error[0])
+	if (hndl == null || error[0])
 	{
 		LogError("PlayerManager_GetItemsFromDB: %s", error);
 		return;
 	}
 	
-	new client = GetClientFromSerial(serial);
+	int client = GetClientFromSerial(serial);
 	if (!client)
-	{
 		return;
-	}
 	
-	decl String:sItemId[16], String:s_Query[256];
+	char sItemId[16], s_Query[256];
 	while (SQL_FetchRow(hndl))
 	{
-		new item_id = SQL_FetchInt(hndl, 0);
-		new buy_time = SQL_FetchInt(hndl, 6);
-		new duration = SQL_FetchInt(hndl, 2);
-		new timeleft = SQL_FetchInt(hndl, 3);
+		int item_id = SQL_FetchInt(hndl, 0);
+		int buy_time = SQL_FetchInt(hndl, 6);
+		int duration = SQL_FetchInt(hndl, 2);
+		int timeleft = SQL_FetchInt(hndl, 3);
 		
-		if (duration > 0 && ((g_iTimerMethod == 0 && timeleft < 1) || (g_iTimerMethod != 0 && global_timer - buy_time > duration)))
+		if (duration > 0 && ((g_bTimerMethod == false && timeleft < 1) || (g_bTimerMethod != false && global_timer - buy_time > duration)))
 		{
 			FormatEx(s_Query, sizeof(s_Query), "DELETE FROM `%sboughts` WHERE `player_id` = '%d' AND `item_id` = '%d';", g_sDbPrefix, i_Id[client], item_id);
 			TQueryEx(s_Query, DBPrio_High);
@@ -1332,51 +1133,51 @@ public PlayerManager_GetItemsFromDB(Handle:owner, Handle:hndl, const String:erro
 			timeleft = duration;
 			if (duration > 0)
 			{
-				new total = global_timer+duration-buy_time;
+				int total = global_timer+duration-buy_time;
 				FormatEx(s_Query, sizeof(s_Query), "UPDATE `%sboughts` SET `duration` = '%d', `timeleft` = '%d' WHERE `player_id` = '%d' AND `item_id` = '%d';", g_sDbPrefix, total, timeleft, i_Id[client], item_id);
 				TQueryEx(s_Query, DBPrio_High);
 			}
 		}
 		
-		new category_id = GetItemCategoryIdEx(sItemId);
+		int category_id = GetItemCategoryIdEx(sItemId);
 		
-		if (KvJumpToKey(h_KvClientItems[client], sItemId))
+		if (h_KvClientItems[client].JumpToKey(sItemId))
 		{
-			new Handle:timer = Handle:KvGetNum(h_KvClientItems[client], "timer", _:INVALID_HANDLE);
-			if (timer != INVALID_HANDLE)
+			Handle timer = view_as<Handle>(h_KvClientItems[client].GetNum("timer", 0));
+			if (timer != null)
 			{
 				KillTimer(timer);
-				KvSetNum(h_KvClientItems[client], "timer", _:INVALID_HANDLE);
+				h_KvClientItems[client].SetNum("timer", 0);
 			}
 		}
 		else
 		{
-			decl String:cat_count[16];
+			char cat_count[16];
 			IntToString(category_id, cat_count, sizeof(cat_count));
 			StrCat(cat_count, sizeof(cat_count), "c");
-			KvSetNum(h_KvClientItems[client], cat_count, KvGetNum(h_KvClientItems[client], cat_count, 0)+1);
+			h_KvClientItems[client].SetNum(cat_count, h_KvClientItems[client].GetNum(cat_count, 0)+1);
 			
-			KvJumpToKey(h_KvClientItems[client], sItemId, true);
+			h_KvClientItems[client].JumpToKey(sItemId, true);
 		}
 		
-		KvSetNum(h_KvClientItems[client], "category_id", category_id);
-		KvSetNum(h_KvClientItems[client], "count", SQL_FetchInt(hndl, 1));
-		KvSetNum(h_KvClientItems[client], "duration", duration);
-		KvSetNum(h_KvClientItems[client], "timeleft", timeleft);
-		KvSetNum(h_KvClientItems[client], "price", SQL_FetchInt(hndl, 4));
-		KvSetNum(h_KvClientItems[client], "sell_price", SQL_FetchInt(hndl, 5));
-		KvSetNum(h_KvClientItems[client], "method", g_iTimerMethod);
-		KvSetNum(h_KvClientItems[client], "buy_time", buy_time);
-		if (duration > 0 && (g_iTimerMethod != 0 || GetItemTypeEx(sItemId) == Item_None))
+		h_KvClientItems[client].SetNum("category_id", category_id);
+		h_KvClientItems[client].SetNum("count", SQL_FetchInt(hndl, 1));
+		h_KvClientItems[client].SetNum("duration", duration);
+		h_KvClientItems[client].SetNum("timeleft", timeleft);
+		h_KvClientItems[client].SetNum("price", SQL_FetchInt(hndl, 4));
+		h_KvClientItems[client].SetNum("sell_price", SQL_FetchInt(hndl, 5));
+		h_KvClientItems[client].SetNum("method", g_bTimerMethod);
+		h_KvClientItems[client].SetNum("buy_time", buy_time);
+		if (duration > 0 && (g_bTimerMethod != false || GetItemTypeEx(sItemId) == Item_None))
 		{
-			decl Handle:dp;
-			new Handle:timer = CreateDataTimer(float(buy_time+duration-global_timer), PlayerManager_OnPlayerItemElapsed, dp);
+			DataPack dp;
+			Handle timer = CreateDataTimer(float(buy_time+duration-global_timer), PlayerManager_OnPlayerItemElapsed, dp);
 			
-			KvSetNum(h_KvClientItems[client], "timer", _:timer);
-			WritePackCell(dp, client);
-			WritePackCell(dp, item_id);
+			h_KvClientItems[client].SetNum("timer", view_as<int>(timer));
+			dp.WriteCell(client);
+			dp.WriteCell(item_id);
 		}
-		KvRewind(h_KvClientItems[client]);
+		h_KvClientItems[client].Rewind();
 		
 		if (PlayerManager_IsItemToggledEx(client, sItemId))
 		{
@@ -1385,18 +1186,18 @@ public PlayerManager_GetItemsFromDB(Handle:owner, Handle:hndl, const String:erro
 	}
 }
 
-PlayerManager_ClearPlayer(client)
+void PlayerManager_ClearPlayer(int client)
 {
-	if (h_KvClientItems[client] != INVALID_HANDLE)
+	if (h_KvClientItems[client] != null)
 	{
 		CloseHandle(h_KvClientItems[client]);
-		h_KvClientItems[client] = INVALID_HANDLE;
+		h_KvClientItems[client] = null;
 	}
 	i_Id[client] = 0;
 	iCredits[client] = 0;
 }
 
-PlayerManager_OnClientDisconnect_Post(client)
+void PlayerManager_OnClientDisconnect_Post(int client)
 {
 	if (!i_Id[client]) return;
 	
@@ -1405,61 +1206,57 @@ PlayerManager_OnClientDisconnect_Post(client)
 	PlayerManager_ClearPlayer(client);
 }
 
-PlayerManager_SaveInfo(client, bool:cleartimer = false)
+void PlayerManager_SaveInfo(int client, bool cleartimer = false)
 {
 	if (!i_Id[client]) return;
 	
-	decl String:s_Query[256], timeleft, String:sItemId[16];
+	char s_Query[256];
+	int timeleft;
+	char sItemId[16];
 	FormatEx(s_Query, sizeof(s_Query), "UPDATE `%splayers` SET `money` = '%d' WHERE `id` = '%d';", g_sDbPrefix, iCredits[client], i_Id[client]);
 	TQueryEx(s_Query, DBPrio_High);
 	
-	if (KvGotoFirstSubKey(h_KvClientItems[client]))
+	if (h_KvClientItems[client].GotoFirstSubKey())
 	{
 		do
 		{
 			if (!KvGetSectionName(h_KvClientItems[client], sItemId, sizeof(sItemId)))
-			{
 				continue;
-			}
 			
-			new duration = KvGetNum(h_KvClientItems[client], "duration");
-			if (KvGetNum(h_KvClientItems[client], "method") == 0)
+			int duration = h_KvClientItems[client].GetNum("duration");
+			if (view_as<bool>(h_KvClientItems[client].GetNum("method")) == false)
 			{
-				timeleft = KvGetNum(h_KvClientItems[client], "timeleft");
-				new started = KvGetNum(h_KvClientItems[client], "started", 0);
+				timeleft = h_KvClientItems[client].GetNum("timeleft");
+				int started = h_KvClientItems[client].GetNum("started", 0);
 				if (started)
-				{
 					timeleft = timeleft-(global_timer-started);
-				}
 			}
 			else
-			{
-				timeleft = KvGetNum(h_KvClientItems[client], "buy_time", 0)+duration-global_timer;
-			}
+				timeleft = h_KvClientItems[client].GetNum("buy_time", 0)+duration-global_timer;
 			
 			if (cleartimer)
 			{
-				new Handle:timer = Handle:KvGetNum(h_KvClientItems[client], "timer", _:INVALID_HANDLE);
-				if (timer != INVALID_HANDLE)
+				Handle timer = view_as<Handle>(h_KvClientItems[client].GetNum("timer", 0));
+				if (timer != null)
 				{
 					KillTimer(timer);
-					KvSetNum(h_KvClientItems[client], "timer", _:INVALID_HANDLE);
+					h_KvClientItems[client].SetNum("timer", 0);
 				}
 			}
 			
-			FormatEx(s_Query, sizeof(s_Query), "UPDATE `%sboughts` SET `count` = '%d', `duration` = '%d', `timeleft` = '%d', `buy_price` = '%d', `sell_price` = '%d' WHERE `player_id` = '%d' AND `item_id` = '%s';", g_sDbPrefix, KvGetNum(h_KvClientItems[client], "count", 1), duration, timeleft, KvGetNum(h_KvClientItems[client], "price"), KvGetNum(h_KvClientItems[client], "sell_price"), i_Id[client], sItemId);
+			FormatEx(s_Query, sizeof(s_Query), "UPDATE `%sboughts` SET `count` = '%d', `duration` = '%d', `timeleft` = '%d', `buy_price` = '%d', `sell_price` = '%d' WHERE `player_id` = '%d' AND `item_id` = '%s';", g_sDbPrefix, h_KvClientItems[client].GetNum("count", 1), duration, timeleft, h_KvClientItems[client].GetNum("price"), h_KvClientItems[client].GetNum("sell_price"), i_Id[client], sItemId);
 			TQueryEx(s_Query, DBPrio_High);
 		}
-		while (KvGotoNextKey(h_KvClientItems[client]));
+		while (h_KvClientItems[client].GotoNextKey());
 		
-		KvRewind(h_KvClientItems[client]);
+		h_KvClientItems[client].Rewind();
 	}
 }
 
-PlayerManager_OnItemRegistered(item_id)
+void PlayerManager_OnItemRegistered(int item_id)
 {
-	decl String:s_Query[256];
-	for (new client = 1; client <= MaxClients; client++)
+	char s_Query[256];
+	for (int client = 1; client <= MaxClients; client++)
 	{
 		if (!i_Id[client]) continue;
 		
@@ -1468,89 +1265,86 @@ PlayerManager_OnItemRegistered(item_id)
 	}
 }
 
-PlayerManager_OnItemUnregistered(item_id)
+void PlayerManager_OnItemUnregistered(int item_id)
 {
-	decl String:sItemId[16];
+	char sItemId[16];
 	IntToString(item_id, sItemId, sizeof(sItemId));
 	
-	decl String:s_Query[256];
+	char s_Query[256];
 	
-	new category_id = -1;
-	for (new client = 1; client <= MaxClients; client++)
+	int category_id = -1;
+	for (int client = 1; client <= MaxClients; client++)
 	{
 		if (!i_Id[client]) continue;
 		
-		if (KvJumpToKey(h_KvClientItems[client], sItemId))
+		if (h_KvClientItems[client].JumpToKey(sItemId))
 		{
-			new duration = KvGetNum(h_KvClientItems[client], "duration");
-			new started = KvGetNum(h_KvClientItems[client], "started", 0);
-			new timeleft = KvGetNum(h_KvClientItems[client], "timeleft");
+			int duration = h_KvClientItems[client].GetNum("duration");
+			int started = h_KvClientItems[client].GetNum("started", 0);
+			int timeleft = h_KvClientItems[client].GetNum("timeleft");
 			
 			if (started)
 			{
 				timeleft = timeleft-(global_timer-started);
 				
-				new Handle:timer = Handle:KvGetNum(h_KvClientItems[client], "timer", _:INVALID_HANDLE);
-				if (timer != INVALID_HANDLE)
+				Handle timer = view_as<Handle>(h_KvClientItems[client].GetNum("timer", 0));
+				if (timer != null)
 				{
 					KillTimer(timer);
-					KvSetNum(h_KvClientItems[client], "timer", _:INVALID_HANDLE);
+					h_KvClientItems[client].SetNum("timer", 0);
 				}
 			}
 			
-			FormatEx(s_Query, sizeof(s_Query), "UPDATE `%sboughts` SET `count` = '%d', `duration` = '%d', `timeleft` = '%d', `buy_price` = '%d', `sell_price` = '%d' WHERE `player_id` = '%d' AND `item_id` = '%s';", g_sDbPrefix, KvGetNum(h_KvClientItems[client], "count", 1), duration, timeleft, KvGetNum(h_KvClientItems[client], "price"), KvGetNum(h_KvClientItems[client], "sell_price"), i_Id[client], sItemId);
+			FormatEx(s_Query, sizeof(s_Query), "UPDATE `%sboughts` SET `count` = '%d', `duration` = '%d', `timeleft` = '%d', `buy_price` = '%d', `sell_price` = '%d' WHERE `player_id` = '%d' AND `item_id` = '%s';", g_sDbPrefix, h_KvClientItems[client].GetNum("count", 1), duration, timeleft, h_KvClientItems[client].GetNum("price"), h_KvClientItems[client].GetNum("sell_price"), i_Id[client], sItemId);
 			TQueryEx(s_Query, DBPrio_High);
 			
-			category_id = KvGetNum(h_KvClientItems[client], "category_id", -1);
+			category_id = h_KvClientItems[client].GetNum("category_id", -1);
 			
-			KvDeleteThis(h_KvClientItems[client]);
-			KvRewind(h_KvClientItems[client]);
+			h_KvClientItems[client].DeleteThis();
+			h_KvClientItems[client].Rewind();
 			
 			IntToString(category_id, sItemId, sizeof(sItemId));
 			StrCat(sItemId, sizeof(sItemId), "c");
-			KvSetNum(h_KvClientItems[client], sItemId, KvGetNum(h_KvClientItems[client], sItemId, 0)-1);
+			h_KvClientItems[client].SetNum(sItemId, h_KvClientItems[client].GetNum(sItemId, 0)-1);
 			
 			//NotifyItemOff(client, item_id);
 		}
 	}
 }
 
-PlayerManager_GetCredits(client)
+int PlayerManager_GetCredits(int client)
 {
 	return iCredits[client];
 }
 
-stock PlayerManager_SetCredits(client, credits)
+stock void PlayerManager_SetCredits(int client, int credits)
 {
 	if (credits < 0)
-	{
 		credits = 0;
-	}
+	
 	iCredits[client] = credits;
 	
-	decl String:s_Query[256];
+	char s_Query[256];
 	FormatEx(s_Query, sizeof(s_Query), "UPDATE `%splayers` SET `money` = '%d' WHERE `id` = '%d';", g_sDbPrefix, iCredits[client], i_Id[client]);
 	TQueryEx(s_Query, DBPrio_High);
 }
 
-PlayerManager_GiveCredits(client, credits)
+void PlayerManager_GiveCredits(int client, int credits)
 {
 	iCredits[client] += credits;
 	
-	decl String:s_Query[256];
+	char s_Query[256];
 	FormatEx(s_Query, sizeof(s_Query), "UPDATE `%splayers` SET `money` = '%d' WHERE `id` = '%d';", g_sDbPrefix, iCredits[client], i_Id[client]);
 	TQueryEx(s_Query, DBPrio_High);
 }
 
-PlayerManager_RemoveCredits(client, credits)
+void PlayerManager_RemoveCredits(int client, int credits)
 {
 	iCredits[client] -= credits;
 	if (iCredits[client] < 0)
-	{
 		iCredits[client] = 0;
-	}
 	
-	decl String:s_Query[256];
+	char s_Query[256];
 	FormatEx(s_Query, sizeof(s_Query), "UPDATE `%splayers` SET `money` = '%d' WHERE `id` = '%d';", g_sDbPrefix, iCredits[client], i_Id[client]);
 	TQueryEx(s_Query, DBPrio_High);
 }
