@@ -7,7 +7,7 @@
  *	-
  *	@noreturn
 */
-functag public FuncDisplay(client, String:buffer[], maxlength);
+typedef FuncDisplay = function void (int client, char[] buffer, int maxlength);
 
 /**
  *	Called when an item from functions menu is being selected
@@ -16,7 +16,7 @@ functag public FuncDisplay(client, String:buffer[], maxlength);
  *	-
  *	@return true to allow performing and false to block
 */
-functag public bool:FuncSelect(client);
+typedef FuncSelect = function bool (int client);
 
 /**
  *	Adds an item to the functions menu
@@ -26,7 +26,7 @@ functag public bool:FuncSelect(client);
  *	-
  *	@noreturn
 */
-native Shop_AddToFunctionsMenu(FuncDisplay:callback_display, FuncSelect:callback_select);
+native void Shop_AddToFunctionsMenu(FuncDisplay callback_display, FuncSelect callback_select);
 
 /**
  *	Removes an item from the functions menu
@@ -36,7 +36,7 @@ native Shop_AddToFunctionsMenu(FuncDisplay:callback_display, FuncSelect:callback
  *	-
  *	@return true on success, false otherwise
 */
-native bool:Shop_RemoveFromFunctionsMenu(FuncDisplay:callback_display, FuncSelect:callback_select);
+native bool Shop_RemoveFromFunctionsMenu(FuncDisplay callback_display, FuncSelect callback_select);
 
 /**
  *	Shows functions menu to a player
@@ -45,4 +45,4 @@ native bool:Shop_RemoveFromFunctionsMenu(FuncDisplay:callback_display, FuncSelec
  *	-
  *	@noreturn
 */
-native Shop_ShowFunctionsMenu(client);
+native void Shop_ShowFunctionsMenu(int client);

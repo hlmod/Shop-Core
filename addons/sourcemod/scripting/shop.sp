@@ -34,11 +34,11 @@ int g_iItemTransfer;
 #include "shop/colors.sp"
 #include "shop/admin.sp"
 #include "shop/commands.sp"
+#pragma newdecls required
 #include "shop/db.sp"
 #include "shop/forwards.sp"
-#include "shop/functions.sp"
-#pragma newdecls required
 #include "shop/helpers.sp"
+#include "shop/functions.sp"
 #include "shop/item_manager.sp"
 #include "shop/player_manager.sp"
 
@@ -48,7 +48,7 @@ public Plugin myinfo =
 	description = "An advanced in game market",
 	author = "FrozDark (Fork by R1KO)",
 	// version = SHOP_VERSION,
-	version = "3.0B:15-01-2017",
+	version = "3.0B:23-01-2017",
 	url = "http://www.hlmod.ru/"
 };
 
@@ -1966,7 +1966,7 @@ stock void FastQuery(const char[] query)
 	DB_FastQuery(query);
 }
 
-void TQuery(SQLTCallback callback, const char[] query, any data, DBPriority prio = DBPrio_Normal)
+void TQuery(SQLQueryCallback callback, const char[] query, any data, DBPriority prio = DBPrio_Normal)
 {
 	DB_TQuery(callback, query, data, prio);
 }

@@ -91,21 +91,35 @@ void ItemManager_UnregisterMe(Handle plugin = null)
 	char buffer[SHOP_MAX_STRING_LENGTH];
 	if (!h_KvItems.GotoFirstSubKey())
 		return;
-	for (;;)
+	
+	do
 	{
 		if (plugin != null && view_as<Handle>(h_KvItems.GetNum("plugin", 0)) != plugin) continue;
 			
 		h_KvItems.GetSectionName(buffer, sizeof(buffer));
 		int item_id = StringToInt(buffer);
+		// LogToFileEx("addons/sourcemod/shop.log", "Removed module %d", item_id);
 		OnItemUnregistered(item_id);
 		
 		DataPack dpCallback = view_as<DataPack>(h_KvItems.GetNum("callbacks", 0));
 		if (dpCallback != null)
 			delete dpCallback;
 		
-		if (h_KvItems.DeleteThis() == 1) continue;
-		else if (!h_KvItems.GotoNextKey()) break;
-	}
+		// I don't know why, but DeleteThis method skips one keyvalue
+		while (h_KvItems.DeleteThis() == 1)
+		{
+			if (plugin != null && view_as<Handle>(h_KvItems.GetNum("plugin", 0)) != plugin) break;
+			
+			h_KvItems.GetSectionName(buffer, sizeof(buffer));
+			item_id = StringToInt(buffer);
+			// LogToFileEx("addons/sourcemod/shop.log", "Removed module %d", item_id);
+			OnItemUnregistered(item_id);
+			
+			dpCallback = view_as<DataPack>(h_KvItems.GetNum("callbacks", 0));
+			if (dpCallback != null)
+				delete dpCallback;
+		}
+	} while (h_KvItems.GotoNextKey());
 	h_KvItems.Rewind();
 	
 	StringMap trie;
@@ -116,16 +130,36 @@ void ItemManager_UnregisterMe(Handle plugin = null)
 		if (!h_trieCategories.GetValue(buffer, trie)) continue;
 		
 		trie.GetValue("plugin_array", array);
-		
+		// LogToFileEx("addons/sourcemod/shop.log", "Category name: %s", buffer);
 		int index = array.FindValue(plugin);
-		if (index == -1) continue;
-		
+		if (index == -1)
+		{
+			if (plugin == null)
+			{
+				DataPack dp;
+				for (int j = 1; j < array.Length; j+=2)
+				{
+					dp = array.Get(j);
+					delete dp;
+				}
+				
+				delete array;
+				delete trie;
+				h_trieCategories.Remove(buffer);
+			}
+			continue;
+		}
+		// Remove plugin handle
 		array.Erase(index);
 		
 		// Delete datapack in category
-		DataPack dp = view_as<DataPack>(array.Get(index+1));
+		DataPack dp = view_as<DataPack>(array.Get(index));
 		delete dp;
-		array.Erase(index+1); // to remove datapack
+		array.Erase(index); // to remove datapack
+		
+		char cName[24];
+		GetPluginFilename(plugin, cName, sizeof(cName));
+		// LogToFileEx("addons/sourcemod/shop.log", "[%s] Deleted %s", cName, buffer);
 		
 		if (!array.Length)
 		{
@@ -1401,7 +1435,7 @@ bool ItemManager_FillItemsOfCategory(Menu menu, int client, int source_client, i
 			
 			h_KvItems.Rewind();
 			
-			if (!ItemManger_OnItemShouldDisplay(plugin, callback_should, source_client, category_id, category, item_id, item, inventory ? Menu_Inventory : Menu_Buy)) continue;
+			bool bShouldDisplay = ItemManager_OnItemShouldDisplay(plugin, callback_should, source_client, category_id, category, item_id, item, inventory ? Menu_Inventory : Menu_Buy);
 			
 			bool disabled = false;
 			if (!ItemManager_OnItemDisplay(plugin, callback_display, source_client, category_id, category, item_id, item, inventory ? Menu_Inventory : Menu_Buy, disabled, display, display, sizeof(display)))
@@ -1411,7 +1445,8 @@ bool ItemManager_FillItemsOfCategory(Menu menu, int client, int source_client, i
 			
 			h_KvItems.JumpToKey(sItemId);
 			
-			menu.AddItem(sItemId, display, disabled ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
+			if (bShouldDisplay)
+				menu.AddItem(sItemId, display, disabled ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
 			
 			result = true;
 		}
@@ -2005,7 +2040,7 @@ bool ItemManager_OnItemSellEx(int client, int category_id, const char[] category
 	return result;
 }
 
-bool ItemManger_OnItemShouldDisplay(Handle plugin, Function callback, int client, int category_id, const char[] category, int item_id, const char[] item, ShopMenu menu)
+bool ItemManager_OnItemShouldDisplay(Handle plugin, Function callback, int client, int category_id, const char[] category, int item_id, const char[] item, ShopMenu menu)
 {
 	bool result = true;
 	

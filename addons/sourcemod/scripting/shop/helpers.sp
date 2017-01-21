@@ -149,3 +149,16 @@ stock int Helpers_GetRandomIntEx(int min, int max)
 	
 	return number;
 }
+
+/**
+ * Makes a negative integer number to a positive integer number.
+ * This is faster than Sourcemod's native FloatAbs() for integers.
+ * Use FloatAbs() for Float numbers.
+ *
+ * @param number		A number that can be positive or negative.
+ * @return				Positive number.
+ */
+stock int Helpers_Math_Abs(int value)
+{
+	return (value ^ (value >> 31)) - (value >> 31);
+}

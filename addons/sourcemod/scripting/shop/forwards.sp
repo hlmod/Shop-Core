@@ -1,23 +1,23 @@
-new Handle:h_fwdOnAuthorized,
-	Handle:h_fwdOnMenuTitle,
-	Handle:h_fwdOnItemDisplay,
-	Handle:h_fwdOnItemDescription,
-	Handle:h_fwdOnItemDraw,
-	Handle:h_fwdOnItemToggled,
-	Handle:h_fwdOnItemElapsed,
-	Handle:h_fwdOnItemBuy,
-	Handle:h_fwdOnItemSell,
-	Handle:h_fwdOnLuckProcess,
-	Handle:h_fwdOnItemLuck,
-	Handle:h_fwdOnItemLucked,
-	Handle:h_fwdOnItemTransfer,
-	Handle:h_fwdOnItemTransfered,
-	Handle:h_fwdOnCreditsTransfer,
-	Handle:h_fwdOnCreditsTransfered,
-	Handle:h_fwdOnCreditsGiven,
-Handle:h_fwdOnCreditsTaken;
+Handle h_fwdOnAuthorized,
+	h_fwdOnMenuTitle,
+	h_fwdOnItemDisplay,
+	h_fwdOnItemDescription,
+	h_fwdOnItemDraw,
+	h_fwdOnItemToggled,
+	h_fwdOnItemElapsed,
+	h_fwdOnItemBuy,
+	h_fwdOnItemSell,
+	h_fwdOnLuckProcess,
+	h_fwdOnItemLuck,
+	h_fwdOnItemLucked,
+	h_fwdOnItemTransfer,
+	h_fwdOnItemTransfered,
+	h_fwdOnCreditsTransfer,
+	h_fwdOnCreditsTransfered,
+	h_fwdOnCreditsGiven,
+	h_fwdOnCreditsTaken;
 
-Forward_OnPluginStart()
+void Forward_OnPluginStart()
 {
 	h_fwdOnAuthorized = CreateGlobalForward("Shop_OnAuthorized", ET_Ignore, Param_Cell);
 	h_fwdOnMenuTitle = CreateGlobalForward("Shop_OnMenuTitle", ET_Hook, Param_Cell, Param_Cell, Param_String, Param_String, Param_Cell);
@@ -39,9 +39,9 @@ Forward_OnPluginStart()
 	h_fwdOnCreditsTaken = CreateGlobalForward("Shop_OnCreditsTaken", ET_Hook, Param_Cell, Param_CellByRef, Param_Cell);
 }
 
-bool:Forward_OnItemTransfer(client, target, item_id)
+bool Forward_OnItemTransfer(int client, int target, int item_id)
 {
-	new bool:result = true;
+	bool result = true;
 	
 	Call_StartForward(h_fwdOnItemTransfer);
 	Call_PushCell(client);
@@ -52,7 +52,7 @@ bool:Forward_OnItemTransfer(client, target, item_id)
 	return result;
 }
 
-Forward_OnItemTransfered(client, target, item_id)
+void Forward_OnItemTransfered(int client, int target, int item_id)
 {
 	Call_StartForward(h_fwdOnItemTransfered);
 	Call_PushCell(client);
@@ -61,9 +61,9 @@ Forward_OnItemTransfered(client, target, item_id)
 	Call_Finish();
 }
 
-Action:Forward_OnCreditsTransfer(client, target, &credits_give, &credits_remove)
+Action Forward_OnCreditsTransfer(int client, int target, int &credits_give, int &credits_remove)
 {
-	new Action:result = Plugin_Continue;
+	Action result = Plugin_Continue;
 	
 	Call_StartForward(h_fwdOnCreditsTransfer);
 	Call_PushCell(client);
@@ -75,7 +75,7 @@ Action:Forward_OnCreditsTransfer(client, target, &credits_give, &credits_remove)
 	return result;
 }
 
-Forward_OnCreditsTransfered(client, target, credits_give, credits_remove)
+void Forward_OnCreditsTransfered(int client, int target, int credits_give, int credits_remove)
 {
 	Call_StartForward(h_fwdOnCreditsTransfered);
 	Call_PushCell(client);
@@ -85,9 +85,9 @@ Forward_OnCreditsTransfered(client, target, credits_give, credits_remove)
 	Call_Finish();
 }
 
-bool:Forward_OnLuckProcess(client)
+bool Forward_OnLuckProcess(int client)
 {
-	new bool:result = true;
+	bool result = true;
 	
 	Call_StartForward(h_fwdOnLuckProcess);
 	Call_PushCell(client);
@@ -96,9 +96,9 @@ bool:Forward_OnLuckProcess(client)
 	return result;
 }
 
-bool:Forward_OnItemLuck(client, item_id)
+bool Forward_OnItemLuck(int client, int item_id)
 {
-	new bool:result = true;
+	bool result = true;
 	
 	Call_StartForward(h_fwdOnItemLuck);
 	Call_PushCell(client);
@@ -108,7 +108,7 @@ bool:Forward_OnItemLuck(client, item_id)
 	return result;
 }
 
-Forward_OnItemLucked(client, item_id)
+void Forward_OnItemLucked(int client, int item_id)
 {
 	Call_StartForward(h_fwdOnItemLucked);
 	Call_PushCell(client);
@@ -116,9 +116,9 @@ Forward_OnItemLucked(client, item_id)
 	Call_Finish();
 }
 
-Action:Forward_OnItemDraw(client, ShopMenu:menu_action, category_id, item_id, &bool:disabled)
+Action Forward_OnItemDraw(int client, ShopMenu menu_action, int category_id, int item_id, bool &disabled)
 {
-	new Action:result = Plugin_Continue;
+	Action result = Plugin_Continue;
 	
 	Call_StartForward(h_fwdOnItemDraw);
 	Call_PushCell(client);
@@ -131,9 +131,9 @@ Action:Forward_OnItemDraw(client, ShopMenu:menu_action, category_id, item_id, &b
 	return result;
 }
 
-bool:Forward_OnItemDisplay(client, ShopMenu:menu_action, category_id, item_id, const String:display[], String:buffer[], maxlength)
+bool Forward_OnItemDisplay(int client, ShopMenu menu_action, int category_id, int item_id, const char[] display, char[] buffer, int maxlength)
 {
-	new bool:result = false;
+	bool result = false;
 	
 	Call_StartForward(h_fwdOnItemDisplay);
 	Call_PushCell(client);
@@ -153,9 +153,9 @@ bool:Forward_OnItemDisplay(client, ShopMenu:menu_action, category_id, item_id, c
 	return result;
 }
 
-bool:Forward_OnItemDescription(client, ShopMenu:menu_action, category_id, item_id, const String:display[], String:buffer[], maxlength)
+bool Forward_OnItemDescription(int client, ShopMenu menu_action, int category_id, int item_id, const char[] display, char[] buffer, int maxlength)
 {
-	new bool:result = false;
+	bool result = false;
 	
 	Call_StartForward(h_fwdOnItemDescription);
 	Call_PushCell(client);
@@ -175,9 +175,9 @@ bool:Forward_OnItemDescription(client, ShopMenu:menu_action, category_id, item_i
 	return result;
 }
 
-Action:Forward_OnCreditsTaken(client, &credits, by_who)
+Action Forward_OnCreditsTaken(int client, int &credits, int by_who)
 {
-	new Action:result = Plugin_Continue;
+	Action result = Plugin_Continue;
 	
 	Call_StartForward(h_fwdOnCreditsTaken);
 	Call_PushCell(client);
@@ -188,9 +188,9 @@ Action:Forward_OnCreditsTaken(client, &credits, by_who)
 	return result;
 }
 
-Action:Forward_OnCreditsGiven(client, &credits, by_who)
+Action Forward_OnCreditsGiven(int client, int &credits, int by_who)
 {
-	new Action:result = Plugin_Continue;
+	Action result = Plugin_Continue;
 	
 	Call_StartForward(h_fwdOnCreditsGiven);
 	Call_PushCell(client);
@@ -201,14 +201,14 @@ Action:Forward_OnCreditsGiven(client, &credits, by_who)
 	return result;
 }
 
-Forward_OnAuthorized(client)
+void Forward_OnAuthorized(int client)
 {
 	Call_StartForward(h_fwdOnAuthorized);
 	Call_PushCell(client);
 	Call_Finish();
 }
 
-Forward_OnItemElapsed(client, category_id, const String:category[], item_id, const String:item[])
+void Forward_OnItemElapsed(int client, int category_id, const char[] category, int item_id, const char[] item)
 {
 	Call_StartForward(h_fwdOnItemElapsed);
 	Call_PushCell(client);
@@ -219,7 +219,7 @@ Forward_OnItemElapsed(client, category_id, const String:category[], item_id, con
 	Call_Finish();
 }
 
-Forward_OnItemToggled(client, category_id, const String:category[], item_id, const String:item[], ToggleState:toggle)
+void Forward_OnItemToggled(int client, int category_id, const char[] category, int item_id, const char[] item, ToggleState toggle)
 {
 	Call_StartForward(h_fwdOnItemToggled);
 	Call_PushCell(client);
@@ -231,12 +231,12 @@ Forward_OnItemToggled(client, category_id, const String:category[], item_id, con
 	Call_Finish();
 }
 
-Forward_NotifyShopLoaded()
+void Forward_NotifyShopLoaded()
 {
-	decl Handle:plugin;
+	Handle plugin;
 	
-	new Handle:myhandle = GetMyHandle();
-	new Handle:hIter = GetPluginIterator();
+	Handle myhandle = GetMyHandle();
+	Handle hIter = GetPluginIterator();
 	
 	while (MorePlugins(hIter))
 	{
@@ -247,7 +247,7 @@ Forward_NotifyShopLoaded()
 			continue;
 		}
 		
-		new Function:func = GetFunctionByName(plugin, "Shop_Started");
+		Function func = GetFunctionByName(plugin, "Shop_Started");
 		
 		if (func != INVALID_FUNCTION)
 		{
@@ -256,12 +256,12 @@ Forward_NotifyShopLoaded()
 		}
 	}
 	
-	CloseHandle(hIter);
+	delete hIter;
 }
 
-Forward_OnMenuTitle(client, ShopMenu:menu_action, const String:title[], String:buffer[], maxlength)
+void Forward_OnMenuTitle(int client, ShopMenu menu_action, const char[] title, char[] buffer, int maxlength)
 {
-	new bool:result = false;
+	bool result = false;
 	
 	Call_StartForward(h_fwdOnMenuTitle);
 	Call_PushCell(client);
@@ -272,15 +272,14 @@ Forward_OnMenuTitle(client, ShopMenu:menu_action, const String:title[], String:b
 	Call_Finish(result);
 	
 	if (!result)
-	{
 		strcopy(buffer, maxlength, title);
-	}
+	
 	StrCat(buffer, maxlength, "\n ");
 }
 
-Action:Forward_OnItemBuy(client, category_id, const String:category[], item_id, const String:item[], ItemType:type, &price, &sell_price, &value)
+Action Forward_OnItemBuy(int client, int category_id, const char[] category, int item_id, const char[] item, ItemType type, int &price, int &sell_price, int &value)
 {
-	new Action:result = Plugin_Continue;
+	Action result = Plugin_Continue;
 	
 	Call_StartForward(h_fwdOnItemBuy);
 	Call_PushCell(client);
@@ -297,9 +296,9 @@ Action:Forward_OnItemBuy(client, category_id, const String:category[], item_id, 
 	return result;
 }
 
-Action:Forward_OnItemSell(client, category_id, const String:category[], item_id, const String:item[], ItemType:type, &sell_price)
+Action Forward_OnItemSell(int client, int category_id, const char[] category, int item_id, const char[] item, ItemType type, int &sell_price)
 {
-	new Action:result = Plugin_Continue;
+	Action result = Plugin_Continue;
 	
 	Call_StartForward(h_fwdOnItemSell);
 	Call_PushCell(client);

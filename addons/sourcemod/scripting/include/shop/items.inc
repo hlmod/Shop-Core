@@ -5,11 +5,11 @@
  *	@param menu_action		Menu performing this action
  *	@param category_id		Category id of an item
  *	@param item_id			Item id of an item
- *	@param disabled			Whether an item should be disabled of to be selected
+ *	@param disable			Whether an item should be disabled of to be selected
  *	-
  *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block an item to shown. Plugin_Continue otherwise
 */
-forward Action Shop_OnItemDraw(int client, ShopMenu menu_action, CategoryId category_id, ItemId item_id, &bool disabled);
+forward Action Shop_OnItemDraw(int client, ShopMenu menu_action, CategoryId category_id, ItemId item_id, bool &disable);
 
 /**
  *	Called when an item is being displayd
@@ -379,9 +379,9 @@ native bool Shop_GetCategoryNameById(CategoryId category_id, char[] buffer, int 
  *	-
  *	@param array			ADT array to use
  *	-
- *	@noreturn
+ *	@return Number of bytes that written to ArrayList
 */
-native void Shop_FillArrayByItems(ArrayList array);
+native int Shop_FillArrayByItems(ArrayList array);
 
 /**
  *	Formats item display name to use in menu
@@ -437,7 +437,7 @@ stock ItemId Shop_GetArrayItem(ArrayList array, int index)
  *	-
  *	@return Size of the array
 */
-#pragma deprecated
+#pragma deprecated Do not use it
 stock int Shop_GetArrayItemSize(ArrayList array)
 {
 	return array.Length;

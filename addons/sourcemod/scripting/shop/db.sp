@@ -1,60 +1,60 @@
-new Handle:h_db;
+Database h_db;
 
-new ShopDBType:db_type;
+ShopDBType db_type;
 
-new Handle:backup_dp;
+DataPack backup_dp;
 
-new iDays = -1;
+int iDays = -1;
 
-DB_CreateNatives()
+void DB_CreateNatives()
 {
 	CreateNative("Shop_GetDatabase", DB_GetDatabase);
 	CreateNative("Shop_GetDatabasePrefix", DB_GetDatabasePrefix);
 	CreateNative("Shop_GetDatabaseType", DB_GetDatabaseType);
 }
 
-public DB_GetDatabase(Handle:plugin, numParams)
+public int DB_GetDatabase(Handle plugin, int numParams)
 {
-	return _:CloneHandle(h_db, plugin);
+	return view_as<int>(CloneHandle(h_db, plugin));
 }
 
-public DB_GetDatabasePrefix(Handle:plugin, numParams)
+public int DB_GetDatabasePrefix(Handle plugin, int numParams)
 {
-	new bytes;
+	int bytes;
 	
 	SetNativeString(1, g_sDbPrefix, GetNativeCell(2), false, bytes);
 	
 	return bytes;
 }
 
-public DB_GetDatabaseType(Handle:plugin, numParams)
+public int DB_GetDatabaseType(Handle plugin, int numParams)
 {
-	return _:db_type;
+	return view_as<int>(db_type);
 }
 
-DB_OnPluginStart()
+void DB_OnPluginStart()
 {
 	RegServerCmd("sm_shop_clear_db", DB_Command_Clear, "Clears database");
 	
-	backup_dp = CreateDataPack();
+	backup_dp = new DataPack();
 	DB_TryConnect();
 }
 
-DB_OnSettingsLoad(Handle:kv)
+void DB_OnSettingsLoad(KeyValues kv)
 {
-	KvGetString(kv, "db_prefix", g_sDbPrefix, sizeof(g_sDbPrefix), "shop_");
+	kv.GetString("db_prefix", g_sDbPrefix, sizeof(g_sDbPrefix), "shop_");
 	TrimString(g_sDbPrefix);
 }
 
-DB_OnMapStart()
+void DB_OnMapStart()
 {
 	iDays = -1;
 }
 
-new num_rows;
-public Action:DB_Command_Clear(argc)
+int num_rows;
+public Action DB_Command_Clear(int argc)
 {
-	if (h_db == INVALID_HANDLE || !IsStarted())
+	if (h_db == null || !IsStarted())
 	{
 		PrintToServer("[Shop] Database is not ready! Try again later");
 		DB_TryConnect();
@@ -70,14 +70,14 @@ public Action:DB_Command_Clear(argc)
 	}
 	else
 	{
-		decl String:sDays[8];
+		char sDays[8];
 		GetCmdArg(1, sDays, sizeof(sDays));
 		
 		if (iDays != -1)
 		{
 			if (StrEqual(sDays, "ok", false))
 			{
-				decl String:s_Query[128];
+				char s_Query[128];
 				if (iDays == 0)
 				{
 					if (db_type == DB_MySQL)
@@ -137,7 +137,7 @@ public Action:DB_Command_Clear(argc)
 			return Plugin_Handled;
 		}
 		
-		new days = StringToInt(sDays);
+		int days = StringToInt(sDays);
 		
 		if (days < 1)
 		{
@@ -154,7 +154,7 @@ public Action:DB_Command_Clear(argc)
 	return Plugin_Handled;
 }
 
-public DB_Clear(Handle:owner, Handle:hndl, const String:error[], any:data)
+public void DB_Clear(Database db, DBResultSet results, const char[] error, any data)
 {
 	if (num_rows) num_rows--;
 	
@@ -181,12 +181,13 @@ public DB_Clear(Handle:owner, Handle:hndl, const String:error[], any:data)
 			}
 		}
 		
-		if (SQL_GetRowCount(hndl) > 0)
+		if (results.RowCount > 0)
 		{
-			decl String:s_Query[128], id;
-			while (SQL_FetchRow(hndl))
+			char s_Query[128];
+			int id;
+			while (results.FetchRow())
 			{
-				id = SQL_FetchInt(hndl, 0);
+				id = results.FetchInt(0);
 				
 				if (!IsInGame(id))
 				{
@@ -207,14 +208,14 @@ public DB_Clear(Handle:owner, Handle:hndl, const String:error[], any:data)
 	}
 }
 
-new bool:isLoading;
-DB_TryConnect()
+bool isLoading;
+void DB_TryConnect()
 {
 	if (isLoading)
 	{
 		return;
 	}
-	if (h_db != INVALID_HANDLE)
+	if (h_db != null)
 	{
 		isLoading = false;
 		return;
@@ -226,34 +227,34 @@ DB_TryConnect()
 	
 	if (SQL_CheckConfig("shop"))
 	{
-		SQL_TConnect(DB_Connect, "shop", 1);
+		Database.Connect(DB_Connect, "shop", 1);
 	}
 	else
 	{
-		decl String:error[256];
+		char error[256];
 		error[0] = '\0';
 		
 		h_db = SQLite_UseDatabase("shop", error, sizeof(error));
 		
-		DB_Connect(h_db, h_db, error, 2);
+		DB_Connect(h_db, error, 2);
 	}
 }
 
-public Action:DB_ReconnectTimer(Handle:timer)
+public Action DB_ReconnectTimer(Handle timer)
 {
-	if (h_db == INVALID_HANDLE)
+	if (h_db == null)
 	{
 		DB_TryConnect();
 	}
 }
 
-new Handle:upgrade_dp;
-new Handle:insert_dp;
-public DB_Connect(Handle:owner, Handle:hndl, const String:error[], any:data)
+DataPack upgrade_dp;
+DataPack insert_dp;
+public void DB_Connect(Database db, const char[] error, any data)
 {
-	h_db = hndl;
+	h_db = db;
 	
-	if (h_db == INVALID_HANDLE)
+	if (h_db == null)
 	{
 		LogError("DB_Connect %d: %s", data, error);
 		CreateTimer(15.0, DB_ReconnectTimer);
@@ -265,18 +266,21 @@ public DB_Connect(Handle:owner, Handle:hndl, const String:error[], any:data)
 		LogError("DB_Connect %d: %s", data, error);
 	}
 
-	decl String:driver[16];
-	switch (data)
+	char driver[16];
+	DBDriver dbdriver = db.Driver;
+	dbdriver.GetIdentifier(driver, sizeof(driver));
+	/* switch (data)
 	{
 		case 1 :
 		{
-			SQL_GetDriverIdent(owner, driver, sizeof(driver));
+			// SQL_GetDriverIdent(owner, driver, sizeof(driver));
+			dbdriver.GetIdentifier(driver, sizeof(driver));
 		}
 		default :
 		{
-			SQL_ReadDriver(owner, driver, sizeof(driver));
+			SQL_ReadDriver(db, driver, sizeof(driver));
 		}
-	}
+	} */
 	
 	if (StrEqual(driver, "mysql", false))
 	{
@@ -291,7 +295,7 @@ public DB_Connect(Handle:owner, Handle:hndl, const String:error[], any:data)
 		SetFailState("DB_Connect: Driver \"%s\" is not supported!", driver);
 	}
 	
-	decl String:s_Query[256];
+	char s_Query[256];
 	if (db_type == DB_MySQL)
 	{
 		DB_TQueryEx("SET NAMES 'utf8'");
@@ -299,7 +303,7 @@ public DB_Connect(Handle:owner, Handle:hndl, const String:error[], any:data)
 
 		if (GetFeatureStatus(FeatureType_Native, "SQL_SetCharset") == FeatureStatus_Available)
 		{
-			SQL_SetCharset(h_db, "utf8");
+			h_db.SetCharset("utf8");
 		}
 
 		DB_TQuery(DB_GlobalTimer, "SELECT UNIX_TIMESTAMP()", _, DBPrio_High);
@@ -316,39 +320,39 @@ public DB_Connect(Handle:owner, Handle:hndl, const String:error[], any:data)
 	}
 }
 
-public DB_GlobalTimer(Handle:owner, Handle:hndl, const String:error[], any:data)
+public void DB_GlobalTimer(Database db, DBResultSet results, const char[] error, any data)
 {
 	if (error[0])
 	{
 		LogError("DB_GlobalTimer: %s", error);
 	}
 	
-	if (hndl == INVALID_HANDLE || !SQL_HasResultSet(hndl))
+	if (results == null || !results.HasResults)
 	{
 		DB_TQuery(DB_GlobalTimer, "SELECT UNIX_TIMESTAMP()");
 		return;
 	}
 	
-	SQL_FetchRow(hndl);
-	global_timer = SQL_FetchInt(hndl, 0);
+	results.FetchRow();
+	global_timer = results.FetchInt(0);
 }
 
-public DB_CheckTable(Handle:owner, Handle:hndl, const String:error[], any:data)
+public void DB_CheckTable(Database db, DBResultSet results, const char[] error, any data)
 {
 	if (error[0])
 	{
 		LogError("DB_CheckTable: %s", error);
-		CloseHandle(h_db);
-		h_db = INVALID_HANDLE;
+		delete h_db;
+		h_db = null;
 		CreateTimer(15.0, DB_ReconnectTimer);
 		isLoading = false;
 		return;
 	}
 	
-	decl String:s_Query[256];
+	char s_Query[256];
 	if (db_type == DB_MySQL)
 	{
-		if (!SQL_HasResultSet(hndl) || !SQL_FetchRow(hndl) || SQL_FetchInt(hndl, 0) < 1)
+		if (!results.HasResults || !results.FetchRow() || results.FetchInt(0) < 1)
 		{
 			FormatEx(s_Query, sizeof(s_Query), "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '%sitems';", g_sDbPrefix);
 			DB_TQuery(DB_CheckTable2, s_Query);
@@ -356,7 +360,7 @@ public DB_CheckTable(Handle:owner, Handle:hndl, const String:error[], any:data)
 			return;
 		}
 	}
-	else if (!SQL_GetRowCount(hndl))
+	else if (!results.RowCount)
 	{
 		FormatEx(s_Query, sizeof(s_Query), "PRAGMA TABLE_INFO(%sitems);", g_sDbPrefix);
 		DB_TQuery(DB_CheckTable2, s_Query);
@@ -369,23 +373,23 @@ public DB_CheckTable(Handle:owner, Handle:hndl, const String:error[], any:data)
 	OnReadyToStart();
 }
 
-public DB_CheckTable2(Handle:owner, Handle:hndl, const String:error[], any:data)
+public void DB_CheckTable2(Database db, DBResultSet results, const char[] error, any data)
 {
 	if (error[0])
 	{
 		LogError("DB_CheckTable2: %s", error);
-		CloseHandle(h_db);
-		h_db = INVALID_HANDLE;
+		delete h_db;
+		h_db = null;
 		CreateTimer(15.0, DB_ReconnectTimer);
 		isLoading = false;
 		return;
 	}
 	
-	if (SQL_GetRowCount(hndl) > 0)
+	if (results.RowCount > 0)
 	{
 		if (db_type == DB_MySQL)
 		{
-			if (SQL_FetchRow(hndl) && SQL_FetchInt(hndl, 0) > 0)
+			if (results.FetchRow() && results.FetchInt(0) > 0)
 			{
 				DB_UpgradeToNewVersion();
 				return;
@@ -401,9 +405,9 @@ public DB_CheckTable2(Handle:owner, Handle:hndl, const String:error[], any:data)
 	DB_CreateTables();
 }
 
-DB_CreateTables()
+void DB_CreateTables()
 {
-	decl String:s_Query[512];
+	char s_Query[512];
 	if (db_type == DB_MySQL)
 	{
 		FormatEx(s_Query, sizeof(s_Query), "CREATE TABLE IF NOT EXISTS `%sboughts` (\
@@ -468,13 +472,13 @@ DB_CreateTables()
 	isLoading = false;
 }
 
-public DB_OnPlayersTableLoad(Handle:owner, Handle:hndl, const String:error[], any:data)
+public void DB_OnPlayersTableLoad(Database db, DBResultSet results, const char[] error, any data)
 {
 	if (error[0])
 	{
 		LogError("DB_OnPlayersTableLoad %d: %s", data, error);
-		CloseHandle(h_db);
-		h_db = INVALID_HANDLE;
+		delete h_db;
+		h_db = null;
 		CreateTimer(15.0, DB_ReconnectTimer);
 		return;
 	}
@@ -490,7 +494,7 @@ public DB_OnPlayersTableLoad(Handle:owner, Handle:hndl, const String:error[], an
 		DB_TQueryEx("SET CHARSET 'utf8'");
 	}
 	
-	if (upgrade_dp != INVALID_HANDLE)
+	if (upgrade_dp != null)
 	{
 		DB_RunUpgrade();
 	}
@@ -500,17 +504,17 @@ public DB_OnPlayersTableLoad(Handle:owner, Handle:hndl, const String:error[], an
 	}
 }
 
-stock DB_FastQuery(const String:query[])
+stock void DB_FastQuery(const char[] query)
 {
-	if (h_db == INVALID_HANDLE)
+	if (h_db == null)
 	{
-		new Handle:dp = CreateDataPack();
-		WritePackCell(dp, _:DB_ErrorCheck);
-		WritePackString(dp, query);
-		WritePackCell(dp, 0);
-		WritePackCell(dp, _:DBPrio_Normal);
+		DataPack dp = new DataPack();
+		dp.WriteFunction(DB_ErrorCheck);
+		dp.WriteString(query);
+		dp.WriteCell(0);
+		dp.WriteCell(view_as<int>(DBPrio_Normal));
 		
-		WritePackCell(backup_dp, _:dp);
+		backup_dp.WriteCell(dp);
 		
 		return;
 	}
@@ -520,9 +524,9 @@ stock DB_FastQuery(const String:query[])
 	SQL_UnlockDatabase(h_db);
 }
 
-DB_TQuery(SQLTCallback:callback, const String:query[], any:data = 0, DBPriority:prio = DBPrio_Normal)
+void DB_TQuery(SQLQueryCallback callback, const char[] query, any data = 0, DBPriority prio = DBPrio_Normal)
 {
-	if (h_db == INVALID_HANDLE)
+	if (h_db == null)
 	{
 		DataPack dp = new DataPack();
 		dp.WriteFunction(callback);
@@ -530,16 +534,16 @@ DB_TQuery(SQLTCallback:callback, const String:query[], any:data = 0, DBPriority:
 		dp.WriteCell(data);
 		dp.WriteCell(prio);
 		
-		WritePackCell(backup_dp, dp);
+		backup_dp.WriteCell(dp);
 		
 		return;
 	}
-	SQL_TQuery(h_db, callback, query, data, prio);
+	h_db.Query(callback, query, data, prio);
 }
 
-DB_TQueryEx(const String:query[], DBPriority:prio = DBPrio_Normal)
+void DB_TQueryEx(const char[] query, DBPriority prio = DBPrio_Normal)
 {
-	if (h_db == INVALID_HANDLE)
+	if (h_db == null)
 	{
 		DataPack dp = new DataPack();
 		dp.WriteFunction(DB_ErrorCheck);
@@ -547,45 +551,49 @@ DB_TQueryEx(const String:query[], DBPriority:prio = DBPrio_Normal)
 		dp.WriteCell(0);
 		dp.WriteCell(prio);
 		
-		WritePackCell(backup_dp, _:dp);
+		backup_dp.WriteCell(dp);
 		
 		return;
 	}
-	SQL_TQuery(h_db, DB_ErrorCheck, query, _, prio);
+	h_db.Query(DB_ErrorCheck, query, _, prio);
 }
 
-DB_EscapeString(const String:string[], String:buffer[], maxlength, &written=0)
+void DB_EscapeString(const char[] string, char[] buffer, int maxlength, int &written=0)
 {
-	SQL_EscapeString(h_db, string, buffer, maxlength, written);
+	h_db.Escape(string, buffer, maxlength, written);
 }
 
-DB_RunBackup()
+void DB_RunBackup()
 {
-	decl String:buffer[256], Handle:dp, SQLTCallback:callback, any:data, DBPriority:prio;
+	char buffer[256];
+	DataPack dp;
+	SQLQueryCallback callback;
+	any data;
+	DBPriority prio;
 	
-	ResetPack(backup_dp);
+	backup_dp.Reset();
 	while (IsPackReadable(backup_dp, 1))
 	{
-		dp = Handle:ReadPackCell(backup_dp);
+		dp = backup_dp.ReadCell();
 		
-		callback = view_as<SQLTCallback>(ReadPackFunction(dp));
-		ReadPackString(dp, buffer, sizeof(buffer));
-		data = ReadPackCell(dp);
-		prio = DBPriority:ReadPackCell(dp);
+		callback = view_as<SQLQueryCallback>(dp.ReadFunction());
+		dp.ReadString(buffer, sizeof(buffer));
+		data = dp.ReadCell();
+		prio = view_as<DBPriority>(dp.ReadCell());
 		
-		CloseHandle(dp);
+		delete dp;
 		
 		DB_TQuery(callback, buffer, data, prio);
 	}
-	ResetPack(backup_dp, true);
+	backup_dp.Reset(true);
 }
 
-stock bool:DB_IsConnected()
+stock bool DB_IsConnected()
 {
-	return (h_db != INVALID_HANDLE);
+	return (h_db != null);
 }
 
-public DB_ErrorCheck(Handle:owner, Handle:hndl, const String:error[], any:data)
+public void DB_ErrorCheck(Database db, DBResultSet results, const char[] error, any data)
 {
 	if (error[0])
 	{
@@ -593,11 +601,11 @@ public DB_ErrorCheck(Handle:owner, Handle:hndl, const String:error[], any:data)
 	}
 }
 
-DB_UpgradeToNewVersion()
+void DB_UpgradeToNewVersion()
 {
 	PrintToServer("[Shop] Started upgrading to version 2!");
 	
-	decl String:s_Query[256];
+	char s_Query[256];
 	
 	if (db_type == DB_MySQL)
 	{
@@ -613,7 +621,7 @@ DB_UpgradeToNewVersion()
 	DB_TQuery(DB_UgradeState_1, s_Query);
 }
 
-public DB_UgradeState_1(Handle:owner, Handle:hndl, const String:error[], any:data)
+public void DB_UgradeState_1(Database db, DBResultSet results, const char[] error, any data)
 {
 	if (error[0])
 	{
@@ -624,48 +632,50 @@ public DB_UgradeState_1(Handle:owner, Handle:hndl, const String:error[], any:dat
 	
 	PrintToServer("[Shop] Reading old tables...");
 	
-	upgrade_dp = CreateDataPack();
-	insert_dp = CreateDataPack();
+	upgrade_dp = new DataPack();
+	insert_dp = new DataPack();
 	
-	new bool:got_categories;
-	decl String:category[64], String:item[64], String:buffer[2048], id, String:part[128];
-	while (SQL_FetchRow(hndl))
+	bool got_categories;
+	char category[64], item[64], buffer[2048], part[128];
+	int id;
+	while (results.FetchRow())
 	{
-		id = SQL_FetchInt(hndl, 0);
-		for (new i = 1; i < SQL_GetFieldCount(hndl); i++)
+		id = results.FetchInt(0);
+		for (int i = 1; i < results.FieldCount; i++)
 		{
-			SQL_FieldNumToName(hndl, i, category, sizeof(category));
+			results.FieldNumToName(i, category, sizeof(category));
 			
 			if (!got_categories)
 			{
 				SQL_LockDatabase(h_db);
 				FormatEx(buffer, sizeof(buffer), "SELECT `item` FROM `%s`;", category);
-				new Handle:hQuery = SQL_Query(h_db, buffer);
-				if (hQuery != INVALID_HANDLE)
+				DBResultSet hQuery = SQL_Query(h_db, buffer);
+				if (hQuery != null)
 				{
-					while (SQL_FetchRow(hQuery))
+					while (hQuery.FetchRow())
 					{
-						SQL_FetchString(hQuery, 0, item, sizeof(item));
+						hQuery.FetchString(0, item, sizeof(item));
 						
 						FormatEx(buffer, sizeof(buffer), "INSERT INTO `%sitems` (`category`, `item`) VALUES ('%s', '%s');", g_sDbPrefix, category, item);
-						WritePackString(insert_dp, buffer);
+						insert_dp.WriteString(buffer);
 					}
-					CloseHandle(hQuery);
+					delete hQuery;
 				}
 				SQL_UnlockDatabase(h_db);
 			}
 			
-			SQL_FetchString(hndl, i, buffer, sizeof(buffer));
+			results.FetchString(i, buffer, sizeof(buffer));
 			
-			new num, itemId[256], count[256], duration[256], item_id;
+			int num, item_id;
+			char itemId[256], count[256], duration[256];
 			
-			new reloc_idx = 0, var2 = 0;
+			int reloc_idx = 0, var2 = 0;
 			while ((var2 = SplitString(buffer[reloc_idx], ",", part, sizeof(part))) != -1)
 			{
 				reloc_idx += var2;
 				if (!part[0]) continue;
 				
-				new ture = FindCharInString(part, '-');
+				int ture = FindCharInString(part, '-');
 				if (ture != -1)
 				{
 					ture++;
@@ -685,12 +695,12 @@ public DB_UgradeState_1(Handle:owner, Handle:hndl, const String:error[], any:dat
 				count[item_id]++;
 			}
 			
-			for (new x = 0; x < num; x++)
+			for (int x = 0; x < num; x++)
 			{
 				FormatEx(buffer, sizeof(buffer), "INSERT INTO `%sboughts` (`player_id`, `item_id`, `count`, `duration`, `timeleft`, `buy_price`, `sell_price`, `buy_time`) VALUES \
 												('%d', (SELECT `id` FROM `%sitems` WHERE `category` = '%s' AND `item` = (SELECT `item` FROM `%s` WHERE `id` = '%d')), '%d', '%d', '%d', '0', '-1', '%d');", 
 												g_sDbPrefix, id, g_sDbPrefix, category, category, itemId[x], count[itemId[x]], duration[itemId[x]], duration[itemId[x]], global_timer);
-				WritePackString(upgrade_dp, buffer);
+				upgrade_dp.WriteString(buffer);
 			}
 		}
 		
@@ -703,26 +713,26 @@ public DB_UgradeState_1(Handle:owner, Handle:hndl, const String:error[], any:dat
 	DB_CreateTables();
 }
 
-new num_queries;
-DB_RunUpgrade()
+int num_queries;
+void DB_RunUpgrade()
 {
 	PrintToServer("[Shop] Running queries...");
 	
-	decl String:buffer[256];
+	char buffer[256];
 	
-	ResetPack(insert_dp);
+	insert_dp.Reset();
 	while (IsPackReadable(insert_dp, 1))
 	{
-		ReadPackString(insert_dp, buffer, sizeof(buffer));
+		insert_dp.ReadString(buffer, sizeof(buffer));
 		DB_TQuery(DB_UgradeState_2, buffer);
 		num_queries++;
 	}
-	CloseHandle(insert_dp);
-	insert_dp = INVALID_HANDLE;
+	delete insert_dp;
+	insert_dp = null;
 }
 
-new num_queries2;
-public DB_UgradeState_2(Handle:owner, Handle:hndl, const String:error[], any:data)
+int num_queries2;
+public void DB_UgradeState_2(Database db, DBResultSet results, const char[] error, any data)
 {
 	num_queries--;
 	
@@ -736,22 +746,22 @@ public DB_UgradeState_2(Handle:owner, Handle:hndl, const String:error[], any:dat
 		return;
 	}
 	
-	decl String:buffer[512];
+	char buffer[512];
 	
-	ResetPack(upgrade_dp);
+	upgrade_dp.Reset();
 	
 	while (IsPackReadable(upgrade_dp, 1))
 	{
-		ReadPackString(upgrade_dp, buffer, sizeof(buffer));
+		upgrade_dp.ReadString(buffer, sizeof(buffer));
 		DB_TQuery(DB_UgradeState_3, buffer, DBPrio_High);
 		num_queries2++;
 	}
 	
-	CloseHandle(upgrade_dp);
-	upgrade_dp = INVALID_HANDLE;
+	delete upgrade_dp;
+	upgrade_dp = null;
 }
 
-public DB_UgradeState_3(Handle:owner, Handle:hndl, const String:error[], any:data)
+public void DB_UgradeState_3(Database db, DBResultSet results, const char[] error, any data)
 {
 	num_queries2--;
 	
