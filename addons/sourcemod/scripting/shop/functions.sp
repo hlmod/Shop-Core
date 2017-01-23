@@ -187,7 +187,9 @@ void Functions_ShowMenu(int client, int pos = 0)
 		{
 			dp = g_hFuncArray.Get(i);
 			dp.Reset();
-			Call_StartFunction(dp.ReadCell(), dp.ReadFunction());
+			Handle plugin = dp.ReadCell();
+			Function callback = dp.ReadFunction();
+			Call_StartFunction(plugin, callback);
 			Call_PushCell(client);
 			Call_PushStringEx(display, sizeof(display), SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
 			Call_PushCell(sizeof(display));
