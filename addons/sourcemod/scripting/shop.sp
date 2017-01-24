@@ -1,6 +1,7 @@
 #pragma semicolon 1
 
 #include <sourcemod>
+#pragma newdecls required
 #include <shop>
 
 #define GAME_UNDEFINED		0
@@ -34,7 +35,6 @@ int g_iItemTransfer;
 #include "shop/colors.sp"
 #include "shop/admin.sp"
 #include "shop/commands.sp"
-#pragma newdecls required
 #include "shop/db.sp"
 #include "shop/forwards.sp"
 #include "shop/helpers.sp"

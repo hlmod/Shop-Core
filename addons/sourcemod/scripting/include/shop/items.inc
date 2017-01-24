@@ -56,7 +56,7 @@ forward bool Shop_OnItemDescription(int client, ShopMenu menu_action, CategoryId
  *	-
  *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block. Plugin_Continue otherwise
 */
-forward Action:Shop_OnItemBuy(int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ItemType type, int &price, int &sell_price, int &value);
+forward Action Shop_OnItemBuy(int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ItemType type, int &price, int &sell_price, int &value);
 
 /**
  *	Called when an item is being bought
@@ -71,7 +71,7 @@ forward Action:Shop_OnItemBuy(int client, CategoryId category_id, const char[] c
  *	-
  *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block. Plugin_Continue otherwise
 */
-forward Action:Shop_OnItemSell(int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ItemType type, int &sell_price);
+forward Action Shop_OnItemSell(int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ItemType type, int &sell_price);
 
 /**
  *	Called when an item has been toggled
@@ -109,7 +109,7 @@ forward void Shop_OnItemElapsed(int client, CategoryId category_id, const char[]
  *	-
  *	@return true to allow transfer and false to block
 */
-forward bool Shop_OnItemTransfer(int client, target, ItemId item_id);
+forward bool Shop_OnItemTransfer(int client, int target, ItemId item_id);
 
 /**
  *	Called when a player has transfered an item
@@ -120,7 +120,7 @@ forward bool Shop_OnItemTransfer(int client, target, ItemId item_id);
  *	-
  *	@noreturn
 */
-forward void Shop_OnItemTransfered(int client, target, ItemId item_id);
+forward void Shop_OnItemTransfered(int client, int target, ItemId item_id);
 
 /**
  *	Gets an item custom info
@@ -177,7 +177,7 @@ native bool Shop_SetItemCustomInfoFloat(ItemId item_id, const char[] info, float
  *	-
  *	@return Number of bytes written
 */
-native int Shop_GetItemCustomInfoString(ItemId item_id, const char[] info, char[] buffer, maxlength, const char[] defaultvalue = "");
+native int Shop_GetItemCustomInfoString(ItemId item_id, const char[] info, char[] buffer, int maxlength, const char[] defaultvalue = "");
 
 /**
  *	Sets an item custom info
@@ -313,7 +313,7 @@ native int Shop_GetItemById(ItemId item_id, char[] buffer, int maxlength);
  *	-
  *	@return Number of bytes written
 */
-native Shop_GetItemNameById(ItemId item_id, char[] buffer, int maxlength);
+native int Shop_GetItemNameById(ItemId item_id, char[] buffer, int maxlength);
 
 /**
  *	Get is feature "Try luck" enabled

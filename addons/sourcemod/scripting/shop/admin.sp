@@ -5,9 +5,9 @@
 #define TAKE_ITEMS		4
 #define ADD_PLAYERS		5
 
-#define ADMINPANEL_PLUGIN 0
+/* #define ADMINPANEL_PLUGIN 0
 #define ADMINPANEL_DISPLAY 1
-#define ADMINPANEL_SELECT 2
+#define ADMINPANEL_SELECT 2 */
 
 enum AdminEnum
 {
@@ -16,42 +16,48 @@ enum AdminEnum
 	AdminCategory
 };
 
-new AdminEnum:g_iOpt[MAXPLAYERS+1][AdminEnum];
+AdminEnum g_iOpt[MAXPLAYERS+1][AdminEnum];
 
-new Handle:count_menu;
+Menu count_menu;
 
-new Handle:g_hAdminArray;
+ArrayList g_hAdminArray;
 
-Admin_CreateNatives()
+void Admin_CreateNatives()
 {
-	g_hAdminArray = CreateArray(3);
+	g_hAdminArray = new ArrayList(3);
 	
 	CreateNative("Shop_AddToAdminMenu", Admin_AddToMenuNative);
 	CreateNative("Shop_RemoveFromAdminMenu", Admin_RemoveFromMenuNative);
 	CreateNative("Shop_ShowAdminMenu", Admin_ShowAdminMenu);
 }
 
-public Admin_AddToMenuNative(Handle:plugin, params)
+public int Admin_AddToMenuNative(Handle plugin, int numParams)
 {
-	decl any:tmp[3];
-	tmp[ADMINPANEL_PLUGIN] = plugin;
-	tmp[ADMINPANEL_DISPLAY] = GetNativeCell(1);
-	tmp[ADMINPANEL_SELECT] = GetNativeCell(2);
+	DataPack dp = new DataPack();
+	dp.WriteCell(plugin);
+	dp.WriteFunction(GetNativeFunction(1));
+	dp.WriteFunction(GetNativeFunction(2));
 	
-	PushArrayArray(g_hAdminArray, tmp);
+	g_hAdminArray.Push(plugin);
+	g_hAdminArray.Push(dp);
 }
 
-public Admin_RemoveFromMenuNative(Handle:plugin, params)
-{
-	decl any:tmp[3];
-	
-	new index = -1;
-	while ((index = FindValueInArray(g_hAdminArray, plugin)) != -1)
+public int Admin_RemoveFromMenuNative(Handle plugin, int numParams)
+{	
+	int index = -1;
+	DataPack dp;
+	while ((index = g_hAdminArray.FindValue(plugin)) != -1)
 	{
-		GetArrayArray(g_hAdminArray, index, tmp);
-		if (tmp[ADMINPANEL_DISPLAY] == GetNativeCell(1) && tmp[ADMINPANEL_SELECT] == GetNativeCell(2))
+		dp = g_hAdminArray.Get(index+1);
+		dp.Reset();
+		dp.Position += view_as<DataPackPos>(9); // skip Handle plugin
+		Function func_disp = dp.ReadFunction();
+		Function func_select = dp.ReadFunction();
+		if (func_disp == GetNativeFunction(1) && func_select == GetNativeFunction(2))
 		{
-			RemoveFromArray(g_hAdminArray, index);
+			// double action to delete Handle (plugin) and datapack (plugin, func_disp, func_select)
+			g_hAdminArray.Erase(index);
+			g_hAdminArray.Erase(index);
 			return true;
 		}
 	}
@@ -59,56 +65,54 @@ public Admin_RemoveFromMenuNative(Handle:plugin, params)
 	return false;
 }
 
-public Admin_ShowAdminMenu(Handle:plugin, numParams)
+public int Admin_ShowAdminMenu(Handle plugin, int numParams)
 {
-	new client = GetNativeCell(1);
+	int client = GetNativeCell(1);
 	
-	decl String:error[64];
+	char error[64];
 	if (!CheckClient(client, error, sizeof(error)))
-	{
 		ThrowNativeError(SP_ERROR_NATIVE, error);
-	}
 	
 	Admin_ShowMenu(client);
 }
 
-Admin_OnSettingsLoad(Handle:kv)
+void Admin_OnSettingsLoad(KeyValues kv)
 {
-	count_menu = CreateMenu(Admin_MenuCount_Handler, MENU_ACTIONS_DEFAULT|MenuAction_Display);
+	count_menu = new Menu(Admin_MenuCount_Handler, MENU_ACTIONS_DEFAULT|MenuAction_Display);
 	
-	if (KvJumpToKey(kv, "Count_Menu", false))
+	if (kv.JumpToKey("Count_Menu", false))
 	{
-		if (KvGotoFirstSubKey(kv, false))
+		if (kv.GotoFirstSubKey(false))
 		{
-			SetMenuExitButton(count_menu, true);
-			SetMenuExitBackButton(count_menu, true);
+			count_menu.ExitButton = true;
+			count_menu.ExitBackButton = true;
 			
-			decl String:amount[24], String:buffer[64];
+			char amount[24], buffer[64];
 			do
 			{
-				if (KvGetSectionName(kv, amount, sizeof(amount)))
+				if (kv.GetSectionName(amount, sizeof(amount)))
 				{
-					KvGetString(kv, NULL_STRING, buffer, sizeof(buffer));
+					kv.GetString(NULL_STRING, buffer, sizeof(buffer));
 					if (amount[0] && buffer[0])
 					{
-						AddMenuItem(count_menu, amount, buffer);
+						count_menu.AddItem(amount, buffer);
 					}
 				}
 			}
-			while (KvGotoNextKey(kv, false));
+			while (kv.GotoNextKey(false));
 		}
-		KvRewind(kv);
+		kv.Rewind();
 	}
 	
-	if (!GetMenuItemCount(count_menu))
+	if (!count_menu.ItemCount)
 	{
-		AddMenuItem(count_menu, "1", "1 credit");
-		AddMenuItem(count_menu, "10", "10 credits");
-		AddMenuItem(count_menu, "100", "Hundred credits");
-		AddMenuItem(count_menu, "1000", "Thousand credits");
-		AddMenuItem(count_menu, "10000", "10000 credits");
-		AddMenuItem(count_menu, "100000", "100000 credits");
-		AddMenuItem(count_menu, "1000000", "Million credits");
+		count_menu.AddItem("1", "1 credit");
+		count_menu.AddItem("10", "10 credits");
+		count_menu.AddItem("100", "Hundred credits");
+		count_menu.AddItem("1000", "Thousand credits");
+		count_menu.AddItem("10000", "10000 credits");
+		count_menu.AddItem("100000", "100000 credits");
+		count_menu.AddItem("1000000", "Million credits");
 	}
 }
 
@@ -118,7 +122,7 @@ public int Admin_MenuCount_Handler(Menu menu, MenuAction action, int param1, int
 	{
 		case MenuAction_Display :
 		{
-			new target = GetClientOfUserId(g_iOpt[param1][AdminTarget]);
+			int target = GetClientOfUserId(g_iOpt[param1][AdminTarget]);
 			
 			if (!target)
 			{
@@ -143,7 +147,7 @@ public int Admin_MenuCount_Handler(Menu menu, MenuAction action, int param1, int
 		}
 		case MenuAction_Select :
 		{
-			new target = GetClientOfUserId(g_iOpt[param1][AdminTarget]);
+			int target = GetClientOfUserId(g_iOpt[param1][AdminTarget]);
 			
 			if (!target)
 			{
@@ -152,8 +156,8 @@ public int Admin_MenuCount_Handler(Menu menu, MenuAction action, int param1, int
 				return;
 			}
 			
-			decl String:info[16];
-			GetMenuItem(menu, param2, info, sizeof(info));
+			char info[16];
+			menu.GetItem(param2, info, sizeof(info));
 			
 			switch (g_iOpt[param1][AdminOption])
 			{
@@ -184,13 +188,13 @@ public int Admin_MenuCount_Handler(Menu menu, MenuAction action, int param1, int
 	}
 }
 
-Admin_ShowMenu(client, pos = 0)
+void Admin_ShowMenu(int client, int pos = 0)
 {
 	SetGlobalTransTarget(client);
 	
 	Menu menu = new Menu(Admin_Menu_Handler);
 	
-	decl String:title[128];
+	char title[128];
 	FormatEx(title, sizeof(title), "%t", "admin_panel");
 	OnMenuTitle(client, Menu_AdminPanel, title, title, sizeof(title));
 	menu.SetTitle(title);
@@ -209,26 +213,28 @@ Admin_ShowMenu(client, pos = 0)
 	FormatEx(buffer, sizeof(buffer), "%t", "take_items");
 	menu.AddItem("e", buffer);
 	
-	new size = GetArraySize(g_hAdminArray);
+	int size = g_hAdminArray.Length;
 	
 	if (size > 0)
 	{
-		decl any:tmp[3], String:id[16], String:display[64];
+		DataPack dp;
+		char id[16], display[64];
 		display[0] = '\0';
-		for (new i = 0; i < size; i++)
+		for (int i = 1; i < size; i+=2)
 		{
-			GetArrayArray(g_hAdminArray, i, tmp, sizeof(tmp));
+			dp = g_hAdminArray.Get(i);
 			
-			Call_StartFunction(tmp[ADMINPANEL_PLUGIN], tmp[ADMINPANEL_DISPLAY]);
+			dp.Reset();
+			Handle plugin = dp.ReadCell();
+			Function func_disp = dp.ReadFunction();
+			Call_StartFunction(plugin, func_disp);
 			Call_PushCell(client);
 			Call_PushStringEx(display, sizeof(display), SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
 			Call_PushCell(sizeof(display));
 			Call_Finish();
 			
 			if (!display[0])
-			{
 				continue;
-			}
 			
 			IntToString(i, id, sizeof(id));
 			
@@ -239,14 +245,14 @@ Admin_ShowMenu(client, pos = 0)
 	menu.DisplayAt(client, pos, MENU_TIME_FOREVER);
 }
 
-public Admin_Menu_Handler(Menu menu, MenuAction action, int param1, int param2)
+public int Admin_Menu_Handler(Menu menu, MenuAction action, int param1, int param2)
 {
 	switch (action)
 	{
 		case MenuAction_Select :
 		{
-			decl String:info[16];
-			GetMenuItem(menu, param2, info, sizeof(info));
+			char info[16];
+			menu.GetItem(param2, info, sizeof(info));
 			
 			switch (info[0])
 			{
@@ -272,20 +278,25 @@ public Admin_Menu_Handler(Menu menu, MenuAction action, int param1, int param2)
 				}
 				default :
 				{
-					new bool:result = false;
+					bool result = false;
 					
-					decl any:tmp[3];
-					if (GetArrayArray(g_hAdminArray, StringToInt(info), tmp, sizeof(tmp)))
+					DataPack dp;
+					dp = g_hAdminArray.Get(StringToInt(info));
+					if (dp != null)
 					{
-						Call_StartFunction(tmp[ADMINPANEL_PLUGIN], tmp[ADMINPANEL_SELECT]);
+						dp.Reset();
+						Handle plugin = dp.ReadCell();
+						
+						dp.Position += view_as<DataPackPos>(9); // Skip func_diplay
+						Function func_select = dp.ReadFunction();
+						
+						Call_StartFunction(plugin, func_select);
 						Call_PushCell(param1);
 						Call_Finish(result);
 					}
 					
 					if (!result)
-					{
 						Admin_ShowMenu(param1, GetMenuSelectionPosition());
-					}
 					
 					return;
 				}
@@ -331,17 +342,17 @@ bool Admin_ShowTargetsMenu(int client, int pos = 0)
 	return true;
 }
 
-public Admin_TargetsMenu_Handler(Menu menu, MenuAction action, int param1, int param2)
+public int Admin_TargetsMenu_Handler(Menu menu, MenuAction action, int param1, int param2)
 {
 	switch (action)
 	{
 		case MenuAction_Select :
 		{
-			decl String:info[16];
-			GetMenuItem(menu, param2, info, sizeof(info));
+			char info[16];
+			menu.GetItem(param2, info, sizeof(info));
 			
-			new userid = StringToInt(info);
-			new target = GetClientOfUserId(userid);
+			int userid = StringToInt(info);
+			int target = GetClientOfUserId(userid);
 			
 			if (!target)
 			{
@@ -378,9 +389,9 @@ public Admin_TargetsMenu_Handler(Menu menu, MenuAction action, int param1, int p
 	}
 }
 
-Admin_ShowCreditsAmount(client, pos = 0)
+void Admin_ShowCreditsAmount(int client, int pos = 0)
 {
-	DisplayMenuAtItem(count_menu, client, pos, MENU_TIME_FOREVER);
+	count_menu.DisplayAt(client, pos, MENU_TIME_FOREVER);
 }
 
 bool Admin_ShowCategories(int client, int pos = 0)
@@ -404,16 +415,16 @@ bool Admin_ShowCategories(int client, int pos = 0)
 	return true;
 }
 
-public Admin_CategoriesMenu_Handler(Menu menu, MenuAction action, int param1, int param2)
+public int Admin_CategoriesMenu_Handler(Menu menu, MenuAction action, int param1, int param2)
 {
 	switch (action)
 	{
 		case MenuAction_Select :
 		{
-			decl String:info[16];
-			GetMenuItem(menu, param2, info, sizeof(info));
+			char info[16];
+			menu.GetItem(param2, info, sizeof(info));
 			
-			new target = GetClientOfUserId(g_iOpt[param1][AdminTarget]);
+			int target = GetClientOfUserId(g_iOpt[param1][AdminTarget]);
 			
 			if (!target)
 			{
@@ -460,7 +471,7 @@ bool Admin_ShowItemsOfCategory(int client, int category_id, int pos = 0)
 	return true;
 }
 
-public Admin_ItemsMenu_Handler(Menu menu, MenuAction action, int param1, int param2)
+public int Admin_ItemsMenu_Handler(Menu menu, MenuAction action, int param1, int param2)
 {
 	switch (action)
 	{
@@ -480,12 +491,12 @@ public Admin_ItemsMenu_Handler(Menu menu, MenuAction action, int param1, int par
 		}
 		case MenuAction_DrawItem  :
 		{
-			decl String:info[16];
-			GetMenuItem(menu, param2, info, sizeof(info));
+			char info[16];
+			menu.GetItem(param2, info, sizeof(info));
 			
-			new target = GetClientOfUserId(g_iOpt[param1][AdminTarget]);
+			int target = GetClientOfUserId(g_iOpt[param1][AdminTarget]);
 			
-			new ItemType:type = GetItemTypeEx(info);
+			ItemType type = GetItemTypeEx(info);
 			
 			if (type != Item_Finite && type != Item_BuyOnly)
 			{
@@ -510,17 +521,17 @@ public Admin_ItemsMenu_Handler(Menu menu, MenuAction action, int param1, int par
 		}
 		case MenuAction_DisplayItem :
 		{
-			decl String:info[16], String:buffer[SHOP_MAX_STRING_LENGTH];
-			GetMenuItem(menu, param2, info, sizeof(info), _, buffer, sizeof(buffer));
+			char info[16], buffer[SHOP_MAX_STRING_LENGTH];
+			menu.GetItem(param2, info, sizeof(info), _, buffer, sizeof(buffer));
 			
-			new ItemType:type = GetItemTypeEx(info);
+			ItemType type = GetItemTypeEx(info);
 			
 			if (type == Item_BuyOnly)
 			{
 				return 0;
 			}
 			
-			new target = GetClientOfUserId(g_iOpt[param1][AdminTarget]);
+			int target = GetClientOfUserId(g_iOpt[param1][AdminTarget]);
 			
 			if (type == Item_Finite)
 			{
@@ -549,10 +560,10 @@ public Admin_ItemsMenu_Handler(Menu menu, MenuAction action, int param1, int par
 		}
 		case MenuAction_Select :
 		{
-			decl String:info[16];
-			GetMenuItem(menu, param2, info, sizeof(info));
+			char info[16];
+			menu.GetItem(param2, info, sizeof(info));
 			
-			new target = GetClientOfUserId(g_iOpt[param1][AdminTarget]);
+			int target = GetClientOfUserId(g_iOpt[param1][AdminTarget]);
 			
 			if (!target)
 			{

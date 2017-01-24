@@ -1,20 +1,20 @@
-functag public bool:CategoryDisplayCallback(client, CategoryId:category_id, const String:category[], const String:name[], String:buffer[], maxlen);
-functag public bool:CategoryDescriptionCallback(client, CategoryId:category_id, const String:category[], const String:description[], String:buffer[], maxlen);
-functag public bool:CategoryShouldDisplayCallback(client, CategoryId:category_id, const String:category[]);
-functag public bool:CategorySelectCallback(client, CategoryId:category_id, const String:category[], ShopMenu:menu);
+typedef CategoryDisplayCallback = function bool (int client, CategoryId category_id, const char[] category, const char[] name, char[] buffer, int maxlen);
+typedef CategoryDescriptionCallback = function bool (int client, CategoryId category_id, const char[] category, const char[] description, char[] buffer, int maxlen);
+typedef CategoryShouldDisplayCallback = function bool (int client, CategoryId category_id, const char[] category);
+typedef CategorySelectCallback = function bool (int client, CategoryId category_id, const char[] category, ShopMenu menu);
 
-funcenum ItemUseToggleCallback
+typeset ItemUseToggleCallback
 {
-	ShopAction:public(client, CategoryId:category_id, const String:category[], ItemId:item_id, const String:item[]),
-	ShopAction:public(client, CategoryId:category_id, const String:category[], ItemId:item_id, const String:item[], bool:isOn, bool:elapsed)
+	function ShopAction (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item);
+	function ShopAction (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, bool isOn, bool elapsed);
 }
-functag public ItemRegister(CategoryId:category_id, const String:category[], const String:item[], ItemId:item_id);
-functag public ItemCommon(client, CategoryId:category_id, const String:category[], ItemId:item_id, const String:item[]);
-functag public bool:ItemShouldDisplayCallback(client, CategoryId:category_id, const String:category[], ItemId:item_id, const String:item[], ShopMenu:menu);
-functag public bool:ItemDisplayCallback(client, CategoryId:category_id, const String:category[], ItemId:item_id, const String:item[], ShopMenu:menu, &bool:disabled, const String:name[], String:buffer[], maxlen);
-functag public bool:ItemDescriptionCallback(client, CategoryId:category_id, const String:category[], ItemId:item_id, const String:item[], ShopMenu:menu, const String:description[], String:buffer[], maxlen);
-functag public bool:ItemBuyCallback(client, CategoryId:category_id, const String:category[], ItemId:item_id, const String:item[], ItemType:type, price, sell_price, value);
-functag public bool:ItemSellCallback(client, CategoryId:category_id, const String:category[], ItemId:item_id, const String:item[], ItemType:type, sell_price);
+typedef ItemRegister = function void (CategoryId category_id, const char[] category, const char[] item, ItemId item_id);
+typedef ItemCommon = function void(int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item);
+typedef ItemShouldDisplayCallback = function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ShopMenu menu);
+typedef ItemDisplayCallback = function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ShopMenu menu, bool &disabled, const char[] name, char[] buffer, int maxlen);
+typedef ItemDescriptionCallback = function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ShopMenu menu, const char[] description, char[] buffer, int maxlen);
+typedef ItemBuyCallback = function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ItemType type, int price, int sell_price, int value);
+typedef ItemSellCallback = function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ItemType type, int sell_price);
 
 /**
  *	Registers new category id
@@ -29,11 +29,11 @@ functag public bool:ItemSellCallback(client, CategoryId:category_id, const Strin
  *	-
  *	@return Category id of the category
 */
-native CategoryId:Shop_RegisterCategory(const String:category[], const String:name[], const String:description[], 
-								CategoryDisplayCallback:cat_display=CategoryDisplayCallback:INVALID_FUNCTION, 
-								CategoryDescriptionCallback:cat_desc=CategoryDescriptionCallback:INVALID_FUNCTION,
-								CategoryShouldDisplayCallback:cat_should=CategoryShouldDisplayCallback:INVALID_FUNCTION,
-								CategorySelectCallback:cat_select=CategorySelectCallback:INVALID_FUNCTION);
+native CategoryId Shop_RegisterCategory(const char[] category, const char[] name, const char[] description, 
+								CategoryDisplayCallback cat_display=INVALID_FUNCTION, 
+								CategoryDescriptionCallback cat_desc=INVALID_FUNCTION,
+								CategoryShouldDisplayCallback cat_should=INVALID_FUNCTION,
+								CategorySelectCallback cat_select=INVALID_FUNCTION);
 
 /**
  *	Starts an item to register
@@ -43,7 +43,7 @@ native CategoryId:Shop_RegisterCategory(const String:category[], const String:na
  *	-
  *	@return true to success, false otherwise
 */
-native bool:Shop_StartItem(CategoryId:category_id, const String:item[]);
+native bool Shop_StartItem(CategoryId category_id, const char[] item);
 
 /**
  *	Sets the item information
@@ -57,7 +57,7 @@ native bool:Shop_StartItem(CategoryId:category_id, const String:item[]);
  *	-
  *	@noreturn
 */
-native Shop_SetInfo(const String:name[], const String:description[], price, sell_price = -1, ItemType:type, value = 1);
+native void Shop_SetInfo(const char[] name, const char[] description, int price, int sell_price = -1, ItemType type, int value = 1);
 
 /**
  *	Sets the item callbacks
@@ -74,15 +74,15 @@ native Shop_SetInfo(const String:name[], const String:description[], price, sell
  *	-
  *	@noreturn
 */
-native Shop_SetCallbacks(ItemRegister:register=ItemRegister:INVALID_FUNCTION,
-							ItemUseToggleCallback:use_toggle=ItemUseToggleCallback:INVALID_FUNCTION, 
-							ItemShouldDisplayCallback:should=ItemShouldDisplayCallback:INVALID_FUNCTION, 
-							ItemDisplayCallback:display=ItemDisplayCallback:INVALID_FUNCTION, 
-							ItemDescriptionCallback:description=ItemDescriptionCallback:INVALID_FUNCTION, 
-							ItemCommon:preview=ItemCommon:INVALID_FUNCTION,
-							ItemBuyCallback:buy=ItemBuyCallback:INVALID_FUNCTION,
-							ItemSellCallback:sell=ItemSellCallback:INVALID_FUNCTION,
-							ItemCommon:elapse=ItemCommon:INVALID_FUNCTION);
+native void Shop_SetCallbacks(ItemRegister register=INVALID_FUNCTION,
+							ItemUseToggleCallback use_toggle=INVALID_FUNCTION, 
+							ItemShouldDisplayCallback should=INVALID_FUNCTION, 
+							ItemDisplayCallback display=INVALID_FUNCTION, 
+							ItemDescriptionCallback description=INVALID_FUNCTION, 
+							ItemCommon preview=INVALID_FUNCTION,
+							ItemBuyCallback buy=INVALID_FUNCTION,
+							ItemSellCallback sell=INVALID_FUNCTION,
+							ItemCommon elapse=INVALID_FUNCTION);
 
 
 /**
@@ -92,7 +92,7 @@ native Shop_SetCallbacks(ItemRegister:register=ItemRegister:INVALID_FUNCTION,
  *	-
  *	@noreturn
 */
-native Shop_SetCanLuck(bool:bCanLuck);
+native void Shop_SetCanLuck(bool bCanLuck);
 
 /**
  *	Sets item custom info
@@ -102,7 +102,7 @@ native Shop_SetCanLuck(bool:bCanLuck);
  *	-
  *	@noreturn
 */
-native Shop_SetCustomInfo(const String:info[], value);
+native void Shop_SetCustomInfo(const char[] info, int value);
 
 /**
  *	Sets item custom info
@@ -112,7 +112,7 @@ native Shop_SetCustomInfo(const String:info[], value);
  *	-
  *	@noreturn
 */
-native Shop_SetCustomInfoFloat(const String:info[], Float:value);
+native void Shop_SetCustomInfoFloat(const char[] info, float value);
 
 /**
  *	Sets item custom info
@@ -122,7 +122,7 @@ native Shop_SetCustomInfoFloat(const String:info[], Float:value);
  *	-
  *	@noreturn
 */
-native Shop_SetCustomInfoString(const String:info[], String:value[]);
+native void Shop_SetCustomInfoString(const char[] info, char[] value);
 
 /**
  *	Copies sub keys of the given kv structure to the item
@@ -132,7 +132,7 @@ native Shop_SetCustomInfoString(const String:info[], String:value[]);
  *	-
  *	@noreturn
 */
-native Shop_KvCopySubKeysCustomInfo(Handle:kv);
+native void Shop_KvCopySubKeysCustomInfo(KeyValues kv);
 
 /**
  *	Copletes the item info structure and start to register. Can not be used before an item has been started to register
@@ -141,4 +141,4 @@ native Shop_KvCopySubKeysCustomInfo(Handle:kv);
  *	-
  *	@noreturn
 */
-native Shop_EndItem();
+native void Shop_EndItem();

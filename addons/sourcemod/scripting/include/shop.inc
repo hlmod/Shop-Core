@@ -252,7 +252,7 @@ native bool Shop_ShowItemsOfCategory(int client, CategoryId category_id, bool in
  *	-
  *	@noreturn
 */
-stock Shop_GetCfgFile(char[] buffer, int size, const char[] file)
+stock void Shop_GetCfgFile(char[] buffer, int size, const char[] file)
 {
 	BuildPath(Path_SM, buffer, size, "configs/shop/%s", file);
 }

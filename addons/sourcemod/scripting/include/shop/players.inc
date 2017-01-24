@@ -67,7 +67,7 @@ native bool Shop_IsClientHasItem(int client, ItemId item_id);
  *	-
  *	@return true on success and false otherwise
 */
-native bool Shop_ToggleClientItem(client, ItemId item_id, ToggleState:toggle = Toggle);
+native bool Shop_ToggleClientItem(int client, ItemId item_id, ToggleState toggle = Toggle);
 
 /**
  *	Toggles all items of category off
@@ -77,7 +77,7 @@ native bool Shop_ToggleClientItem(client, ItemId item_id, ToggleState:toggle = T
  *	-
  *	@noreturn
 */
-native void Shop_ToggleClientCategoryOff(client, CategoryId:category_id);
+native void Shop_ToggleClientCategoryOff(int client, CategoryId category_id);
 
 /**
  *	Checks whether the player has been loaded from database
