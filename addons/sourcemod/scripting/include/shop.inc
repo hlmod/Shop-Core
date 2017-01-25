@@ -9,8 +9,9 @@
 #endif
 #define _shop_included
 
-#define SHOP_VERSION	"2.1.2"
-#define SHOP_MAX_STRING_LENGTH 64
+#define SHOP_VERSION					"2.2.0"
+
+#define SHOP_MAX_STRING_LENGTH	64
 
 enum CategoryId
 {

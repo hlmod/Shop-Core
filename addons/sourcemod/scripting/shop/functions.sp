@@ -555,7 +555,7 @@ Action:Functions_OnClientSayCommand(client, const String:text[])
 	
 	g_iCreditsTransferAmount[client] = StringToInt(text);
 	
-	if(g_iCreditsTransferAmount[client] <= 0)
+	if(g_iCreditsTransferAmount[client] < 2)
 	{
 		CPrintToChat(client, "%t", "IncorrectCredits");
 		return Plugin_Handled;
