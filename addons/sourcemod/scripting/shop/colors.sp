@@ -37,7 +37,7 @@ void CPrintToChat(int client, const char[] sFormat, any ...)
 	
 			if(!hColorsTrie)
 			{
-				InitColors(hColorsTrie);
+				hColorsTrie = InitColors();
 			}
 	
 			if(!hRegex)
@@ -181,9 +181,9 @@ void SayText2(int client, int iAuthor = 0, const char[] sMessage)
 	EndMessage();
 }
 
-void InitColors(StringMap &hColorsTrie)
+StringMap InitColors()
 {
-	hColorsTrie = new StringMap();
+	StringMap hColorsTrie = new StringMap();
 	hColorsTrie.SetValue("aliceblue", 0xF0F8FF);
 	hColorsTrie.SetValue("allies", 0x4D7942); // same as Allies team in DoD:S
 	hColorsTrie.SetValue("antiquewhite", 0xFAEBD7);
@@ -339,4 +339,6 @@ void InitColors(StringMap &hColorsTrie)
 	hColorsTrie.SetValue("whitesmoke", 0xF5F5F5);
 	hColorsTrie.SetValue("yellow", 0xFFFF00);
 	hColorsTrie.SetValue("yellowgreen", 0x9ACD32);
+	
+	return hColorsTrie;
 }

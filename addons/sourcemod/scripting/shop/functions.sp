@@ -531,7 +531,7 @@ Action Functions_OnClientSayCommand(int client, const char[] text)
 	
 	g_iCreditsTransferAmount[client] = StringToInt(text);
 	
-	if(g_iCreditsTransferAmount[client] == 0)
+	if(g_iCreditsTransferAmount[client] < 2)
 	{
 		CPrintToChat(client, "%t", "IncorrectCredits");
 		return Plugin_Handled;
@@ -547,8 +547,6 @@ Action Functions_OnClientSayCommand(int client, const char[] text)
 	if (g_bTransMode == false)
 	{
 		g_iCreditsTransferCommission[client] = g_iCreditsTransferAmount[client] * g_iTransCredits / 100;
-		if (g_iCreditsTransferCommission[client] == 0)
-			g_iCreditsTransferCommission[client] = 1;
 	}
 	else
 	{
