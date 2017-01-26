@@ -28,6 +28,7 @@ void ItemManager_CreateNatives()
 	CreateNative("Shop_KvCopySubKeysCustomInfo", ItemManager_KvCopySubKeysCustomInfo);
 	CreateNative("Shop_SetCallbacks", ItemManager_SetCallbacks);
 	CreateNative("Shop_SetCanLuck", ItemManager_SetCanLuck);
+	CreateNative("Shop_SetHide", ItemManager_SetHide);
 	CreateNative("Shop_EndItem", ItemManager_EndItem);
 	
 	CreateNative("Shop_GetItemCustomInfo", ItemManager_GetItemCustomInfo);
@@ -55,6 +56,9 @@ void ItemManager_CreateNatives()
 	
 	CreateNative("Shop_GetItemCanLuck", ItemManager_GetItemCanLuck);
 	CreateNative("Shop_SetItemCanLuck", ItemManager_SetItemCanLuck);
+	
+	CreateNative("Shop_GetItemHide", ItemManager_GetItemHide);
+	CreateNative("Shop_SetItemHide", ItemManager_SetItemHide);
 	
 	CreateNative("Shop_GetItemCategoryId", ItemManager_GetItemCategoryIdNative);
 	
@@ -374,6 +378,7 @@ public int ItemManager_SetInfo(Handle plugin, int numParams)
 	}
 	
 	plugin_kv.SetNum("can_luck", 1);
+	plugin_kv.SetNum("hide", 0);
 }
 
 public int ItemManager_SetCustomInfo(Handle plugin, int numParams)
@@ -454,6 +459,14 @@ public int ItemManager_SetCanLuck(Handle plugin, int numParams)
 		ThrowNativeError(SP_ERROR_NATIVE, "No item is being registered");
 	
 	plugin_kv.SetNum("can_luck", GetNativeCell(1));
+}
+
+public int ItemManager_SetHide(Handle plugin, int numParams)
+{
+	if (plugin_kv == null)
+		ThrowNativeError(SP_ERROR_NATIVE, "No item is being registered");
+	
+	plugin_kv.SetNum("hide", GetNativeCell(1));
 }
 
 public int ItemManager_EndItem(Handle plugin, int numParams)
@@ -1063,6 +1076,40 @@ public int ItemManager_SetItemCanLuck(Handle plugin, int numParams)
 	h_KvItems.Rewind();
 }
 
+public int ItemManager_GetItemHide(Handle plugin, int numParams)
+{
+	char sItemId[SHOP_MAX_STRING_LENGTH];
+	IntToString(GetNativeCell(1), sItemId, sizeof(sItemId));
+
+	if (!h_KvItems.JumpToKey(sItemId))
+		ThrowNativeError(SP_ERROR_NATIVE, "Item id %s is invalid", sItemId);
+	h_KvItems.Rewind();
+
+	return ItemManager_GetItemHideEx(sItemId);
+}
+
+bool ItemManager_GetItemHideEx(const char[] sItemId)
+{
+	if (!h_KvItems.JumpToKey(sItemId)) return false;
+	
+	bool bResult = view_as<bool>(h_KvItems.GetNum("hide", 0));
+	h_KvItems.Rewind();
+	return bResult;
+}
+
+public int ItemManager_SetItemHide(Handle plugin, int numParams)
+{
+	char sItemId[SHOP_MAX_STRING_LENGTH];
+	IntToString(GetNativeCell(1), sItemId, sizeof(sItemId));
+
+	if (!h_KvItems.JumpToKey(sItemId))
+		ThrowNativeError(SP_ERROR_NATIVE, "Item id %s is invalid", sItemId);
+
+	h_KvItems.SetNum("hide", GetNativeCell(2));
+	
+	h_KvItems.Rewind();
+}
+
 public int ItemManager_GetItemCategoryIdNative(Handle plugin, int numParams)
 {
 	return ItemManager_GetItemCategoryId(GetNativeCell(1));
@@ -1199,7 +1246,7 @@ bool ItemManager_GetCanLuck(int item_id)
 	return bResult;
 }
 
-bool ItemManager_FillCategories(Menu menu, int source_client, bool inventory = false)
+bool ItemManager_FillCategories(Menu menu, int source_client, bool inventory = false, bool showAll = false)
 {
 	char category[SHOP_MAX_STRING_LENGTH], display[128], buffer[SHOP_MAX_STRING_LENGTH], description[SHOP_MAX_STRING_LENGTH];
 	StringMap trie;
@@ -1268,7 +1315,24 @@ bool ItemManager_FillCategories(Menu menu, int source_client, bool inventory = f
 				Function func_desc = dp.ReadFunction(); // Category description
 				Function func_should = dp.ReadFunction(); // Category should display
 				dp.Position += view_as<DataPackPos>(9); // to skip Category select
-				int icat_size = dp.ReadCell(); // Count of items in category
+				int icat_size = dp.ReadCell(); // Real count of items in category
+				
+				if (!showAll)
+				{
+					/* Temporary modification */
+					// Count of not hidden items
+					ArrayList items = ItemManager_GetItemIdArrayFromPlugin(cat_plugin);
+					icat_size = 0;
+					char cItemid[5];
+					for (int k = 0; k < items.Length; k++)
+					{
+						IntToString(items.Get(k), cItemid, sizeof(cItemid));
+						if (ItemManager_GetItemHideEx(cItemid) == false)
+							icat_size++;
+					}
+					
+					delete items;
+				}
 			
 				if (func_should != INVALID_FUNCTION)
 				{
@@ -1299,7 +1363,8 @@ bool ItemManager_FillCategories(Menu menu, int source_client, bool inventory = f
 				}
 			}
 		}
-		if (!should_display)
+		// Hide category if 0 items available
+		if (!should_display || x == 0)
 		{
 			continue;
 		}
@@ -1401,7 +1466,7 @@ bool ItemManager_GetItemDisplay(int item_id, int source_client, char[] buffer, i
 	return true;
 }
 
-bool ItemManager_FillItemsOfCategory(Menu menu, int client, int source_client, int category_id, bool inventory = false)
+bool ItemManager_FillItemsOfCategory(Menu menu, int client, int source_client, int category_id, bool inventory = false, bool showAll = false)
 {
 	bool result = false;
 	if (h_KvItems.GotoFirstSubKey())
@@ -1410,10 +1475,13 @@ bool ItemManager_FillItemsOfCategory(Menu menu, int client, int source_client, i
 		h_arCategories.GetString(category_id, category, sizeof(category));
 		do
 		{
+			bool isHidden = view_as<bool>(h_KvItems.GetNum("hide", 0));
 			if (h_KvItems.GetNum("category_id", -1) != category_id || !h_KvItems.GetSectionName(sItemId, sizeof(sItemId)) || (inventory && !ClientHasItemEx(client, sItemId)))
 			{
 				continue;
 			}
+			
+			if (!inventory && !showAll && isHidden) continue;
 			
 			h_KvItems.GetString("item", item, sizeof(item));
 			
@@ -1971,6 +2039,9 @@ bool ItemManager_OnItemBuyEx(int client, int category_id, const char[] category,
 	
 	if (!h_KvItems.JumpToKey(sItemId))
 		return false;
+		
+	bool isHidden = view_as<bool>(h_KvItems.GetNum("hide", 0));
+	if (isHidden) return false; // make hidden items unbuyable
 	
 	Handle plugin = view_as<Handle>(h_KvItems.GetNum("plugin", 0));
 	
@@ -2170,4 +2241,33 @@ bool ItemManager_IsValidCategory(int category_id)
 	}
 	
 	return true;
+}
+
+ArrayList ItemManager_GetItemIdArrayFromPlugin(Handle plugin)
+{
+	if (plugin != null)
+	{
+		ArrayList array = new ArrayList(1);
+		KeyValues kv = new KeyValues("kv");
+		h_KvItems.Rewind();
+		KvCopySubkeys(h_KvItems, kv);
+		
+		if (kv.GotoFirstSubKey())
+		{
+			char cSection[5];
+			do
+			{
+				if (kv.GetSectionName(cSection, sizeof(cSection)))
+				{
+					if (plugin == view_as<Handle>(kv.GetNum("plugin", 0)))
+						array.Push(StringToInt(cSection));
+				}
+			} while (kv.GotoNextKey());
+		}
+		
+		delete kv;
+		return array;
+	}
+	
+	return null;
 }

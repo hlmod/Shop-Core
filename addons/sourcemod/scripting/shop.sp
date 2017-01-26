@@ -48,7 +48,7 @@ public Plugin myinfo =
 	description = "An advanced in game market",
 	author = "FrozDark (Fork by R1KO)",
 	// version = SHOP_VERSION,
-	version = "3.0B:23-01-2017",
+	version = "3.0B:26-01-2017",
 	url = "http://www.hlmod.ru/"
 };
 
@@ -825,6 +825,9 @@ bool ShowItemInfo(int client, int item_id)
 	{
 		char sBuffer[SHOP_MAX_STRING_LENGTH], sItemId[16];
 		IntToString(item_id, sItemId, sizeof(sItemId));
+		
+		bool isHidden = ItemManager_GetItemHideEx(sItemId);
+		
 		SetGlobalTransTarget(client);
 		
 		int credits = GetCredits(client);
@@ -863,26 +866,29 @@ bool ShowItemInfo(int client, int item_id)
 						panel.DrawItem(sBuffer);
 						iButton[client][button++] = BUTTON_SELL;
 					}
-					switch (g_iItemTransfer)
+					if (!isHidden)
 					{
-						case -1 :
+						switch (g_iItemTransfer)
 						{
-						}
-						case 0 :
-						{
-							FormatEx(sBuffer, sizeof(sBuffer), "%t", "transfer");
-							panel.DrawItem(sBuffer);
-							iButton[client][button++] = BUTTON_TRANSFER;
-						}
-						default :
-						{
-							FormatEx(sBuffer, sizeof(sBuffer), "%t [%t: %d]", "transfer", "Price", g_iItemTransfer);
-							panel.DrawItem(sBuffer, (credits < g_iItemTransfer) ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
-							iButton[client][button++] = BUTTON_TRANSFER;
+							case -1 :
+							{
+							}
+							case 0 :
+							{
+								FormatEx(sBuffer, sizeof(sBuffer), "%t", "transfer");
+								panel.DrawItem(sBuffer);
+								iButton[client][button++] = BUTTON_TRANSFER;
+							}
+							default :
+							{
+								FormatEx(sBuffer, sizeof(sBuffer), "%t [%t: %d]", "transfer", "Price", g_iItemTransfer);
+								panel.DrawItem(sBuffer, (credits < g_iItemTransfer) ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
+								iButton[client][button++] = BUTTON_TRANSFER;
+							}
 						}
 					}
 				}
-				else
+				else if (!isHidden)
 				{
 					if (GetCredits(client) < ItemManager_GetItemPriceEx(sItemId))
 					{
@@ -905,19 +911,21 @@ bool ShowItemInfo(int client, int item_id)
 				
 				panel.DrawItem(" ", ITEMDRAW_SPACER|ITEMDRAW_RAWLINE);
 				
-				if (GetCredits(client) < ItemManager_GetItemPriceEx(sItemId))
+				if (!isHidden)
 				{
-					FormatEx(sBuffer, sizeof(sBuffer), "%t", "buy_not");
-					panel.DrawItem(sBuffer, ITEMDRAW_DISABLED);
+					if (GetCredits(client) < ItemManager_GetItemPriceEx(sItemId))
+					{
+						FormatEx(sBuffer, sizeof(sBuffer), "%t", "buy_not");
+						panel.DrawItem(sBuffer, ITEMDRAW_DISABLED);
+					}
+					else
+					{
+						FormatEx(sBuffer, sizeof(sBuffer), "%t", "buy");
+						panel.DrawItem(sBuffer);
+					}
+					
+					iButton[client][button++] = BUTTON_BUY;
 				}
-				else
-				{
-					FormatEx(sBuffer, sizeof(sBuffer), "%t", "buy");
-					panel.DrawItem(sBuffer);
-				}
-				
-				iButton[client][button++] = BUTTON_BUY;
-				
 				if (count > 0)
 				{
 					FormatEx(sBuffer, sizeof(sBuffer), "%t", "use");
@@ -932,22 +940,25 @@ bool ShowItemInfo(int client, int item_id)
 						panel.DrawItem(sBuffer);
 						iButton[client][button++] = BUTTON_SELL;
 					}
-					switch (g_iItemTransfer)
+					if (!isHidden)
 					{
-						case -1 :
+						switch (g_iItemTransfer)
 						{
-						}
-						case 0 :
-						{
-							FormatEx(sBuffer, sizeof(sBuffer), "%t", "transfer");
-							panel.DrawItem(sBuffer);
-							iButton[client][button++] = BUTTON_TRANSFER;
-						}
-						default :
-						{
-							FormatEx(sBuffer, sizeof(sBuffer), "%t [%t: %d]", "transfer", "Price", g_iItemTransfer);
-							panel.DrawItem(sBuffer, (credits < g_iItemTransfer) ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
-							iButton[client][button++] = BUTTON_TRANSFER;
+							case -1 :
+							{
+							}
+							case 0 :
+							{
+								FormatEx(sBuffer, sizeof(sBuffer), "%t", "transfer");
+								panel.DrawItem(sBuffer);
+								iButton[client][button++] = BUTTON_TRANSFER;
+							}
+							default :
+							{
+								FormatEx(sBuffer, sizeof(sBuffer), "%t [%t: %d]", "transfer", "Price", g_iItemTransfer);
+								panel.DrawItem(sBuffer, (credits < g_iItemTransfer) ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
+								iButton[client][button++] = BUTTON_TRANSFER;
+							}
 						}
 					}
 				}
@@ -988,26 +999,30 @@ bool ShowItemInfo(int client, int item_id)
 						panel.DrawItem(sBuffer);
 						iButton[client][button++] = BUTTON_SELL;
 					}
-					switch (g_iItemTransfer)
+					
+					if (!isHidden)
 					{
-						case -1 :
+						switch (g_iItemTransfer)
 						{
-						}
-						case 0 :
-						{
-							FormatEx(sBuffer, sizeof(sBuffer), "%t", "transfer");
-							panel.DrawItem(sBuffer);
-							iButton[client][button++] = BUTTON_TRANSFER;
-						}
-						default :
-						{
-							FormatEx(sBuffer, sizeof(sBuffer), "%t [%t: %d]", "transfer", "Price", g_iItemTransfer);
-							panel.DrawItem(sBuffer, (credits < g_iItemTransfer) ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
-							iButton[client][button++] = BUTTON_TRANSFER;
+							case -1 :
+							{
+							}
+							case 0 :
+							{
+								FormatEx(sBuffer, sizeof(sBuffer), "%t", "transfer");
+								panel.DrawItem(sBuffer);
+								iButton[client][button++] = BUTTON_TRANSFER;
+							}
+							default :
+							{
+								FormatEx(sBuffer, sizeof(sBuffer), "%t [%t: %d]", "transfer", "Price", g_iItemTransfer);
+								panel.DrawItem(sBuffer, (credits < g_iItemTransfer) ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
+								iButton[client][button++] = BUTTON_TRANSFER;
+							}
 						}
 					}
 				}
-				else
+				else if (!isHidden)
 				{
 					if (GetCredits(client) < ItemManager_GetItemPriceEx(sItemId))
 					{
@@ -1036,17 +1051,20 @@ bool ShowItemInfo(int client, int item_id)
 			}
 			case Item_BuyOnly :
 			{
-				if (GetCredits(client) < ItemManager_GetItemPriceEx(sItemId))
+				if (!isHidden)
 				{
-					FormatEx(sBuffer, sizeof(sBuffer), "%t", "buy_not");
-					panel.DrawItem(sBuffer, ITEMDRAW_DISABLED);
+					if (GetCredits(client) < ItemManager_GetItemPriceEx(sItemId))
+					{
+						FormatEx(sBuffer, sizeof(sBuffer), "%t", "buy_not");
+						panel.DrawItem(sBuffer, ITEMDRAW_DISABLED);
+					}
+					else
+					{
+						FormatEx(sBuffer, sizeof(sBuffer), "%t", "buy");
+						panel.DrawItem(sBuffer);
+					}
+					iButton[client][button++] = BUTTON_BUY;
 				}
-				else
-				{
-					FormatEx(sBuffer, sizeof(sBuffer), "%t", "buy");
-					panel.DrawItem(sBuffer);
-				}
-				iButton[client][button++] = BUTTON_BUY;
 			}
 		}
 		
@@ -1793,14 +1811,14 @@ bool IsAdmin(int client)
 	return view_as<bool>(GetUserFlagBits(client) & g_iAdminFlags);
 }
 
-bool FillCategories(Menu menu, int source_client, bool inventory = false)
+bool FillCategories(Menu menu, int source_client, bool inventory = false, bool showAll = false)
 {
-	return ItemManager_FillCategories(menu, source_client, inventory);
+	return ItemManager_FillCategories(menu, source_client, inventory, showAll);
 }
 
-bool FillItemsOfCategory(Menu menu, int client, int source_client, int category_id)
+bool FillItemsOfCategory(Menu menu, int client, int source_client, int category_id, bool showAll = false)
 {
-	return ItemManager_FillItemsOfCategory(menu, client, source_client, category_id);
+	return ItemManager_FillItemsOfCategory(menu, client, source_client, category_id, _, showAll);
 }
 
 int GetItemCategoryId(int item_id)

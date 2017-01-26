@@ -335,6 +335,25 @@ native bool Shop_GetItemCanLuck(ItemId item_id);
 native void Shop_SetItemCanLuck(ItemId item_id, bool bCanLuck);
 
 /**
+ *	Get is feature "Hide" enabled
+ *	-
+ *	@param item_id				Item id to get for
+ *	-
+ *	@return true - item hidden, false - available for buying
+*/
+native bool Shop_GetItemHide(ItemId item_id);
+
+/**
+ *	Set feature "Hide"
+ *	-
+ *	@param item_id				Item id to set for
+ *	@param state			true - to hide item, false - to show in buyable list
+ *	-
+ *	@noreturn
+*/
+native void Shop_SetItemHide(ItemId item_id, bool state);
+
+/**
  *	Gets the item's category id
  *	-
  *	@param item_id				Item id to get category id from
