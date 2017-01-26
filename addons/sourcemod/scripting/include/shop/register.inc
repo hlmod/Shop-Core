@@ -95,6 +95,15 @@ native void Shop_SetCallbacks(ItemRegister register=INVALID_FUNCTION,
 native void Shop_SetCanLuck(bool bCanLuck);
 
 /**
+ *	Позволяет скрыть предмет из списка покупок. Выдача только через админ-панель
+ *	-
+ *	@param state			true - спрятать, false - нет
+ *	-
+ *	@noreturn
+*/
+native void Shop_SetHide(bool state);
+
+/**
  *	Sets item custom info
  *	-
  *	@param info			Name of the key

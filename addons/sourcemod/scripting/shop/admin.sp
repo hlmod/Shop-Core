@@ -5,10 +5,6 @@
 #define TAKE_ITEMS		4
 #define ADD_PLAYERS		5
 
-/* #define ADMINPANEL_PLUGIN 0
-#define ADMINPANEL_DISPLAY 1
-#define ADMINPANEL_SELECT 2 */
-
 enum AdminEnum
 {
 	AdminOption = 0,
@@ -401,7 +397,7 @@ bool Admin_ShowCategories(int client, int pos = 0)
 	SetGlobalTransTarget(client);
 	
 	Menu menu = new Menu(Admin_CategoriesMenu_Handler);
-	if (!FillCategories(menu, client))
+	if (!FillCategories(menu, client, false, true))
 	{
 		CPrintToChat(client, "%t", "EmptyShop");
 		delete menu;
@@ -458,7 +454,7 @@ bool Admin_ShowItemsOfCategory(int client, int category_id, int pos = 0)
 	SetGlobalTransTarget(client);
 	
 	Menu menu = new Menu(Admin_ItemsMenu_Handler, MENU_ACTIONS_DEFAULT|MenuAction_Display|MenuAction_DrawItem|MenuAction_DisplayItem);
-	if (!FillItemsOfCategory(menu, client, client, category_id))
+	if (!FillItemsOfCategory(menu, client, client, category_id, true))
 	{
 		CPrintToChat(client, "%t", "EmptyCategory");
 		delete menu;
