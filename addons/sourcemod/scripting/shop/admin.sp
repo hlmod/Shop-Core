@@ -58,6 +58,8 @@ public int Admin_RemoveFromMenuNative(Handle plugin, int numParams)
 			// double action to delete Handle (plugin) and datapack (plugin, func_disp, func_select)
 			g_hAdminArray.Erase(index);
 			g_hAdminArray.Erase(index);
+			
+			delete dp;
 			return true;
 		}
 	}

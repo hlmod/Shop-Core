@@ -48,7 +48,7 @@ public Plugin myinfo =
 	description = "An advanced in game market",
 	author = "FrozDark (Fork by R1KO)",
 	// version = SHOP_VERSION,
-	version = "3.0B:23-01-2017",
+	version = "3.0B:26-01-2017",
 	url = "http://www.hlmod.ru/"
 };
 
