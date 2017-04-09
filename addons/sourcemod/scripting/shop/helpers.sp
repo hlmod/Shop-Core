@@ -1,18 +1,18 @@
 int Helpers_GetCSGame()
 {
-	if (GetFeatureStatus(FeatureType_Native, "GetEngineVersion") == FeatureStatus_Available) 
-	{ 
-		switch (GetEngineVersion()) 
-		{ 
-			case Engine_SourceSDK2006: return GAME_CSS_34; 
-			case Engine_CSS: return GAME_CSS; 
-			case Engine_CSGO: return GAME_CSGO; 
-		} 
-	} 
+	if (GetFeatureStatus(FeatureType_Native, "GetEngineVersion") == FeatureStatus_Available)
+	{
+		switch (GetEngineVersion())
+		{
+			case Engine_SourceSDK2006: return GAME_CSS_34;
+			case Engine_CSS: return GAME_CSS;
+			case Engine_CSGO: return GAME_CSGO;
+		}
+	}
 	else if (GetFeatureStatus(FeatureType_Native, "GuessSDKVersion") == FeatureStatus_Available) 
-	{ 
+	{
 		switch (GuessSDKVersion())
-		{ 
+		{
 			case SOURCE_SDK_EPISODE1: return GAME_CSS_34;
 			case SOURCE_SDK_CSS: return GAME_CSS;
 			case SOURCE_SDK_CSGO: return GAME_CSGO;

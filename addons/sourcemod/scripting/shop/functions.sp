@@ -536,8 +536,9 @@ Action Functions_OnClientSayCommand(int client, const char[] text)
 		CPrintToChat(client, "%t", "IncorrectCredits");
 		return Plugin_Handled;
 	}
-	else if (g_iCreditsTransferAmount[client] < 0)
-		g_iCreditsTransferAmount[client] = Helpers_Math_Abs(g_iCreditsTransferAmount[client]);
+	
+	// I don't know why, but sourcemod allowes negative values for send. So this KOCTbIJIb must fix this.
+	g_iCreditsTransferAmount[client] = Helpers_Math_Abs(g_iCreditsTransferAmount[client]);
 	
 	if (g_iCreditsTransferAmount[client] > GetCredits(client))
 	{
