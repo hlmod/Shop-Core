@@ -533,6 +533,7 @@ Action Functions_OnClientSayCommand(int client, const char[] text)
 	
 	if(g_iCreditsTransferAmount[client] < 2)
 	{
+		Functions_OnClientDisconnect_Post(client); // call this, if transaction revoked.
 		CPrintToChat(client, "%t", "IncorrectCredits");
 		return Plugin_Handled;
 	}

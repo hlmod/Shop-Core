@@ -9,15 +9,6 @@ int Helpers_GetCSGame()
 			case Engine_CSGO: return GAME_CSGO;
 		}
 	}
-	else if (GetFeatureStatus(FeatureType_Native, "GuessSDKVersion") == FeatureStatus_Available) 
-	{
-		switch (GuessSDKVersion())
-		{
-			case SOURCE_SDK_EPISODE1: return GAME_CSS_34;
-			case SOURCE_SDK_CSS: return GAME_CSS;
-			case SOURCE_SDK_CSGO: return GAME_CSGO;
-		}
-	}
 	return GAME_UNDEFINED;
 }
 
