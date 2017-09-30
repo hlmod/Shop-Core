@@ -58,7 +58,7 @@ public int PlayerManager_IsAdmin(Handle plugin, int numParams)
 
 bool PlayerManager_IsAuthorizedIn(int client)
 {
-	return i_Id[client] != 0;
+	return (client > 0 && client <= MaxClients && IsClientInGame(client) && !IsFakeClient(client) && i_Id[client] != 0);
 }
 
 public int PlayerManager_GetClientId(Handle plugin, int numParams)

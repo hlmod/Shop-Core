@@ -1171,7 +1171,7 @@ public int ItemManager_GetCategoryNameByIdNative(Handle plugin, int numParams)
 
 public int ItemManager_FillArrayByItemsNative(Handle plugin, int numParams)
 {
-	ArrayList h_Array = GetNativeCell(1);
+	ArrayList h_Array = GetNativeCellRef(1); // because arraylist can be called always by reference (c++)
 	if (h_Array == null)
 		ThrowNativeError(SP_ERROR_NATIVE, "Handle is invalid!");
 	
