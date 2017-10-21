@@ -1327,7 +1327,7 @@ bool ItemManager_FillCategories(Menu menu, int source_client, bool inventory = f
 					for (int k = 0; k < items.Length; k++)
 					{
 						IntToString(items.Get(k), cItemid, sizeof(cItemid));
-						if (ItemManager_GetItemHideEx(cItemid) == false)
+						if (!ItemManager_GetItemHideEx(cItemid))
 							icat_size++;
 					}
 					
@@ -1376,13 +1376,14 @@ bool ItemManager_FillCategories(Menu menu, int source_client, bool inventory = f
 		trie.GetString("description", buffer, sizeof(buffer));
 		ItemManager_OnCategoryDescription(on_desc_hndl, on_desc_func, source_client, index, category, buffer, description, sizeof(description));
 		
+		if (showAll || g_hHideCategoriesItemsCount.BoolValue)
+		{
+			Format(display, sizeof(display), "%s (%i)", display, x);
+		}
+		
 		if (description[0])
 		{
-			Format(display, sizeof(display), "%s (%i)\n%s\n", display, x, description);
-		}
-		else
-		{
-			Format(display, sizeof(display), "%s (%i)\n", display, x);
+			Format(display, sizeof(display), "%s\n%s\n", display, description);
 		}
 		
 		IntToString(index, sCatId, sizeof(sCatId));

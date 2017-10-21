@@ -32,6 +32,8 @@ int g_iAdminFlags;
 ConVar g_hItemTransfer;
 int g_iItemTransfer;
 
+ConVar g_hHideCategoriesItemsCount;
+
 #include "shop/colors.sp"
 #include "shop/admin.sp"
 #include "shop/commands.sp"
@@ -241,6 +243,8 @@ void CreateConfigs()
 	g_hItemTransfer = CreateConVar("sm_shop_item_transfer_credits", "500", "How many credits an item transfer cost. Set -1 to disable the feature", 0, true, -1.0);
 	g_iItemTransfer = g_hItemTransfer.IntValue;
 	g_hItemTransfer.AddChangeHook(OnConVarChange);
+	
+	g_hHideCategoriesItemsCount = CreateConVar("sm_shop_category_items_hideamount", "0", "Hide amount of items in category", 0, true, 0.0, true, 1.0);
 	
 	KeyValues kv_settings = new KeyValues("Settings");
 	Shop_GetCfgFile(sBuffer, sizeof(sBuffer), "settings.txt");
