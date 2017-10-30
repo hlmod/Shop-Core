@@ -36,7 +36,7 @@ before_deploy:
     - rsync -a --prune-empty-dirs --include '*/' --include 'shop*' --exclude '*' addons/sourcemod/translations/ shop/addons/sourcemod/translations/
     - mv addons/sourcemod/configs/shop* shop/addons/sourcemod/configs
     - mv cfg/shop/* shop/cfg/shop
-    - mv LICENSE.md shop
+    - mv LICENSE shop
     - zip -rq shop shop
     - tar -czf shop.tar.gz shop
 deploy:
