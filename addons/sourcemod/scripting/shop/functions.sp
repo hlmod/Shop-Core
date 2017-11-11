@@ -110,7 +110,7 @@ public void Functions_OnConVarChange(ConVar convar, const char[] oldValue, const
 	}
 }
 
-Functions_UnregisterMe(Handle plugin)
+void Functions_UnregisterMe(Handle plugin)
 {
 	int index = -1;
 	while ((index = FindValueInArray(g_hFuncArray, plugin)) != -1)
@@ -119,7 +119,7 @@ Functions_UnregisterMe(Handle plugin)
 	}
 }
 
-Functions_OnMapEnd()
+void Functions_OnMapEnd()
 {
 	for (int i = 1; i <= MaxClients; i++)
 	{
