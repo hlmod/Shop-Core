@@ -113,9 +113,12 @@ public void Functions_OnConVarChange(ConVar convar, const char[] oldValue, const
 void Functions_UnregisterMe(Handle plugin)
 {
 	int index = -1;
-	while ((index = FindValueInArray(g_hFuncArray, plugin)) != -1)
+	while ((index = g_hFuncArray.FindValue(plugin)) != -1)
 	{
-		RemoveFromArray(g_hFuncArray, index);
+		delete view_as<Handle>(g_hFuncArray.Get(index+1));
+
+		g_hFuncArray.Erase(index);
+		g_hFuncArray.Erase(index);
 	}
 }
 
