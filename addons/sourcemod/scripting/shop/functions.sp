@@ -110,10 +110,10 @@ public void Functions_OnConVarChange(ConVar convar, const char[] oldValue, const
 	}
 }
 
-Functions_UnregisterMe(Handle:hPlugin)
+Functions_UnregisterMe(Handle plugin)
 {
-	new index = -1;
-	while ((index = FindValueInArray(g_hFuncArray, hPlugin)) != -1)
+	int index = -1;
+	while ((index = FindValueInArray(g_hFuncArray, plugin)) != -1)
 	{
 		RemoveFromArray(g_hFuncArray, index);
 	}
