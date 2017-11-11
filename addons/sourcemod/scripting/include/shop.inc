@@ -9,7 +9,7 @@
 #endif
 #define _shop_included
 
-#define SHOP_VERSION					"3.0B2:21-10-2017"
+#define SHOP_VERSION					"3.0B3:11-11-2017"
 
 #define SHOP_MAX_STRING_LENGTH	64
 
