@@ -5,11 +5,11 @@
  *	@param menu_action		Menu performing this action
  *	@param category_id		Category id of an item
  *	@param item_id			Item id of an item
- *	@param disabled			Whether an item should be disabled of to be selected
+ *	@param disable			Whether an item should be disabled of to be selected
  *	-
  *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block an item to shown. Plugin_Continue otherwise
 */
-forward Action:Shop_OnItemDraw(client, ShopMenu:menu_action, CategoryId:category_id, ItemId:item_id, &bool:disabled);
+forward Action Shop_OnItemDraw(int client, ShopMenu menu_action, CategoryId category_id, ItemId item_id, bool &disable);
 
 /**
  *	Called when an item is being displayd
@@ -24,7 +24,7 @@ forward Action:Shop_OnItemDraw(client, ShopMenu:menu_action, CategoryId:category
  *	-
  *	@return true to apply new display name, false otherwise
 */
-forward bool:Shop_OnItemDisplay(client, ShopMenu:menu_action, CategoryId:category_id, ItemId:item_id, const String:display[], String:buffer[], maxlength);
+forward bool Shop_OnItemDisplay(int client, ShopMenu menu_action, CategoryId category_id, ItemId item_id, const char[] display, char[] buffer, int maxlength);
 
 /**
  *	Called when an item's description is being displayd
@@ -39,7 +39,7 @@ forward bool:Shop_OnItemDisplay(client, ShopMenu:menu_action, CategoryId:categor
  *	-
  *	@return true to apply new description, false otherwise
 */
-forward bool:Shop_OnItemDescription(client, ShopMenu:menu_action, CategoryId:category_id, ItemId:item_id, const String:description[], String:buffer[], maxlength);
+forward bool Shop_OnItemDescription(int client, ShopMenu menu_action, CategoryId category_id, ItemId item_id, const char[] description, char[] buffer, int maxlength);
 
 /**
  *	Called when an item is being bought
@@ -56,7 +56,7 @@ forward bool:Shop_OnItemDescription(client, ShopMenu:menu_action, CategoryId:cat
  *	-
  *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block. Plugin_Continue otherwise
 */
-forward Action:Shop_OnItemBuy(client, CategoryId:category_id, const String:category[], ItemId:item_id, const String:item[], ItemType:type, &price, &sell_price, &value);
+forward Action Shop_OnItemBuy(int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ItemType type, int &price, int &sell_price, int &value);
 
 /**
  *	Called when an item is being bought
@@ -71,7 +71,7 @@ forward Action:Shop_OnItemBuy(client, CategoryId:category_id, const String:categ
  *	-
  *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block. Plugin_Continue otherwise
 */
-forward Action:Shop_OnItemSell(client, CategoryId:category_id, const String:category[], ItemId:item_id, const String:item[], ItemType:type, &sell_price);
+forward Action Shop_OnItemSell(int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ItemType type, int &sell_price);
 
 /**
  *	Called when an item has been toggled
@@ -85,7 +85,7 @@ forward Action:Shop_OnItemSell(client, CategoryId:category_id, const String:cate
  *	-
  *	@noreturn
 */
-forward Shop_OnItemToggled(client, CategoryId:category_id, const String:category[], ItemId:item_id, const String:item[], ToggleState:toggle);
+forward void Shop_OnItemToggled(int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ToggleState toggle);
 
 /**
  *	Called when an item has been elapsed
@@ -98,7 +98,7 @@ forward Shop_OnItemToggled(client, CategoryId:category_id, const String:category
  *	-
  *	@noreturn
 */
-forward Shop_OnItemElapsed(client, CategoryId:category_id, const String:category[], ItemId:item_id, const String:item[]);
+forward void Shop_OnItemElapsed(int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item);
 
 /**
  *	Called when a player is transferring an item
@@ -109,7 +109,7 @@ forward Shop_OnItemElapsed(client, CategoryId:category_id, const String:category
  *	-
  *	@return true to allow transfer and false to block
 */
-forward bool:Shop_OnItemTransfer(client, target, ItemId:item_id);
+forward bool Shop_OnItemTransfer(int client, int target, ItemId item_id);
 
 /**
  *	Called when a player has transfered an item
@@ -120,7 +120,7 @@ forward bool:Shop_OnItemTransfer(client, target, ItemId:item_id);
  *	-
  *	@noreturn
 */
-forward Shop_OnItemTransfered(client, target, ItemId:item_id);
+forward void Shop_OnItemTransfered(int client, int target, ItemId item_id);
 
 /**
  *	Gets an item custom info
@@ -131,7 +131,7 @@ forward Shop_OnItemTransfered(client, target, ItemId:item_id);
  *	-
  *	@return Integer value of the key
 */
-native Shop_GetItemCustomInfo(ItemId:item_id, const String:info[], defaultvalue = 0);
+native int Shop_GetItemCustomInfo(ItemId item_id, const char[] info, int defaultvalue = 0);
 
 /**
  *	Sets an item custom info
@@ -142,7 +142,7 @@ native Shop_GetItemCustomInfo(ItemId:item_id, const String:info[], defaultvalue 
  *	-
  *	@return true on success, false otherwise
 */
-native bool:Shop_SetItemCustomInfo(ItemId:item_id, const String:info[], value);
+native bool Shop_SetItemCustomInfo(ItemId item_id, const char[] info, int value);
 
 /**
  *	Gets an item custom info
@@ -153,7 +153,7 @@ native bool:Shop_SetItemCustomInfo(ItemId:item_id, const String:info[], value);
  *	-
  *	@return Float value of the key
 */
-native Float:Shop_GetItemCustomInfoFloat(ItemId:item_id, const String:info[], Float:defaultvalue = 0.0);
+native float Shop_GetItemCustomInfoFloat(ItemId item_id, const char[] info, float defaultvalue = 0.0);
 
 /**
  *	Sets an item custom info
@@ -164,7 +164,7 @@ native Float:Shop_GetItemCustomInfoFloat(ItemId:item_id, const String:info[], Fl
  *	-
  *	@return true on success, false otherwise
 */
-native bool:Shop_SetItemCustomInfoFloat(ItemId:item_id, const String:info[], Float:value);
+native bool Shop_SetItemCustomInfoFloat(ItemId item_id, const char[] info, float value);
 
 /**
  *	Gets an item custom info
@@ -177,7 +177,7 @@ native bool:Shop_SetItemCustomInfoFloat(ItemId:item_id, const String:info[], Flo
  *	-
  *	@return Number of bytes written
 */
-native Shop_GetItemCustomInfoString(ItemId:item_id, const String:info[], String:buffer[], maxlength, const String:defaultvalue[] = "");
+native int Shop_GetItemCustomInfoString(ItemId item_id, const char[] info, char[] buffer, int maxlength, const char[] defaultvalue = "");
 
 /**
  *	Sets an item custom info
@@ -188,7 +188,7 @@ native Shop_GetItemCustomInfoString(ItemId:item_id, const String:info[], String:
  *	-
  *	@return true on success, false otherwise
 */
-native bool:Shop_SetItemCustomInfoString(ItemId:item_id, const String:info[], const String:value[]);
+native bool Shop_SetItemCustomInfoString(ItemId item_id, const char[] info, const char[] value);
 
 /**
  *	Copies SubKeys of a KeyValue structure to the item info
@@ -198,7 +198,7 @@ native bool:Shop_SetItemCustomInfoString(ItemId:item_id, const String:info[], co
  *	-
  *	@return true on success, false otherwise
 */
-native bool:Shop_KvCopySubKeysItemCustomInfo(ItemId:item_id, Handle:kv);
+native bool Shop_KvCopySubKeysItemCustomInfo(ItemId item_id, KeyValues kv);
 
 /**
  *	Gets an item price
@@ -207,7 +207,7 @@ native bool:Shop_KvCopySubKeysItemCustomInfo(ItemId:item_id, Handle:kv);
  *	-
  *	@return Price of the item
 */
-native Shop_GetItemPrice(ItemId:item_id);
+native int Shop_GetItemPrice(ItemId item_id);
 
 /**
  *	Sets an item price
@@ -217,7 +217,7 @@ native Shop_GetItemPrice(ItemId:item_id);
  *	-
  *	@noreturn
 */
-native Shop_SetItemPrice(ItemId:item_id, price);
+native void Shop_SetItemPrice(ItemId item_id, int price);
 
 /**
  *	Gets an item sell price
@@ -226,7 +226,7 @@ native Shop_SetItemPrice(ItemId:item_id, price);
  *	-
  *	@return Sell price of the item
 */
-native Shop_GetItemSellPrice(ItemId:item_id);
+native int Shop_GetItemSellPrice(ItemId item_id);
 
 /**
  *	Sets an item sell price
@@ -236,7 +236,7 @@ native Shop_GetItemSellPrice(ItemId:item_id);
  *	-
  *	@noreturn
 */
-native Shop_SetItemSellPrice(ItemId:item_id, sell_price);
+native void Shop_SetItemSellPrice(ItemId item_id, int sell_price);
 
 /**
  *	Gets an item count if item is finite and duration if item is togglable or non-togglable (-1 if duration is unlimited)
@@ -245,7 +245,7 @@ native Shop_SetItemSellPrice(ItemId:item_id, sell_price);
  *	-
  *	@return Value of the item id
 */
-native Shop_GetItemValue(ItemId:item_id);
+native int Shop_GetItemValue(ItemId item_id);
 
 /**
  *	Sets an item count if item is finite and duration if item is togglable or non-togglable (-1 unlimited)
@@ -254,7 +254,7 @@ native Shop_GetItemValue(ItemId:item_id);
  *	-
  *	@noreturn
 */
-native Shop_SetItemValue(ItemId:item_id, value);
+native void Shop_SetItemValue(ItemId item_id, int value);
 
 /**
  *	Whether the item is exists (registered)
@@ -263,7 +263,7 @@ native Shop_SetItemValue(ItemId:item_id, value);
  *	-
  *	@return True if item is exists, false otherwise
 */
-native bool:Shop_IsItemExists(ItemId:item_id);
+native bool Shop_IsItemExists(ItemId item_id);
 
 /**
  *	Получает тип предмета
@@ -272,7 +272,7 @@ native bool:Shop_IsItemExists(ItemId:item_id);
  *	-
  *	@return Тип предмета
 */
-native ItemType:Shop_GetItemType(ItemId:item_id);
+native ItemType Shop_GetItemType(ItemId item_id);
 
 /**
  *	Whether the category is valid (registered)
@@ -281,7 +281,7 @@ native ItemType:Shop_GetItemType(ItemId:item_id);
  *	-
  *	@return True if item is exists, false otherwise
 */
-native bool:Shop_IsValidCategory(CategoryId:category_id);
+native bool Shop_IsValidCategory(CategoryId category_id);
 
 /**
  *	Gets item id of the item unique name
@@ -291,7 +291,7 @@ native bool:Shop_IsValidCategory(CategoryId:category_id);
  *	-
  *	@return Item id of the item
 */
-native ItemId:Shop_GetItemId(CategoryId:category_id, const String:item[]);
+native ItemId Shop_GetItemId(CategoryId category_id, const char[] item);
 
 /**
  *	Gets the item unique name by its id
@@ -302,10 +302,10 @@ native ItemId:Shop_GetItemId(CategoryId:category_id, const String:item[]);
  *	-
  *	@return Number of bytes written
 */
-native Shop_GetItemById(ItemId:item_id, String:buffer[], maxlength);
+native int Shop_GetItemById(ItemId item_id, char[] buffer, int maxlength);
 
 /**
- *	Получает имя предмета
+ *	Get unique name of item
  *	-
  *	@param item_id				Item id to get for
  *	@param buffer				Buffer to store the unique name
@@ -313,26 +313,45 @@ native Shop_GetItemById(ItemId:item_id, String:buffer[], maxlength);
  *	-
  *	@return Number of bytes written
 */
-native Shop_GetItemNameById(ItemId:item_id, String:buffer[], maxlength);
+native int Shop_GetItemNameById(ItemId item_id, char[] buffer, int maxlength);
 
 /**
- *	Получает возможность получения предмета в "Испытать удачу"
+ *	Get is feature "Try luck" enabled
  *	-
  *	@param item_id				Item id to get for
  *	-
- *	@return true - можно, false - нет
+ *	@return true - available, false - restricted
 */
-native bool:Shop_GetItemCanLuck(ItemId:item_id);
+native bool Shop_GetItemCanLuck(ItemId item_id);
 
 /**
- *	Устанавливет возможность получения предмета в "Испытать удачу"
+ *	Set feature "Try luck"
  *	-
  *	@param item_id				Item id to set for
- *	@param bCanLuck			true - можно, false - нет
+ *	@param bCanLuck			true - available, false - restricted
  *	-
  *	@noreturn
 */
-native Shop_SetItemCanLuck(ItemId:item_id, bool:bCanLuck);
+native void Shop_SetItemCanLuck(ItemId item_id, bool bCanLuck);
+
+/**
+ *	Get is feature "Hide" enabled
+ *	-
+ *	@param item_id				Item id to get for
+ *	-
+ *	@return true - item hidden, false - available for buying
+*/
+native bool Shop_GetItemHide(ItemId item_id);
+
+/**
+ *	Set feature "Hide"
+ *	-
+ *	@param item_id				Item id to set for
+ *	@param state			true - to hide item, false - to show in buyable list
+ *	-
+ *	@noreturn
+*/
+native void Shop_SetItemHide(ItemId item_id, bool state);
 
 /**
  *	Gets the item's category id
@@ -341,7 +360,7 @@ native Shop_SetItemCanLuck(ItemId:item_id, bool:bCanLuck);
  *	-
  *	@return Category id or INVALID_CATEGORY if category is not set or item id is invalid
 */
-native CategoryId:Shop_GetItemCategoryId(ItemId:item_id);
+native CategoryId Shop_GetItemCategoryId(ItemId item_id);
 
 /**
  *	Gets category id of the category unique name
@@ -350,7 +369,7 @@ native CategoryId:Shop_GetItemCategoryId(ItemId:item_id);
  *	-
  *	@return Category id of the category
 */
-native CategoryId:Shop_GetCategoryId(const String:category[]);
+native CategoryId Shop_GetCategoryId(const char[] category);
 
 /**
  *	Gets the category unique name by its id
@@ -361,7 +380,7 @@ native CategoryId:Shop_GetCategoryId(const String:category[]);
  *	-
  *	@return True on success, false otherwise
 */
-native bool:Shop_GetCategoryById(CategoryId:category_id, String:buffer[], maxlength);
+native bool Shop_GetCategoryById(CategoryId category_id, char[] buffer, int maxlength);
 
 /**
  *	Получает имя категории
@@ -372,16 +391,16 @@ native bool:Shop_GetCategoryById(CategoryId:category_id, String:buffer[], maxlen
  *	-
  *	@return True on success, false otherwise
 */
-native bool:Shop_GetCategoryNameById(CategoryId:category_id, String:buffer[], maxlength);
+native bool Shop_GetCategoryNameById(CategoryId category_id, char[] buffer, int maxlength);
 
 /**
  *	Fills an adt_array by the item ids. Note that array is cleared before being filled
  *	-
  *	@param array			ADT array to use
  *	-
- *	@noreturn
+ *	@return Number of bytes that written to ArrayList
 */
-native Shop_FillArrayByItems(Handle:array);
+native int Shop_FillArrayByItems(ArrayList array);
 
 /**
  *	Formats item display name to use in menu
@@ -394,18 +413,18 @@ native Shop_FillArrayByItems(Handle:array);
  *	-
  *	@return True if item formatted, false if param menu is Menu_Inventory and the player has not this item and the item is not formatted
 */
-native bool:Shop_FormatItem(client, ItemId:item_id, ShopMenu:menu, String:buffer[], maxlength);
+native bool Shop_FormatItem(int client, ItemId item_id, ShopMenu menu, char[] buffer, int maxlength);
 
 /**
  *	Creates and ADT array of item ids
  *	-
  *	@param size			Optional param to store array size
  *	-
- *	@return Handle of the array
+ *	@return ArrayList
 */
-stock Handle:Shop_CreateArrayOfItems(&size = 0)
+stock ArrayList Shop_CreateArrayOfItems(int &size = 0)
 {
-	new Handle:_shop_array = CreateArray();
+	ArrayList _shop_array = new ArrayList();
 	size = Shop_FillArrayByItems(_shop_array);
 	return _shop_array;
 }
@@ -418,11 +437,18 @@ stock Handle:Shop_CreateArrayOfItems(&size = 0)
  *	-
  *	@return Item id
 */
-stock ItemId:Shop_GetArrayItem(Handle:array, index)
+stock ItemId Shop_GetArrayItem(ArrayList array, int index)
 {
-	return ItemId:GetArrayCell(array, index);
+	return view_as<ItemId>(array.Get(index));
 }
-
+//________________________________
+//|		CODE	HERE			  |
+//|		!Not necessary!			  |
+//| will be removed in the future.|
+//|_______________________________|	
+// | || || || || |	| || || || || |	
+// \ /\ /\ /\ /\ /	\ /\ /\ /\ /\ /	
+//  V  V  V  V  V	 V  V  V  V  V	
 /**
  *	Gets array size
  *	-
@@ -430,7 +456,8 @@ stock ItemId:Shop_GetArrayItem(Handle:array, index)
  *	-
  *	@return Size of the array
 */
-stock Shop_GetArrayItemSize(Handle:array)
+#pragma deprecated Do not use it
+stock int Shop_GetArrayItemSize(ArrayList array)
 {
-	return GetArraySize(array);
+	return array.Length;
 }

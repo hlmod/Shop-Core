@@ -1,51 +1,51 @@
-#define FUNCTIONS_COMMISION 0
-#define FUNCTIONS_CREDITS 1
+ConVar g_hTransCredits, g_hLuckCredits, g_hLuckChance;
+bool g_bTransMode;
+int g_iTransCredits;
 
-#define FUNCTIONS_PLUGIN 0
-#define FUNCTIONS_DISPLAY 1
-#define FUNCTIONS_SELECT 2
-
-new Handle:g_hTransCredits, g_iTransCredits, g_iTransMode;
-new Handle:g_hLuckCredits, g_iLuckCredits;
-new Handle:g_hLuckChance, g_iLuckChance;
-
-new bool:g_bListenChat[MAXPLAYERS+1],
-	g_iCreditsTransferTarget[MAXPLAYERS+1],
+bool g_bListenChat[MAXPLAYERS+1];
+int g_iCreditsTransferTarget[MAXPLAYERS+1],
 	g_iCreditsTransferAmount[MAXPLAYERS+1],
-g_iCreditsTransferCommission[MAXPLAYERS+1];
+	g_iCreditsTransferCommission[MAXPLAYERS+1];
 
-new Handle:g_hFuncArray;
+ArrayList g_hFuncArray;
 
-Functions_CreateNatives()
+void Functions_CreateNatives()
 {
-	g_hFuncArray = CreateArray(3);
+	g_hFuncArray = new ArrayList(1);
 	
 	CreateNative("Shop_AddToFunctionsMenu", Functions_AddToMenuNative);
 	CreateNative("Shop_RemoveFromFunctionsMenu", Functions_RemoveFromMenuNative);
 	CreateNative("Shop_ShowFunctionsMenu", Functions_ShowMenuNative);
 }
 
-public Functions_AddToMenuNative(Handle:plugin, params)
+public int Functions_AddToMenuNative(Handle plugin, int numParams)
 {
-	decl any:tmp[3];
-	tmp[FUNCTIONS_PLUGIN] = plugin;
-	tmp[FUNCTIONS_DISPLAY] = GetNativeCell(1);
-	tmp[FUNCTIONS_SELECT] = GetNativeCell(2);
+	DataPack dp = new DataPack();
+	dp.WriteCell(plugin);
+	dp.WriteFunction(GetNativeFunction(1));
+	dp.WriteFunction(GetNativeFunction(2));
 	
-	PushArrayArray(g_hFuncArray, tmp);
+	g_hFuncArray.Push(plugin);
+	g_hFuncArray.Push(dp);
 }
 
-public Functions_RemoveFromMenuNative(Handle:plugin, params)
+public int Functions_RemoveFromMenuNative(Handle plugin, int numParams)
 {
-	decl any:tmp[3];
+	DataPack dp;
 	
-	new index = -1;
-	while ((index = FindValueInArray(g_hFuncArray, plugin)) != -1)
+	int index = -1;
+	while ((index = g_hFuncArray.FindValue(plugin)) != -1)
 	{
-		GetArrayArray(g_hFuncArray, index, tmp);
-		if (tmp[FUNCTIONS_DISPLAY] == GetNativeCell(1) && tmp[FUNCTIONS_SELECT] == GetNativeCell(2))
+		dp = g_hFuncArray.Get(index+1);
+		dp.Reset();
+		dp.ReadCell(); // plugin
+		Function func_disp = dp.ReadFunction();
+		Function func_select = dp.ReadFunction();
+		if (func_disp == GetNativeFunction(1) && func_select == GetNativeFunction(2))
 		{
-			RemoveFromArray(g_hFuncArray, index);
+			g_hFuncArray.Erase(index);
+			g_hFuncArray.Erase(index+1);
+			delete dp;
 			return true;
 		}
 	}
@@ -53,56 +53,49 @@ public Functions_RemoveFromMenuNative(Handle:plugin, params)
 	return false;
 }
 
-public Functions_ShowMenuNative(Handle:plugin, params)
+public int Functions_ShowMenuNative(Handle plugin, int numParams)
 {
-	new client = GetNativeCell(1);
+	int client = GetNativeCell(1);
 	
-	decl String:error[64];
+	char error[64];
 	if (!CheckClient(client, error, sizeof(error)))
-	{
 		ThrowNativeError(SP_ERROR_NATIVE, error);
-	}
 	
 	Functions_ShowMenu(client);
 }
 
-Functions_OnPluginStart()
+void Functions_OnPluginStart()
 {
-	decl String:buffer[16];
+	char buffer[16];
 	g_hTransCredits = CreateConVar("sm_shop_trans_credits", "%5", "Use % to make the transfer to cost the commision or without % to make it cost as the cvar set or -1 to disable this feature", 0, true, -1.0);
-	GetConVarString(g_hTransCredits, buffer, sizeof(buffer));
+	g_hTransCredits.GetString(buffer, sizeof(buffer));
 	TrimString(buffer);
 	if (buffer[0] == '%')
 	{
-		g_iTransMode = FUNCTIONS_COMMISION;
+		g_bTransMode = false;
 		g_iTransCredits = StringToInt(buffer[1]);
 	}
 	else
 	{
-		g_iTransMode = FUNCTIONS_CREDITS;
+		g_bTransMode = true;
 		g_iTransCredits = StringToInt(buffer);
 	}
-	HookConVarChange(g_hTransCredits, Functions_OnConVarChange);
+	g_hTransCredits.AddChangeHook(Functions_OnConVarChange);
 	
 	g_hLuckCredits = CreateConVar("sm_shop_luck_credits", "500", "How many credits the luck cost", 0, true, 0.0);
-	g_iLuckCredits = GetConVarInt(g_hLuckCredits);
-	HookConVarChange(g_hLuckCredits, Functions_OnConVarChange);
-	
 	g_hLuckChance = CreateConVar("sm_shop_luck_chance", "20", "How many chance the luck can be succeded", 0, true, 1.0, true, 100.0);
-	g_iLuckChance = GetConVarInt(g_hLuckChance);
-	HookConVarChange(g_hLuckChance, Functions_OnConVarChange);
 }
 
-public Functions_OnConVarChange(Handle:convar, const String:oldValue[], const String:newValue[])
+public void Functions_OnConVarChange(ConVar convar, const char[] oldValue, const char[] newValue)
 {
 	if (convar == g_hTransCredits)
 	{
-		decl String:buffer[16];
+		char buffer[16];
 		strcopy(buffer, sizeof(buffer), newValue);
 		TrimString(buffer);
 		if (buffer[0] == '%')
 		{
-			g_iTransMode = FUNCTIONS_COMMISION;
+			g_bTransMode = false;
 			g_iTransCredits = StringToInt(buffer[1]);
 			if (g_iTransCredits > 99)
 			{
@@ -111,24 +104,16 @@ public Functions_OnConVarChange(Handle:convar, const String:oldValue[], const St
 		}
 		else
 		{
-			g_iTransMode = FUNCTIONS_CREDITS;
+			g_bTransMode = true;
 			g_iTransCredits = StringToInt(buffer);
 		}
 	}
-	else if (convar == g_hLuckCredits)
-	{
-		g_iLuckCredits = StringToInt(newValue);
-	}
-	else if (convar == g_hLuckChance)
-	{
-		g_iLuckChance = StringToInt(newValue);
-	}
 }
 
-Functions_UnregisterMe(Handle:hPlugin)
+Functions_UnregisterMe(Handle plugin)
 {
-	new index = -1;
-	while ((index = FindValueInArray(g_hFuncArray, hPlugin)) != -1)
+	int index = -1;
+	while ((index = FindValueInArray(g_hFuncArray, plugin)) != -1)
 	{
 		RemoveFromArray(g_hFuncArray, index);
 	}
@@ -136,7 +121,7 @@ Functions_UnregisterMe(Handle:hPlugin)
 
 Functions_OnMapEnd()
 {
-	for (new i = 1; i <= MaxClients; i++)
+	for (int i = 1; i <= MaxClients; i++)
 	{
 		g_bListenChat[i] = false;
 		g_iCreditsTransferTarget[i] = 0;
@@ -145,7 +130,7 @@ Functions_OnMapEnd()
 	}
 }
 
-Functions_OnClientDisconnect_Post(client)
+void Functions_OnClientDisconnect_Post(int client)
 {
 	g_bListenChat[client] = false;
 	g_iCreditsTransferAmount[client] = 0;
@@ -153,97 +138,92 @@ Functions_OnClientDisconnect_Post(client)
 	g_iCreditsTransferTarget[client] = 0;
 }
 
-Functions_ShowMenu(client, pos = 0)
+void Functions_ShowMenu(int client, int pos = 0)
 {
 	SetGlobalTransTarget(client);
 	
-	new credits = GetCredits(client);
+	int credits = GetCredits(client);
 	
-	new Handle:menu = CreateMenu(Functions_Menu_Handler);
+	Menu menu = CreateMenu(Functions_Menu_Handler);
 	
-	decl String:buffer[128];
+	char buffer[128];
 	FormatEx(buffer, sizeof(buffer), "%t\n%t", "functions", "credits", credits);
 	OnMenuTitle(client, Menu_Functions, buffer, buffer, sizeof(buffer));
-	SetMenuTitle(menu, buffer);
-	SetMenuExitButton(menu, true);
-	SetMenuExitBackButton(menu, true);
+	menu.SetTitle(buffer);
+	menu.ExitButton = true;
+	menu.ExitBackButton = true;
 	
 	if (g_iTransCredits == -1)
 	{
 		FormatEx(buffer, sizeof(buffer), "%t %t", "trans_credits", "trans_credits_disabled");
-		AddMenuItem(menu, "a", buffer, ITEMDRAW_DISABLED);
+		menu.AddItem("a", buffer, ITEMDRAW_DISABLED);
 	}
 	else if (!g_iTransCredits)
 	{
 		FormatEx(buffer, sizeof(buffer), "%t", "trans_credits");
-		AddMenuItem(menu, "a", buffer);
+		menu.AddItem("a", buffer);
 	}
+	else if (!g_bTransMode)
+	{
+		FormatEx(buffer, sizeof(buffer), "%t %t", "trans_credits", "trans_credits_commision", g_iTransCredits);
+		menu.AddItem("a", buffer);
+	}	
 	else
 	{
-		switch (g_iTransMode)
-		{
-			case FUNCTIONS_COMMISION :
-			{
-				FormatEx(buffer, sizeof(buffer), "%t %t", "trans_credits", "trans_credits_commision", g_iTransCredits);
-				AddMenuItem(menu, "a", buffer);
-			}
-			case FUNCTIONS_CREDITS :
-			{
-				FormatEx(buffer, sizeof(buffer), "%t %t", "trans_credits", "trans_credits_cost", g_iTransCredits);
-				AddMenuItem(menu, "a", buffer, (credits < g_iTransCredits) ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
-			}
-		}
+		FormatEx(buffer, sizeof(buffer), "%t %t", "trans_credits", "trans_credits_cost", g_iTransCredits);
+		menu.AddItem("a", buffer, (credits < g_iTransCredits) ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
 	}
 	
-	if (!g_iLuckCredits)
+	if (g_hLuckCredits.IntValue == 0)
 	{
 		FormatEx(buffer, sizeof(buffer), "%t %t", "try_luck", "luck_disabled");
-		AddMenuItem(menu, "b", buffer, ITEMDRAW_DISABLED);
+		menu.AddItem("b", buffer, ITEMDRAW_DISABLED);
 	}
 	else
 	{
-		FormatEx(buffer, sizeof(buffer), "%t %t", "try_luck", "luck_credits_chance", g_iLuckCredits, g_iLuckChance);
-		AddMenuItem(menu, "b", buffer, (credits < g_iLuckCredits) ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
+		FormatEx(buffer, sizeof(buffer), "%t %t", "try_luck", "luck_credits_chance", g_hLuckCredits.IntValue, g_hLuckChance.IntValue);
+		menu.AddItem("b", buffer, (credits < g_hLuckCredits.IntValue) ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
 	}
 	
-	new size = GetArraySize(g_hFuncArray);
+	int size = g_hFuncArray.Length;
 	
 	if (size > 0)
 	{
-		decl any:tmp[3], String:id[16], String:display[64];
+		DataPack dp;
+		char id[16], display[64];
 		display[0] = '\0';
-		for (new i = 0; i < size; i++)
+		for (int i = 1; i < size; i+=2)
 		{
-			GetArrayArray(g_hFuncArray, i, tmp, sizeof(tmp));
-			
-			Call_StartFunction(tmp[FUNCTIONS_PLUGIN], tmp[FUNCTIONS_DISPLAY]);
+			dp = g_hFuncArray.Get(i);
+			dp.Reset();
+			Handle plugin = dp.ReadCell();
+			Function callback = dp.ReadFunction();
+			Call_StartFunction(plugin, callback);
 			Call_PushCell(client);
 			Call_PushStringEx(display, sizeof(display), SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
 			Call_PushCell(sizeof(display));
 			Call_Finish();
 			
 			if (!display[0])
-			{
 				continue;
-			}
 			
 			IntToString(i, id, sizeof(id));
 			
-			AddMenuItem(menu, id, display);
+			menu.AddItem(id, display);
 		}
 	}
 	
-	DisplayMenuAtItem(menu, client, pos, MENU_TIME_FOREVER);
+	menu.DisplayAt(client, pos, MENU_TIME_FOREVER);
 }
 
-public Functions_Menu_Handler(Handle:menu, MenuAction:action, param1, param2)
+public int Functions_Menu_Handler(Menu menu, MenuAction action, int param1, int param2)
 {
 	switch (action)
 	{
 		case MenuAction_Select :
 		{
-			decl String:info[16];
-			GetMenuItem(menu, param2, info, sizeof(info));
+			char info[16];
+			menu.GetItem(param2, info, sizeof(info));
 			
 			switch (info[0])
 			{
@@ -258,20 +238,22 @@ public Functions_Menu_Handler(Handle:menu, MenuAction:action, param1, param2)
 				}
 				default :
 				{
-					new bool:result = false;
+					bool result = false;
 					
-					decl any:tmp[3];
-					if (GetArrayArray(g_hFuncArray, StringToInt(info), tmp, sizeof(tmp)))
+					DataPack dp = g_hFuncArray.Get(StringToInt(info));
+					if (dp != null)
 					{
-						Call_StartFunction(tmp[FUNCTIONS_PLUGIN], tmp[FUNCTIONS_SELECT]);
+						dp.Reset();
+						Handle plugin = dp.ReadCell();
+						dp.Position += view_as<DataPackPos>(9); // skip func_display
+						Function func_select = dp.ReadFunction();
+						Call_StartFunction(plugin, func_select);
 						Call_PushCell(param1);
 						Call_Finish(result);
 					}
 					
 					if (!result)
-					{
 						Functions_ShowMenu(param1, GetMenuSelectionPosition());
-					}
 				}
 			}
 		}
@@ -282,31 +264,28 @@ public Functions_Menu_Handler(Handle:menu, MenuAction:action, param1, param2)
 				ShowMainMenu(param1);
 			}
 		}
-		case MenuAction_End :
-		{
-			CloseHandle(menu);
-		}
+		case MenuAction_End : delete menu;
 	}
 }
 
-bool:Functions_ShowCreditsTransferMenu(client)
+bool Functions_ShowCreditsTransferMenu(int client)
 {
 	SetGlobalTransTarget(client);
 	
-	new credits = GetCredits(client);
+	int credits = GetCredits(client);
 	
-	new Handle:menu = CreateMenu(Functions_MenuCreditsTransfer_Handler);
+	Menu menu = CreateMenu(Functions_MenuCreditsTransfer_Handler);
 	
-	decl String:buffer[128];
+	char buffer[128];
 	FormatEx(buffer, sizeof(buffer), "%t\n%t", "trans_credits", "credits", credits);
 	OnMenuTitle(client, Menu_Functions, buffer, buffer, sizeof(buffer));
-	SetMenuTitle(menu, buffer);
-	SetMenuExitButton(menu, true);
-	SetMenuExitBackButton(menu, true);
+	menu.SetTitle(buffer);
+	menu.ExitButton = true;
+	menu.ExitBackButton = true;
 	
 	if (!Functions_AddTargetsToMenu(menu, client))
 	{
-		CloseHandle(menu);
+		delete menu;
 		Functions_ShowMenu(client);
 		
 		CPrintToChat(client, "%t", "no_targets");
@@ -314,22 +293,22 @@ bool:Functions_ShowCreditsTransferMenu(client)
 		return false;
 	}
 	
-	DisplayMenu(menu, client, MENU_TIME_FOREVER);
+	menu.Display(client, MENU_TIME_FOREVER);
 	
 	return true;
 }
 
-public Functions_MenuCreditsTransfer_Handler(Handle:menu, MenuAction:action, param1, param2)
+public int Functions_MenuCreditsTransfer_Handler(Menu menu, MenuAction action, int param1, int param2)
 {
 	switch (action)
 	{
 		case MenuAction_Select :
 		{
-			decl String:info[16];
-			GetMenuItem(menu, param2, info, sizeof(info));
+			char info[16];
+			menu.GetItem(param2, info, sizeof(info));
 			
-			new userid = StringToInt(info);
-			new target = GetClientOfUserId(userid);
+			int userid = StringToInt(info);
+			int target = GetClientOfUserId(userid);
 			
 			if (!target)
 			{
@@ -347,14 +326,11 @@ public Functions_MenuCreditsTransfer_Handler(Handle:menu, MenuAction:action, par
 				Functions_ShowMenu(param1);
 			}
 		}
-		case MenuAction_End :
-		{
-			CloseHandle(menu);
-		}
+		case MenuAction_End : delete menu;
 	}
 }
 
-Functions_SetupCreditsTransfer(client, target_userid)
+void Functions_SetupCreditsTransfer(int client, int target_userid)
 {
 	g_bListenChat[client] = true;
 	
@@ -363,9 +339,9 @@ Functions_SetupCreditsTransfer(client, target_userid)
 	Functions_ShowPanel(client);
 }
 
-Functions_ShowPanel(client)
+void Functions_ShowPanel(int client)
 {
-	new target = GetClientOfUserId(g_iCreditsTransferTarget[client]);
+	int target = GetClientOfUserId(g_iCreditsTransferTarget[client]);
 	if (!target)
 	{
 		Functions_OnClientDisconnect_Post(client);
@@ -373,101 +349,101 @@ Functions_ShowPanel(client)
 		return;
 	}
 	
-	new Handle:panel = CreatePanel();
+	Panel panel = new Panel();
 	
 	SetGlobalTransTarget(client);
 	
-	new credits = GetCredits(client);
+	int credits = GetCredits(client);
 	
-	decl String:buffer[128];
+	char buffer[128];
 	FormatEx(buffer, sizeof(buffer), "%t\n%t", "trans_credits", "credits", credits);
-	SetPanelTitle(panel, buffer);
+	panel.SetTitle(buffer);
 	
-	DrawPanelItem(panel, " ", ITEMDRAW_SPACER|ITEMDRAW_RAWLINE);
+	panel.DrawItem(" ", ITEMDRAW_SPACER|ITEMDRAW_RAWLINE);
 	
 	FormatEx(buffer, sizeof(buffer), "%N (%d)", target, GetCredits(target));
-	DrawPanelText(panel, buffer);
+	panel.DrawText(buffer);
 	
-	DrawPanelItem(panel, " ", ITEMDRAW_SPACER|ITEMDRAW_RAWLINE);
+	panel.DrawItem(" ", ITEMDRAW_SPACER|ITEMDRAW_RAWLINE);
 	
 	FormatEx(buffer, sizeof(buffer), "%t", "trans_credits_operation");
-	DrawPanelText(panel, buffer);
+	panel.DrawText(buffer);
 	
 	if (g_iCreditsTransferAmount[client] != 0)
 	{
-		DrawPanelItem(panel, " ", ITEMDRAW_SPACER|ITEMDRAW_RAWLINE);
+		panel.DrawItem(" ", ITEMDRAW_SPACER|ITEMDRAW_RAWLINE);
 		
 		if (g_iCreditsTransferCommission[client] > 0)
 		{
 			FormatEx(buffer, sizeof(buffer), "%t", "credits_being_transfered", g_iCreditsTransferAmount[client]);
-			DrawPanelText(panel, buffer);
+			panel.DrawText(buffer);
 			
-			if (g_iTransMode == FUNCTIONS_COMMISION)
+			if (g_bTransMode == false)
 			{
 				FormatEx(buffer, sizeof(buffer), "%t", "credits_to_transfer_commission", g_iCreditsTransferCommission[client]);
-				DrawPanelText(panel, buffer);
+				panel.DrawText(buffer);
 				
 				FormatEx(buffer, sizeof(buffer), "%t", "credits_to_transfer", g_iCreditsTransferAmount[client]-g_iCreditsTransferCommission[client]);
-				DrawPanelText(panel, buffer);
+				panel.DrawText(buffer);
 			}
 			else
 			{
 				FormatEx(buffer, sizeof(buffer), "%t", "credits_to_transfer_price", g_iCreditsTransferCommission[client]);
-				DrawPanelText(panel, buffer);
+				panel.DrawText(buffer);
 			}
 		}
 		else
 		{
 			FormatEx(buffer, sizeof(buffer), "%t", "credits_to_transfer", g_iCreditsTransferAmount[client]);
-			DrawPanelText(panel, buffer);
+			panel.DrawText(buffer);
 		}
 		
-		new left = credits-g_iCreditsTransferAmount[client]-g_iCreditsTransferCommission[client];
+		int left = credits-g_iCreditsTransferAmount[client]-g_iCreditsTransferCommission[client];
 		
 		FormatEx(buffer, sizeof(buffer), "%t", "transfer_credits_left", left);
-		DrawPanelText(panel, buffer);
+		panel.DrawText(buffer);
 	
-		DrawPanelItem(panel, " ", ITEMDRAW_SPACER|ITEMDRAW_RAWLINE);
+		panel.DrawItem(" ", ITEMDRAW_SPACER|ITEMDRAW_RAWLINE);
 		
 		if (left < 0)
 		{
 			FormatEx(buffer, sizeof(buffer), "%t", "need_positive", left * -1);
-			DrawPanelText(panel, buffer);
+			panel.DrawText(buffer);
 		
-			DrawPanelItem(panel, " ", ITEMDRAW_SPACER|ITEMDRAW_RAWLINE);
+			panel.DrawItem(" ", ITEMDRAW_SPACER|ITEMDRAW_RAWLINE);
 			
 			FormatEx(buffer, sizeof(buffer), "%t", "confirm");
-			DrawPanelItem(panel, buffer, ITEMDRAW_DISABLED);
+			panel.DrawItem(buffer, ITEMDRAW_DISABLED);
 		}
 		else
 		{
 			FormatEx(buffer, sizeof(buffer), "%t", "confirm");
-			DrawPanelItem(panel, buffer);
+			panel.DrawItem(buffer);
 		}
 	}
 	else
 	{
-		DrawPanelItem(panel, " ", ITEMDRAW_SPACER|ITEMDRAW_RAWLINE);
+		panel.DrawItem(" ", ITEMDRAW_SPACER|ITEMDRAW_RAWLINE);
 		
 		FormatEx(buffer, sizeof(buffer), "%t", "confirm");
-		DrawPanelItem(panel, buffer, ITEMDRAW_DISABLED);
+		panel.DrawItem(buffer, ITEMDRAW_DISABLED);
 	}
 	
 	FormatEx(buffer, sizeof(buffer), "%t", "cancel");
-	DrawPanelItem(panel, buffer);
+	panel.DrawItem(buffer);
 	
-	DrawPanelItem(panel, " ", ITEMDRAW_SPACER|ITEMDRAW_RAWLINE);
+	panel.DrawItem(" ", ITEMDRAW_SPACER|ITEMDRAW_RAWLINE);
 	
-	SetPanelCurrentKey(panel, g_iExitButton);
+	panel.CurrentKey = g_iExitButton;
 	FormatEx(buffer, sizeof(buffer), "%t", "Exit");
-	DrawPanelItem(panel, buffer);
+	panel.DrawItem(buffer);
 	
-	SendPanelToClient(panel, client, Functions_PanelHandler, MENU_TIME_FOREVER);
+	panel.Send(client, Functions_PanelHandler, MENU_TIME_FOREVER);
 	
-	CloseHandle(panel);
+	delete panel;
 }
 
-public Functions_PanelHandler(Handle:menu, MenuAction:action, param1, param2)
+public int Functions_PanelHandler(Menu menu, MenuAction action, int param1, int param2)
 {
 	switch (action)
 	{
@@ -477,7 +453,7 @@ public Functions_PanelHandler(Handle:menu, MenuAction:action, param1, param2)
 			{
 				case 1 :
 				{
-					new target = GetClientOfUserId(g_iCreditsTransferTarget[param1]);
+					int target = GetClientOfUserId(g_iCreditsTransferTarget[param1]);
 					
 					if (!target)
 					{
@@ -487,9 +463,9 @@ public Functions_PanelHandler(Handle:menu, MenuAction:action, param1, param2)
 						return;
 					}
 					
-					decl amount_remove, amount_give;
+					int amount_remove, amount_give;
 					
-					if (g_iTransMode == FUNCTIONS_COMMISION)
+					if (g_bTransMode == false)
 					{
 						amount_remove = g_iCreditsTransferAmount[param1];
 						amount_give = g_iCreditsTransferAmount[param1]-g_iCreditsTransferCommission[param1];
@@ -500,8 +476,8 @@ public Functions_PanelHandler(Handle:menu, MenuAction:action, param1, param2)
 						amount_give = g_iCreditsTransferAmount[param1];
 					}
 					
-					new dummy_remove = amount_remove;
-					new dummy_give = amount_give;
+					int dummy_remove = amount_remove;
+					int dummy_give = amount_give;
 					switch (OnCreditsTransfer(param1, target, amount_give, amount_remove))
 					{
 						case Plugin_Continue :
@@ -549,7 +525,7 @@ public Functions_PanelHandler(Handle:menu, MenuAction:action, param1, param2)
 	}
 }
 
-Action:Functions_OnClientSayCommand(client, const String:text[])
+Action Functions_OnClientSayCommand(int client, const char[] text)
 {
 	if (!g_bListenChat[client])
 	{
@@ -566,25 +542,26 @@ Action:Functions_OnClientSayCommand(client, const String:text[])
 	
 	if(g_iCreditsTransferAmount[client] < 2)
 	{
+		Functions_OnClientDisconnect_Post(client); // call this, if transaction revoked.
 		CPrintToChat(client, "%t", "IncorrectCredits");
 		return Plugin_Handled;
 	}
+	
+	// I don't know why, but sourcemod allowes negative values for send. So this KOCTbIJIb must fix this.
+	g_iCreditsTransferAmount[client] = Helpers_Math_Abs(g_iCreditsTransferAmount[client]);
 	
 	if (g_iCreditsTransferAmount[client] > GetCredits(client))
 	{
 		g_iCreditsTransferAmount[client] = GetCredits(client);
 	}
 	
-	switch (g_iTransMode)
+	if (g_bTransMode == false)
 	{
-		case FUNCTIONS_COMMISION :
-		{
-			g_iCreditsTransferCommission[client] = g_iCreditsTransferAmount[client] * g_iTransCredits / 100;
-		}
-		case FUNCTIONS_CREDITS :
-		{
-			g_iCreditsTransferCommission[client] = g_iTransCredits;
-		}
+		g_iCreditsTransferCommission[client] = g_iCreditsTransferAmount[client] * g_iTransCredits / 100;
+	}
+	else
+	{
+		g_iCreditsTransferCommission[client] = g_iTransCredits;
 	}
 	
 	Functions_ShowPanel(client);
@@ -592,32 +569,34 @@ Action:Functions_OnClientSayCommand(client, const String:text[])
 	return Plugin_Handled;
 }
 
-Functions_SetupLuck(client)
+void Functions_SetupLuck(int client)
 {
 	if (!OnLuckProcess(client))
 	{
 		return;
 	}
 
-	decl Handle:hArray, size;
+	ArrayList hArray;
+	int size;
 	hArray = Shop_CreateArrayOfItems(size);
 	SortADTArray(hArray, Sort_Random, Sort_Integer);
 	
 	if (!size)
 	{
-		CloseHandle(hArray);
+		delete hArray;
 		
 		CPrintToChat(client, "%t", "EmptyShop");
 		
 		return;
 	}
 	
-	new item_id;
+	int item_id;
 	
-	decl i, dummy, ItemType:type;
-	for (i = 0; i < size; ++i)
+	int dummy;
+	ItemType type;
+	for (int i = 0; i < size; ++i)
 	{
-		dummy = GetArrayCell(hArray, i);
+		dummy = hArray.Get(i);
 		type = GetItemType(dummy);
 		
 		if (type != Item_Finite && type != Item_BuyOnly && ClientHasItem(client, dummy))
@@ -635,7 +614,7 @@ Functions_SetupLuck(client)
 		break;
 	}
 	
-	CloseHandle(hArray);
+	delete hArray;
 	
 	if (!item_id)
 	{
@@ -644,9 +623,9 @@ Functions_SetupLuck(client)
 		return;
 	}
 
-	if (GetRandomIntEx(1, 100) > g_iLuckChance)
+	if (GetRandomIntEx(1, 100) > g_hLuckChance.IntValue)
 	{
-		RemoveCredits(client, g_iLuckCredits, CREDITS_BY_LUCK);
+		RemoveCredits(client, g_hLuckCredits.IntValue, CREDITS_BY_LUCK);
 		
 		CPrintToChat(client, "%t", "Looser");
 		
@@ -658,32 +637,32 @@ Functions_SetupLuck(client)
 		return;
 	}
 	
-	RemoveCredits(client, g_iLuckCredits, CREDITS_BY_LUCK);
+	RemoveCredits(client, g_hLuckCredits.IntValue, CREDITS_BY_LUCK);
 	
 	GiveItem(client, item_id);
 	
 	OnItemLucked(client, item_id);
 	
-	decl String:category[SHOP_MAX_STRING_LENGTH], String:item[SHOP_MAX_STRING_LENGTH];
+	char category[SHOP_MAX_STRING_LENGTH], item[SHOP_MAX_STRING_LENGTH];
 	GetCategoryDisplay(GetItemCategoryId(item_id), client, category, sizeof(category));
 	GetItemDisplay(item_id, client, item, sizeof(item));
 	
 	CPrintToChat(client, "%t", "Lucker", category, item);
 }
 
-stock bool:Functions_AddTargetsToMenu(Handle:menu, filter_client)
+stock bool Functions_AddTargetsToMenu(Menu menu, int filter_client)
 {
-	new bool:result = false;
+	bool result = false;
 	
-	decl String:userid[9], String:buffer[MAX_NAME_LENGTH+21];
-	for (new i = 1; i <= MaxClients; i++)
+	char userid[9], buffer[MAX_NAME_LENGTH+21];
+	for (int i = 1; i <= MaxClients; i++)
 	{
 		if (i != filter_client && IsAuthorizedIn(i))
 		{
 			IntToString(GetClientUserId(i), userid, sizeof(userid));
 			FormatEx(buffer, sizeof(buffer), "%N (%d)", i, GetCredits(i));
 			
-			AddMenuItem(menu, userid, buffer);
+			menu.AddItem(userid, buffer);
 			
 			result = true;
 		}

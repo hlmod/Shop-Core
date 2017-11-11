@@ -1,49 +1,42 @@
-Commands_OnSettingsLoad(Handle:kv)
+void Commands_OnSettingsLoad(KeyValues kv)
 {
-	if (KvJumpToKey(kv, "Commands", false))
+	if (kv.JumpToKey("Commands", false))
 	{
-		decl String:buffer[SHOP_MAX_STRING_LENGTH];
+		char buffer[SHOP_MAX_STRING_LENGTH];
 		
-		KvGetString(kv, "Give_Credits", buffer, sizeof(buffer));
+		kv.GetString("Give_Credits", buffer, sizeof(buffer));
 		TrimString(buffer);
 		RegConsoleCmd(buffer, Commands_GiveCredits, "How many credits to give to players");
 		
-		KvGetString(kv, "Take_Credits", buffer, sizeof(buffer));
+		kv.GetString("Take_Credits", buffer, sizeof(buffer));
 		TrimString(buffer);
 		RegConsoleCmd(buffer, Commands_TakeCredits, "How many credits to take from players");
 		
-		KvGetString(kv, "Set_Credits", buffer, sizeof(buffer));
+		kv.GetString("Set_Credits", buffer, sizeof(buffer));
 		TrimString(buffer);
 		RegConsoleCmd(buffer, Commands_SetCredits, "How many credits to set to players");
 		
-		KvGetString(kv, "Main_Menu", buffer, sizeof(buffer));
+		kv.GetString("Main_Menu", buffer, sizeof(buffer));
 		TrimString(buffer);
 		
-		decl String:part[64];
-		new reloc_idx, var2;
-		new row;
+		char part[64];
+		int reloc_idx, var2;
+		int row;
 		while ((var2 = SplitString(buffer[reloc_idx], ",", part, sizeof(part))))
 		{
-			//reloc_idx += var2;
 			if (var2 == -1)
-			{
 				strcopy(part, sizeof(part), buffer[reloc_idx]);
-			}
 			else
-			{
 				reloc_idx += var2;
-			}
 			
 			TrimString(part);
 			
 			if (!part[0])
-			{
 				continue;
-			}
 			
 			if (!row)
 			{
-				new start;
+				int start;
 				if (!StrContains(part, "sm_", true))
 				{
 					start = 3;
@@ -54,18 +47,16 @@ Commands_OnSettingsLoad(Handle:kv)
 			RegConsoleCmd(part, Commands_Shop, "Open up main menu");
 			
 			if (var2 == -1)
-			{
 				break;
-			}
 			
 			row++;
 		}
 		
-		KvRewind(kv);
+		kv.Rewind();
 	}
 }
 
-public Action:Commands_Shop(client, argc)
+public Action Commands_Shop(int client, int args)
 {
 	if (!client)
 	{
@@ -83,14 +74,14 @@ public Action:Commands_Shop(client, argc)
 	return Plugin_Handled;
 }
 
-public Action:Commands_GiveCredits(client, args)
+public Action Commands_GiveCredits(int client, int args)
 {
 	if (client && !(GetUserFlagBits(client) & g_iAdminFlags))
 	{
 		CPrintToChat(client, "%t", "NoAccessToCommand");
 		return Plugin_Handled;
 	}
-	decl String:buffer[96];
+	char buffer[96];
 	if (args < 2)
 	{
 		GetCmdArg(0, buffer, sizeof(buffer));
@@ -98,15 +89,16 @@ public Action:Commands_GiveCredits(client, args)
 		return Plugin_Handled;
 	}
 	
-	decl String:pattern[96], String:money[32];
+	char pattern[96], money[32];
 	GetCmdArg(1, pattern, sizeof(pattern));
 	GetCmdArg(2, money, sizeof(money));
 	
-	decl targets[MaxClients], bool:ml;
+	int[] targets = new int[MaxClients];
+	bool ml;
 	
-	new imoney = StringToInt(money);
+	int imoney = StringToInt(money);
 	
-	new count = ProcessTargetString(pattern, client, targets, MaxClients, COMMAND_FILTER_NO_BOTS, buffer, sizeof(buffer), ml);
+	int count = ProcessTargetString(pattern, client, targets, MaxClients, COMMAND_FILTER_NO_BOTS, buffer, sizeof(buffer), ml);
 	
 	if (count < 1)
 	{
@@ -117,7 +109,7 @@ public Action:Commands_GiveCredits(client, args)
 	}
 	else
 	{
-		for (new i = 0; i < count; i++)
+		for (int i = 0; i < count; i++)
 		{
 			if (targets[i] != client && !CanUserTarget(client, targets[i])) continue;
 			
@@ -136,14 +128,14 @@ public Action:Commands_GiveCredits(client, args)
 	return Plugin_Handled;
 }
 
-public Action:Commands_TakeCredits(client, args)
+public Action Commands_TakeCredits(int client, int args)
 {
 	if (client && !(GetUserFlagBits(client) & g_iAdminFlags))
 	{
 		CPrintToChat(client, "%t", "NoAccessToCommand");
 		return Plugin_Handled;
 	}
-	decl String:buffer[96];
+	char buffer[96];
 	if (args < 2)
 	{
 		GetCmdArg(0, buffer, sizeof(buffer));
@@ -151,15 +143,16 @@ public Action:Commands_TakeCredits(client, args)
 		return Plugin_Handled;
 	}
 	
-	decl String:pattern[96], String:money[32];
+	char pattern[96], money[32];
 	GetCmdArg(1, pattern, sizeof(pattern));
 	GetCmdArg(2, money, sizeof(money));
 	
-	decl targets[MaxClients], bool:ml;
+	int[] targets = new int[MaxClients];
+	bool ml;
 	
-	new imoney = StringToInt(money);
+	int imoney = StringToInt(money);
 	
-	new count = ProcessTargetString(pattern, client, targets, MaxClients, COMMAND_FILTER_NO_BOTS, buffer, sizeof(buffer), ml);
+	int count = ProcessTargetString(pattern, client, targets, MaxClients, COMMAND_FILTER_NO_BOTS, buffer, sizeof(buffer), ml);
 	
 	if (count < 1)
 	{
@@ -170,7 +163,7 @@ public Action:Commands_TakeCredits(client, args)
 	}
 	else
 	{
-		for (new i = 0; i < count; i++)
+		for (int i = 0; i < count; i++)
 		{
 			if (targets[i] != client && !CanUserTarget(client, targets[i])) continue;
 			
@@ -189,14 +182,14 @@ public Action:Commands_TakeCredits(client, args)
 	return Plugin_Handled;
 }
 
-public Action:Commands_SetCredits(client, args)
+public Action Commands_SetCredits(int client, int args)
 {
 	if (client && !(GetUserFlagBits(client) & g_iAdminFlags))
 	{
 		CPrintToChat(client, "%t", "NoAccessToCommand");
 		return Plugin_Handled;
 	}
-	decl String:buffer[96];
+	char buffer[96];
 	if (args < 2)
 	{
 		GetCmdArg(0, buffer, sizeof(buffer));
@@ -204,15 +197,16 @@ public Action:Commands_SetCredits(client, args)
 		return Plugin_Handled;
 	}
 	
-	decl String:pattern[96], String:money[32];
+	char pattern[96], money[32];
 	GetCmdArg(1, pattern, sizeof(pattern));
 	GetCmdArg(2, money, sizeof(money));
 	
-	decl targets[MaxClients], bool:ml;
+	int[] targets = new int[MaxClients];
+	bool ml;
 	
-	new imoney = StringToInt(money);
+	int imoney = StringToInt(money);
 	
-	new count = ProcessTargetString(pattern, client, targets, MaxClients, COMMAND_FILTER_NO_BOTS, buffer, sizeof(buffer), ml);
+	int count = ProcessTargetString(pattern, client, targets, MaxClients, COMMAND_FILTER_NO_BOTS, buffer, sizeof(buffer), ml);
 	
 	if (count < 1)
 	{
@@ -223,7 +217,7 @@ public Action:Commands_SetCredits(client, args)
 	}
 	else
 	{
-		for (new i = 0; i < count; i++)
+		for (int i = 0; i < count; i++)
 		{
 			if (targets[i] != client && !CanUserTarget(client, targets[i])) continue;
 			

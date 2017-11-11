@@ -5,7 +5,7 @@
  *	-
  *	@return player id in the database
 */
-native Shop_GetClientId(client);
+native int Shop_GetClientId(int client);
 
 /**
  *	Sets timeleft for an item. 0 to set no timelimit
@@ -16,7 +16,7 @@ native Shop_GetClientId(client);
  *	-
  *	@return True on success and false it client has not this item
 */
-native bool:Shop_SetClientItemTimeleft(client, ItemId:item_id, timeleft);
+native bool Shop_SetClientItemTimeleft(int client, ItemId item_id, int timeleft);
 
 /**
  *	Gets timeleft for an item
@@ -26,7 +26,7 @@ native bool:Shop_SetClientItemTimeleft(client, ItemId:item_id, timeleft);
  *	-
  *	@return item timeleft in seconds. 0 if item has no timelimit
 */
-native Shop_GetClientItemTimeleft(client, ItemId:item_id);
+native int Shop_GetClientItemTimeleft(int client, ItemId item_id);
 
 /**
  *	Gets an absolute sell price for an item a player hold
@@ -36,7 +36,7 @@ native Shop_GetClientItemTimeleft(client, ItemId:item_id);
  *	-
  *	@return sell price of the item
 */
-native Shop_GetClientItemSellPrice(client, ItemId:item_id);
+native int Shop_GetClientItemSellPrice(int client, ItemId item_id);
 
 /**
  *	Whether a player has toggled on an item
@@ -46,7 +46,7 @@ native Shop_GetClientItemSellPrice(client, ItemId:item_id);
  *	-
  *	@return true if player has item toggled on and false otherwise
 */
-native bool:Shop_IsClientItemToggled(client, ItemId:item_id);
+native bool Shop_IsClientItemToggled(int client, ItemId item_id);
 
 /**
  *	Whether a player has an item
@@ -56,7 +56,7 @@ native bool:Shop_IsClientItemToggled(client, ItemId:item_id);
  *	-
  *	@return true if player has item and false otherwise
 */
-native bool:Shop_IsClientHasItem(client, ItemId:item_id);
+native bool Shop_IsClientHasItem(int client, ItemId item_id);
 
 /**
  *	Toggles a client's item
@@ -67,7 +67,7 @@ native bool:Shop_IsClientHasItem(client, ItemId:item_id);
  *	-
  *	@return true on success and false otherwise
 */
-native bool:Shop_ToggleClientItem(client, ItemId:item_id, ToggleState:toggle = Toggle);
+native bool Shop_ToggleClientItem(int client, ItemId item_id, ToggleState toggle = Toggle);
 
 /**
  *	Toggles all items of category off
@@ -77,7 +77,7 @@ native bool:Shop_ToggleClientItem(client, ItemId:item_id, ToggleState:toggle = T
  *	-
  *	@noreturn
 */
-native Shop_ToggleClientCategoryOff(client, CategoryId:category_id);
+native void Shop_ToggleClientCategoryOff(int client, CategoryId category_id);
 
 /**
  *	Checks whether the player has been loaded from database
@@ -86,7 +86,7 @@ native Shop_ToggleClientCategoryOff(client, CategoryId:category_id);
  *	-
 	@return	True if the player loaded, false otherwise
 */
-native bool:Shop_IsAuthorized(client);
+native bool Shop_IsAuthorized(int client);
 
 /**
  *	Checks whether a player has access to admin panel
@@ -95,7 +95,7 @@ native bool:Shop_IsAuthorized(client);
  *	-
 	@return	True if the player has access, false otherwise
 */
-native bool:Shop_IsAdmin(client);
+native bool Shop_IsAdmin(int client);
 
 /**
  *	Gives certain amount of credits to the player
@@ -106,7 +106,7 @@ native bool:Shop_IsAdmin(client);
  *	-
  *	@return	New amount of credits
 */
-native Shop_GiveClientCredits(client, amount, by_who = CREDITS_BY_NATIVE);
+native int Shop_GiveClientCredits(int client, int amount, int by_who = CREDITS_BY_NATIVE);
 
 /**
  *	Takes certain amount of credits from the player
@@ -117,7 +117,7 @@ native Shop_GiveClientCredits(client, amount, by_who = CREDITS_BY_NATIVE);
  *	-
  *	@return	New amount of credits
 */
-native Shop_TakeClientCredits(client, amount, by_who = CREDITS_BY_NATIVE);
+native int Shop_TakeClientCredits(int client, int amount, int by_who = CREDITS_BY_NATIVE);
 
 /**
  *	Gets the amount of credits of the player
@@ -126,7 +126,7 @@ native Shop_TakeClientCredits(client, amount, by_who = CREDITS_BY_NATIVE);
  *	-
  *	@return	Amount of credits a player has, -1 on failure
 */
-native Shop_GetClientCredits(client);
+native int Shop_GetClientCredits(int client);
 
 /**
  *	Sets the amount of credits to the player
@@ -136,7 +136,7 @@ native Shop_GetClientCredits(client);
  *	-
  *	@noreturn
 */
-native Shop_SetClientCredits(client, credits);
+native void Shop_SetClientCredits(int client, int credits);
 
 /**
  *	Forces the player to buy the item from the shop
@@ -146,7 +146,7 @@ native Shop_SetClientCredits(client, credits);
  *	-
  *	@return	True if the player successfuly bought, false otherwise
 */
-native bool:Shop_BuyClientItem(client, ItemId:item_id);
+native bool Shop_BuyClientItem(int client, ItemId item_id);
 
 /**
  *	Remove the item from the player's inventory
@@ -157,7 +157,7 @@ native bool:Shop_BuyClientItem(client, ItemId:item_id);
  *	-
  *	@return	True on success, false otherwise
 */
-native bool:Shop_RemoveClientItem(client, ItemId:item_id, count = 0);
+native bool Shop_RemoveClientItem(int client, ItemId item_id, int count = 0);
 
 /**
  *	Gives the item from the player's inventory
@@ -168,7 +168,7 @@ native bool:Shop_RemoveClientItem(client, ItemId:item_id, count = 0);
  *	-
  *	@return	True on success, false otherwise
 */
-native bool:Shop_GiveClientItem(client, ItemId:item_id, value = 1);
+native bool Shop_GiveClientItem(int client, ItemId item_id, int value = 1);
 
 /**
  *	Get's count of an item a player has
@@ -176,9 +176,9 @@ native bool:Shop_GiveClientItem(client, ItemId:item_id, value = 1);
  *	@param client			Client index
  *	@param item_id			The item id
  *	-
- *	@return	True on success, false otherwise
+ *	@return	Amount of item that player has
 */
-native Shop_GetClientItemCount(client, ItemId:item_id);
+native int Shop_GetClientItemCount(int client, ItemId item_id);
 
 /**
  *	Set count of an item a player has
@@ -188,7 +188,7 @@ native Shop_GetClientItemCount(client, ItemId:item_id);
  *	-
  *	@noreturn
 */
-native Shop_SetClientItemCount(client, ItemId:item_id, count = 0);
+native void Shop_SetClientItemCount(int client, ItemId item_id, int count = 0);
 /**
  *	Forces a player to use an item
  *	-
@@ -197,4 +197,4 @@ native Shop_SetClientItemCount(client, ItemId:item_id, count = 0);
  *	-
  *	@return true on success and false otherwise
 */
-native bool:Shop_UseClientItem(client, ItemId:item_id);
+native bool Shop_UseClientItem(int client, ItemId item_id);

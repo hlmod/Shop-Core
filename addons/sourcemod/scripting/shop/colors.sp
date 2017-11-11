@@ -1,9 +1,9 @@
 #include <regex>
 
-CPrintToChat(iClient, const String:sFormat[], any:...)
+void CPrintToChat(int client, const char[] sFormat, any ...)
 {
-	decl String:sMessage[512];
-	SetGlobalTransTarget(iClient);
+	char sMessage[512];
+	SetGlobalTransTarget(client);
 	VFormat(sMessage, sizeof(sMessage), sFormat, 3);
 
 	Format(sMessage, sizeof(sMessage), Engine_Version == GAME_CSGO ? " \x01%s":"\x01%s", sMessage);
@@ -17,14 +17,14 @@ CPrintToChat(iClient, const String:sFormat[], any:...)
 		case GAME_CSS_34:
 		{
 			ReplaceString(sMessage, sizeof(sMessage), "{LIGHTGREEN}", "\x03", false);
-			new iColor = ReplaceColors(sMessage, sizeof(sMessage));
+			int iColor = ReplaceColors(sMessage, sizeof(sMessage));
 			switch(iColor)
 			{
-				case -1:	SayText2(iClient, 0, sMessage);
-				case 0:		SayText2(iClient, iClient, sMessage);
+				case -1:	SayText2(client, 0, sMessage);
+				case 0:		SayText2(client, client, sMessage);
 				default:
 				{
-					SayText2(iClient, FindPlayerByTeam(iColor), sMessage);
+					SayText2(client, FindPlayerByTeam(iColor), sMessage);
 				}
 			}
 		}
@@ -32,7 +32,8 @@ CPrintToChat(iClient, const String:sFormat[], any:...)
 		{
 			ReplaceString(sMessage, sizeof(sMessage), "#", "\x07");
 
-			static Handle:hRegex, Handle:hColorsTrie;
+			Regex hRegex;
+			StringMap hColorsTrie;
 	
 			if(!hColorsTrie)
 			{
@@ -41,20 +42,21 @@ CPrintToChat(iClient, const String:sFormat[], any:...)
 	
 			if(!hRegex)
 			{
-				hRegex = CompileRegex("{[a-zA-Z0-9]+}");
+				hRegex = new Regex("{[a-zA-Z0-9]+}");
 			}
-
-			decl String:sColorName[32], iCursor, iColor, String:sBuffer[32];
-			iCursor = 0;
-			while(MatchRegex(hRegex, sMessage[iCursor]))
+			
+			int iCursor = 0, iColor;
+			char sColorName[32], sBuffer[32];
+			
+			while(hRegex.Match(sMessage[iCursor]))
 			{
-				GetRegexSubString(hRegex, 0, sColorName, sizeof(sColorName));
+				hRegex.GetSubString(0, sColorName, sizeof(sColorName));
 				iCursor = StrContains(sMessage[iCursor], sColorName, true) + iCursor + 1;
 				CStrToLower(sColorName);
 				strcopy(sBuffer, sizeof(sBuffer), sColorName[1]);
 				sBuffer[strlen(sBuffer)-1] = 0;
 
-				if(GetTrieValue(hColorsTrie, sBuffer, iColor))
+				if(hColorsTrie.GetValue(sBuffer, iColor))
 				{
 					FormatEx(sBuffer, sizeof(sBuffer), "\x07%06X", iColor);
 					ReplaceString(sMessage, sizeof(sMessage), sColorName, sBuffer, false);
@@ -63,19 +65,22 @@ CPrintToChat(iClient, const String:sFormat[], any:...)
 
 			if(ReplaceString(sMessage, sizeof(sMessage), "{TEAM}", "\x03", false))
 			{
-				SayText2(iClient, iClient, sMessage);
+				SayText2(client, client, sMessage);
 			}
 			else
 			{
 				ReplaceString(sMessage, sizeof(sMessage), "{LIGHTGREEN}", "\x03", false);
-				SayText2(iClient, 0, sMessage);
+				SayText2(client, 0, sMessage);
 			}
 		}
 		case GAME_CSGO:
 		{
-			static const	String:sColorName[][] =
+			static char sColorName[][] =
 							{
+								"{DEFAULT}",
 								"{RED}",
+								"{LIGHTPURPLE}",
+								"{GREEN}",
 								"{LIME}",
 								"{LIGHTGREEN}",
 								"{LIGHTRED}",
@@ -86,9 +91,12 @@ CPrintToChat(iClient, const String:sFormat[], any:...)
 								"{BLUE}", 
 								"{PURPLE}"
 							},
-							String:sColorCode[][] =
+							sColorCode[][] =
 							{
+								"\x01",
 								"\x02",
+								"\x03",
+								"\x04",
 							    "\x05",
 							    "\x06",
 							    "\x07",
@@ -100,31 +108,31 @@ CPrintToChat(iClient, const String:sFormat[], any:...)
 							    "\x0E"
 							};
 
-			for(new i = 0; i < sizeof(sColorName); ++i)
+			for(int i = 0; i < sizeof(sColorName); ++i)
 			{
 				ReplaceString(sMessage, sizeof(sMessage), sColorName[i], sColorCode[i], false);
 			}
 
 			if(ReplaceString(sMessage, sizeof(sMessage), "{TEAM}", "\x03", false))
 			{
-				SayText2(iClient, iClient, sMessage);
+				SayText2(client, client, sMessage);
 			}
 			else
 			{
-				SayText2(iClient, 0, sMessage);
+				SayText2(client, 0, sMessage);
 			}
 		}
 		default:
 		{
 			ReplaceString(sMessage, sizeof(sMessage), "#", "\x07");
-			SayText2(iClient, 0, sMessage);
+			SayText2(client, 0, sMessage);
 		}
 	}
 }
 
-CStrToLower(String:sBuffer[])
+void CStrToLower(char[] sBuffer)
 {
-	decl iLen, i;
+	int iLen, i;
 	iLen = strlen(sBuffer);
 	for(i = 0; i < iLen; ++i)
 	{
@@ -132,7 +140,7 @@ CStrToLower(String:sBuffer[])
 	}
 }
 
-ReplaceColors(String:sMsg[], iMaxLength)
+int ReplaceColors(char[] sMsg, int iMaxLength)
 {
 	if(ReplaceString(sMsg, iMaxLength, "{TEAM}",	"\x03", false))	return 0;
 
@@ -143,9 +151,9 @@ ReplaceColors(String:sMsg[], iMaxLength)
 	return -1;
 }
 
-FindPlayerByTeam(iTeam)
+int FindPlayerByTeam(int iTeam)
 {
-	for (new i = 1; i <= MaxClients; i++)
+	for (int i = 1; i <= MaxClients; i++)
 	{
 		if (IsClientInGame(i) && GetClientTeam(i) == iTeam) return i;
 	}
@@ -153,11 +161,13 @@ FindPlayerByTeam(iTeam)
 	return 0;
 }
 
-SayText2(iClient, iAuthor = 0, const String:sMessage[])
+void SayText2(int client, int iAuthor = 0, const char[] sMessage)
 {
-	decl iClients[1], Handle:hBuffer;
-	iClients[0] = iClient;
-	hBuffer = StartMessage("SayText2", iClients, 1, USERMSG_RELIABLE|USERMSG_BLOCKHOOKS);
+	int[] clients = new int[1];
+	clients[0] = client;
+	
+	Handle hBuffer;
+	hBuffer = StartMessage("SayText2", clients, 1, USERMSG_RELIABLE|USERMSG_BLOCKHOOKS);
 	if(Engine_Version == GAME_CSGO)
 	{
 		PbSetInt(hBuffer, "ent_idx", iAuthor);
@@ -177,164 +187,164 @@ SayText2(iClient, iAuthor = 0, const String:sMessage[])
 	EndMessage();
 }
 
-Handle:InitColors()
+StringMap InitColors()
 {
-	new Handle:hColorsTrie = CreateTrie();
-	SetTrieValue(hColorsTrie, "aliceblue", 0xF0F8FF);
-	SetTrieValue(hColorsTrie, "allies", 0x4D7942); // same as Allies team in DoD:S
-	SetTrieValue(hColorsTrie, "antiquewhite", 0xFAEBD7);
-	SetTrieValue(hColorsTrie, "aqua", 0x00FFFF);
-	SetTrieValue(hColorsTrie, "aquamarine", 0x7FFFD4);
-	SetTrieValue(hColorsTrie, "axis", 0xFF4040); // same as Axis team in DoD:S
-	SetTrieValue(hColorsTrie, "azure", 0x007FFF);
-	SetTrieValue(hColorsTrie, "beige", 0xF5F5DC);
-	SetTrieValue(hColorsTrie, "bisque", 0xFFE4C4);
-	SetTrieValue(hColorsTrie, "black", 0x000000);
-	SetTrieValue(hColorsTrie, "blanchedalmond", 0xFFEBCD);
-	SetTrieValue(hColorsTrie, "blue", 0x99CCFF); // same as BLU/Counter-Terrorist team color
-	SetTrieValue(hColorsTrie, "blueviolet", 0x8A2BE2);
-	SetTrieValue(hColorsTrie, "brown", 0xA52A2A);
-	SetTrieValue(hColorsTrie, "burlywood", 0xDEB887);
-	SetTrieValue(hColorsTrie, "cadetblue", 0x5F9EA0);
-	SetTrieValue(hColorsTrie, "chartreuse", 0x7FFF00);
-	SetTrieValue(hColorsTrie, "chocolate", 0xD2691E);
-	SetTrieValue(hColorsTrie, "community", 0x70B04A); // same as Community item quality in TF2
-	SetTrieValue(hColorsTrie, "coral", 0xFF7F50);
-	SetTrieValue(hColorsTrie, "cornflowerblue", 0x6495ED);
-	SetTrieValue(hColorsTrie, "cornsilk", 0xFFF8DC);
-	SetTrieValue(hColorsTrie, "crimson", 0xDC143C);
-	SetTrieValue(hColorsTrie, "cyan", 0x00FFFF);
-	SetTrieValue(hColorsTrie, "darkblue", 0x00008B);
-	SetTrieValue(hColorsTrie, "darkcyan", 0x008B8B);
-	SetTrieValue(hColorsTrie, "darkgoldenrod", 0xB8860B);
-	SetTrieValue(hColorsTrie, "darkgray", 0xA9A9A9);
-	SetTrieValue(hColorsTrie, "darkgreen", 0x006400);
-	SetTrieValue(hColorsTrie, "darkkhaki", 0xBDB76B);
-	SetTrieValue(hColorsTrie, "darkmagenta", 0x8B008B);
-	SetTrieValue(hColorsTrie, "darkolivegreen", 0x556B2F);
-	SetTrieValue(hColorsTrie, "darkorange", 0xFF8C00);
-	SetTrieValue(hColorsTrie, "darkorchid", 0x9932CC);
-	SetTrieValue(hColorsTrie, "darkred", 0x8B0000);
-	SetTrieValue(hColorsTrie, "darksalmon", 0xE9967A);
-	SetTrieValue(hColorsTrie, "darkseagreen", 0x8FBC8F);
-	SetTrieValue(hColorsTrie, "darkslateblue", 0x483D8B);
-	SetTrieValue(hColorsTrie, "darkslategray", 0x2F4F4F);
-	SetTrieValue(hColorsTrie, "darkturquoise", 0x00CED1);
-	SetTrieValue(hColorsTrie, "darkviolet", 0x9400D3);
-	SetTrieValue(hColorsTrie, "deeppink", 0xFF1493);
-	SetTrieValue(hColorsTrie, "deepskyblue", 0x00BFFF);
-	SetTrieValue(hColorsTrie, "dimgray", 0x696969);
-	SetTrieValue(hColorsTrie, "dodgerblue", 0x1E90FF);
-	SetTrieValue(hColorsTrie, "firebrick", 0xB22222);
-	SetTrieValue(hColorsTrie, "floralwhite", 0xFFFAF0);
-	SetTrieValue(hColorsTrie, "forestgreen", 0x228B22);
-	SetTrieValue(hColorsTrie, "fuchsia", 0xFF00FF);
-	SetTrieValue(hColorsTrie, "fullblue", 0x0000FF);
-	SetTrieValue(hColorsTrie, "fullred", 0xFF0000);
-	SetTrieValue(hColorsTrie, "gainsboro", 0xDCDCDC);
-	SetTrieValue(hColorsTrie, "genuine", 0x4D7455); // same as Genuine item quality in TF2
-	SetTrieValue(hColorsTrie, "ghostwhite", 0xF8F8FF);
-	SetTrieValue(hColorsTrie, "gold", 0xFFD700);
-	SetTrieValue(hColorsTrie, "goldenrod", 0xDAA520);
-	SetTrieValue(hColorsTrie, "gray", 0xCCCCCC); // same as spectator team color
-	SetTrieValue(hColorsTrie, "grey", 0xCCCCCC);
-	SetTrieValue(hColorsTrie, "green", 0x3EFF3E);
-	SetTrieValue(hColorsTrie, "greenyellow", 0xADFF2F);
-	SetTrieValue(hColorsTrie, "haunted", 0x38F3AB); // same as Haunted item quality in TF2
-	SetTrieValue(hColorsTrie, "honeydew", 0xF0FFF0);
-	SetTrieValue(hColorsTrie, "hotpink", 0xFF69B4);
-	SetTrieValue(hColorsTrie, "indianred", 0xCD5C5C);
-	SetTrieValue(hColorsTrie, "indigo", 0x4B0082);
-	SetTrieValue(hColorsTrie, "ivory", 0xFFFFF0);
-	SetTrieValue(hColorsTrie, "khaki", 0xF0E68C);
-	SetTrieValue(hColorsTrie, "lavender", 0xE6E6FA);
-	SetTrieValue(hColorsTrie, "lavenderblush", 0xFFF0F5);
-	SetTrieValue(hColorsTrie, "lawngreen", 0x7CFC00);
-	SetTrieValue(hColorsTrie, "lemonchiffon", 0xFFFACD);
-	SetTrieValue(hColorsTrie, "lightblue", 0xADD8E6);
-	SetTrieValue(hColorsTrie, "lightcoral", 0xF08080);
-	SetTrieValue(hColorsTrie, "lightcyan", 0xE0FFFF);
-	SetTrieValue(hColorsTrie, "lightgoldenrodyellow", 0xFAFAD2);
-	SetTrieValue(hColorsTrie, "lightgray", 0xD3D3D3);
-	SetTrieValue(hColorsTrie, "lightgreen", 0x99FF99);
-	SetTrieValue(hColorsTrie, "lightpink", 0xFFB6C1);
-	SetTrieValue(hColorsTrie, "lightsalmon", 0xFFA07A);
-	SetTrieValue(hColorsTrie, "lightseagreen", 0x20B2AA);
-	SetTrieValue(hColorsTrie, "lightskyblue", 0x87CEFA);
-	SetTrieValue(hColorsTrie, "lightslategray", 0x778899);
-	SetTrieValue(hColorsTrie, "lightsteelblue", 0xB0C4DE);
-	SetTrieValue(hColorsTrie, "lightyellow", 0xFFFFE0);
-	SetTrieValue(hColorsTrie, "lime", 0x00FF00);
-	SetTrieValue(hColorsTrie, "limegreen", 0x32CD32);
-	SetTrieValue(hColorsTrie, "linen", 0xFAF0E6);
-	SetTrieValue(hColorsTrie, "magenta", 0xFF00FF);
-	SetTrieValue(hColorsTrie, "maroon", 0x800000);
-	SetTrieValue(hColorsTrie, "mediumaquamarine", 0x66CDAA);
-	SetTrieValue(hColorsTrie, "mediumblue", 0x0000CD);
-	SetTrieValue(hColorsTrie, "mediumorchid", 0xBA55D3);
-	SetTrieValue(hColorsTrie, "mediumpurple", 0x9370D8);
-	SetTrieValue(hColorsTrie, "mediumseagreen", 0x3CB371);
-	SetTrieValue(hColorsTrie, "mediumslateblue", 0x7B68EE);
-	SetTrieValue(hColorsTrie, "mediumspringgreen", 0x00FA9A);
-	SetTrieValue(hColorsTrie, "mediumturquoise", 0x48D1CC);
-	SetTrieValue(hColorsTrie, "mediumvioletred", 0xC71585);
-	SetTrieValue(hColorsTrie, "midnightblue", 0x191970);
-	SetTrieValue(hColorsTrie, "mintcream", 0xF5FFFA);
-	SetTrieValue(hColorsTrie, "mistyrose", 0xFFE4E1);
-	SetTrieValue(hColorsTrie, "moccasin", 0xFFE4B5);
-	SetTrieValue(hColorsTrie, "navajowhite", 0xFFDEAD);
-	SetTrieValue(hColorsTrie, "navy", 0x000080);
-	SetTrieValue(hColorsTrie, "normal", 0xB2B2B2); // same as Normal item quality in TF2
-	SetTrieValue(hColorsTrie, "oldlace", 0xFDF5E6);
-	SetTrieValue(hColorsTrie, "olive", 0x9EC34F);
-	SetTrieValue(hColorsTrie, "olivedrab", 0x6B8E23);
-	SetTrieValue(hColorsTrie, "orange", 0xFFA500);
-	SetTrieValue(hColorsTrie, "orangered", 0xFF4500);
-	SetTrieValue(hColorsTrie, "orchid", 0xDA70D6);
-	SetTrieValue(hColorsTrie, "palegoldenrod", 0xEEE8AA);
-	SetTrieValue(hColorsTrie, "palegreen", 0x98FB98);
-	SetTrieValue(hColorsTrie, "paleturquoise", 0xAFEEEE);
-	SetTrieValue(hColorsTrie, "palevioletred", 0xD87093);
-	SetTrieValue(hColorsTrie, "papayawhip", 0xFFEFD5);
-	SetTrieValue(hColorsTrie, "peachpuff", 0xFFDAB9);
-	SetTrieValue(hColorsTrie, "peru", 0xCD853F);
-	SetTrieValue(hColorsTrie, "pink", 0xFFC0CB);
-	SetTrieValue(hColorsTrie, "plum", 0xDDA0DD);
-	SetTrieValue(hColorsTrie, "powderblue", 0xB0E0E6);
-	SetTrieValue(hColorsTrie, "purple", 0x800080);
-	SetTrieValue(hColorsTrie, "red", 0xFF4040); // same as RED/Terrorist team color
-	SetTrieValue(hColorsTrie, "rosybrown", 0xBC8F8F);
-	SetTrieValue(hColorsTrie, "royalblue", 0x4169E1);
-	SetTrieValue(hColorsTrie, "saddlebrown", 0x8B4513);
-	SetTrieValue(hColorsTrie, "salmon", 0xFA8072);
-	SetTrieValue(hColorsTrie, "sandybrown", 0xF4A460);
-	SetTrieValue(hColorsTrie, "seagreen", 0x2E8B57);
-	SetTrieValue(hColorsTrie, "seashell", 0xFFF5EE);
-	SetTrieValue(hColorsTrie, "selfmade", 0x70B04A); // same as Self-Made item quality in TF2
-	SetTrieValue(hColorsTrie, "sienna", 0xA0522D);
-	SetTrieValue(hColorsTrie, "silver", 0xC0C0C0);
-	SetTrieValue(hColorsTrie, "skyblue", 0x87CEEB);
-	SetTrieValue(hColorsTrie, "slateblue", 0x6A5ACD);
-	SetTrieValue(hColorsTrie, "slategray", 0x708090);
-	SetTrieValue(hColorsTrie, "snow", 0xFFFAFA);
-	SetTrieValue(hColorsTrie, "springgreen", 0x00FF7F);
-	SetTrieValue(hColorsTrie, "steelblue", 0x4682B4);
-	SetTrieValue(hColorsTrie, "strange", 0xCF6A32); // same as Strange item quality in TF2
-	SetTrieValue(hColorsTrie, "tan", 0xD2B48C);
-	SetTrieValue(hColorsTrie, "teal", 0x008080);
-	SetTrieValue(hColorsTrie, "thistle", 0xD8BFD8);
-	SetTrieValue(hColorsTrie, "tomato", 0xFF6347);
-	SetTrieValue(hColorsTrie, "turquoise", 0x40E0D0);
-	SetTrieValue(hColorsTrie, "unique", 0xFFD700); // same as Unique item quality in TF2
-	SetTrieValue(hColorsTrie, "unusual", 0x8650AC); // same as Unusual item quality in TF2
-	SetTrieValue(hColorsTrie, "valve", 0xA50F79); // same as Valve item quality in TF2
-	SetTrieValue(hColorsTrie, "vintage", 0x476291); // same as Vintage item quality in TF2
-	SetTrieValue(hColorsTrie, "violet", 0xEE82EE);
-	SetTrieValue(hColorsTrie, "wheat", 0xF5DEB3);
-	SetTrieValue(hColorsTrie, "white", 0xFFFFFF);
-	SetTrieValue(hColorsTrie, "whitesmoke", 0xF5F5F5);
-	SetTrieValue(hColorsTrie, "yellow", 0xFFFF00);
-	SetTrieValue(hColorsTrie, "yellowgreen", 0x9ACD32);
+	StringMap hColorsTrie = new StringMap();
+	hColorsTrie.SetValue("aliceblue", 0xF0F8FF);
+	hColorsTrie.SetValue("allies", 0x4D7942); // same as Allies team in DoD:S
+	hColorsTrie.SetValue("antiquewhite", 0xFAEBD7);
+	hColorsTrie.SetValue("aqua", 0x00FFFF);
+	hColorsTrie.SetValue("aquamarine", 0x7FFFD4);
+	hColorsTrie.SetValue("axis", 0xFF4040); // same as Axis team in DoD:S
+	hColorsTrie.SetValue("azure", 0x007FFF);
+	hColorsTrie.SetValue("beige", 0xF5F5DC);
+	hColorsTrie.SetValue("bisque", 0xFFE4C4);
+	hColorsTrie.SetValue("black", 0x000000);
+	hColorsTrie.SetValue("blanchedalmond", 0xFFEBCD);
+	hColorsTrie.SetValue("blue", 0x99CCFF); // same as BLU/Counter-Terrorist team color
+	hColorsTrie.SetValue("blueviolet", 0x8A2BE2);
+	hColorsTrie.SetValue("brown", 0xA52A2A);
+	hColorsTrie.SetValue("burlywood", 0xDEB887);
+	hColorsTrie.SetValue("cadetblue", 0x5F9EA0);
+	hColorsTrie.SetValue("chartreuse", 0x7FFF00);
+	hColorsTrie.SetValue("chocolate", 0xD2691E);
+	hColorsTrie.SetValue("community", 0x70B04A); // same as Community item quality in TF2
+	hColorsTrie.SetValue("coral", 0xFF7F50);
+	hColorsTrie.SetValue("cornflowerblue", 0x6495ED);
+	hColorsTrie.SetValue("cornsilk", 0xFFF8DC);
+	hColorsTrie.SetValue("crimson", 0xDC143C);
+	hColorsTrie.SetValue("cyan", 0x00FFFF);
+	hColorsTrie.SetValue("darkblue", 0x00008B);
+	hColorsTrie.SetValue("darkcyan", 0x008B8B);
+	hColorsTrie.SetValue("darkgoldenrod", 0xB8860B);
+	hColorsTrie.SetValue("darkgray", 0xA9A9A9);
+	hColorsTrie.SetValue("darkgreen", 0x006400);
+	hColorsTrie.SetValue("darkkhaki", 0xBDB76B);
+	hColorsTrie.SetValue("darkmagenta", 0x8B008B);
+	hColorsTrie.SetValue("darkolivegreen", 0x556B2F);
+	hColorsTrie.SetValue("darkorange", 0xFF8C00);
+	hColorsTrie.SetValue("darkorchid", 0x9932CC);
+	hColorsTrie.SetValue("darkred", 0x8B0000);
+	hColorsTrie.SetValue("darksalmon", 0xE9967A);
+	hColorsTrie.SetValue("darkseagreen", 0x8FBC8F);
+	hColorsTrie.SetValue("darkslateblue", 0x483D8B);
+	hColorsTrie.SetValue("darkslategray", 0x2F4F4F);
+	hColorsTrie.SetValue("darkturquoise", 0x00CED1);
+	hColorsTrie.SetValue("darkviolet", 0x9400D3);
+	hColorsTrie.SetValue("deeppink", 0xFF1493);
+	hColorsTrie.SetValue("deepskyblue", 0x00BFFF);
+	hColorsTrie.SetValue("dimgray", 0x696969);
+	hColorsTrie.SetValue("dodgerblue", 0x1E90FF);
+	hColorsTrie.SetValue("firebrick", 0xB22222);
+	hColorsTrie.SetValue("floralwhite", 0xFFFAF0);
+	hColorsTrie.SetValue("forestgreen", 0x228B22);
+	hColorsTrie.SetValue("fuchsia", 0xFF00FF);
+	hColorsTrie.SetValue("fullblue", 0x0000FF);
+	hColorsTrie.SetValue("fullred", 0xFF0000);
+	hColorsTrie.SetValue("gainsboro", 0xDCDCDC);
+	hColorsTrie.SetValue("genuine", 0x4D7455); // same as Genuine item quality in TF2
+	hColorsTrie.SetValue("ghostwhite", 0xF8F8FF);
+	hColorsTrie.SetValue("gold", 0xFFD700);
+	hColorsTrie.SetValue("goldenrod", 0xDAA520);
+	hColorsTrie.SetValue("gray", 0xCCCCCC); // same as spectator team color
+	hColorsTrie.SetValue("grey", 0xCCCCCC);
+	hColorsTrie.SetValue("green", 0x3EFF3E);
+	hColorsTrie.SetValue("greenyellow", 0xADFF2F);
+	hColorsTrie.SetValue("haunted", 0x38F3AB); // same as Haunted item quality in TF2
+	hColorsTrie.SetValue("honeydew", 0xF0FFF0);
+	hColorsTrie.SetValue("hotpink", 0xFF69B4);
+	hColorsTrie.SetValue("indianred", 0xCD5C5C);
+	hColorsTrie.SetValue("indigo", 0x4B0082);
+	hColorsTrie.SetValue("ivory", 0xFFFFF0);
+	hColorsTrie.SetValue("khaki", 0xF0E68C);
+	hColorsTrie.SetValue("lavender", 0xE6E6FA);
+	hColorsTrie.SetValue("lavenderblush", 0xFFF0F5);
+	hColorsTrie.SetValue("lawngreen", 0x7CFC00);
+	hColorsTrie.SetValue("lemonchiffon", 0xFFFACD);
+	hColorsTrie.SetValue("lightblue", 0xADD8E6);
+	hColorsTrie.SetValue("lightcoral", 0xF08080);
+	hColorsTrie.SetValue("lightcyan", 0xE0FFFF);
+	hColorsTrie.SetValue("lightgoldenrodyellow", 0xFAFAD2);
+	hColorsTrie.SetValue("lightgray", 0xD3D3D3);
+	hColorsTrie.SetValue("lightgreen", 0x99FF99);
+	hColorsTrie.SetValue("lightpink", 0xFFB6C1);
+	hColorsTrie.SetValue("lightsalmon", 0xFFA07A);
+	hColorsTrie.SetValue("lightseagreen", 0x20B2AA);
+	hColorsTrie.SetValue("lightskyblue", 0x87CEFA);
+	hColorsTrie.SetValue("lightslategray", 0x778899);
+	hColorsTrie.SetValue("lightsteelblue", 0xB0C4DE);
+	hColorsTrie.SetValue("lightyellow", 0xFFFFE0);
+	hColorsTrie.SetValue("lime", 0x00FF00);
+	hColorsTrie.SetValue("limegreen", 0x32CD32);
+	hColorsTrie.SetValue("linen", 0xFAF0E6);
+	hColorsTrie.SetValue("magenta", 0xFF00FF);
+	hColorsTrie.SetValue("maroon", 0x800000);
+	hColorsTrie.SetValue("mediumaquamarine", 0x66CDAA);
+	hColorsTrie.SetValue("mediumblue", 0x0000CD);
+	hColorsTrie.SetValue("mediumorchid", 0xBA55D3);
+	hColorsTrie.SetValue("mediumpurple", 0x9370D8);
+	hColorsTrie.SetValue("mediumseagreen", 0x3CB371);
+	hColorsTrie.SetValue("mediumslateblue", 0x7B68EE);
+	hColorsTrie.SetValue("mediumspringgreen", 0x00FA9A);
+	hColorsTrie.SetValue("mediumturquoise", 0x48D1CC);
+	hColorsTrie.SetValue("mediumvioletred", 0xC71585);
+	hColorsTrie.SetValue("midnightblue", 0x191970);
+	hColorsTrie.SetValue("mintcream", 0xF5FFFA);
+	hColorsTrie.SetValue("mistyrose", 0xFFE4E1);
+	hColorsTrie.SetValue("moccasin", 0xFFE4B5);
+	hColorsTrie.SetValue("navajowhite", 0xFFDEAD);
+	hColorsTrie.SetValue("navy", 0x000080);
+	hColorsTrie.SetValue("normal", 0xB2B2B2); // same as Normal item quality in TF2
+	hColorsTrie.SetValue("oldlace", 0xFDF5E6);
+	hColorsTrie.SetValue("olive", 0x9EC34F);
+	hColorsTrie.SetValue("olivedrab", 0x6B8E23);
+	hColorsTrie.SetValue("orange", 0xFFA500);
+	hColorsTrie.SetValue("orangered", 0xFF4500);
+	hColorsTrie.SetValue("orchid", 0xDA70D6);
+	hColorsTrie.SetValue("palegoldenrod", 0xEEE8AA);
+	hColorsTrie.SetValue("palegreen", 0x98FB98);
+	hColorsTrie.SetValue("paleturquoise", 0xAFEEEE);
+	hColorsTrie.SetValue("palevioletred", 0xD87093);
+	hColorsTrie.SetValue("papayawhip", 0xFFEFD5);
+	hColorsTrie.SetValue("peachpuff", 0xFFDAB9);
+	hColorsTrie.SetValue("peru", 0xCD853F);
+	hColorsTrie.SetValue("pink", 0xFFC0CB);
+	hColorsTrie.SetValue("plum", 0xDDA0DD);
+	hColorsTrie.SetValue("powderblue", 0xB0E0E6);
+	hColorsTrie.SetValue("purple", 0x800080);
+	hColorsTrie.SetValue("red", 0xFF4040); // same as RED/Terrorist team color
+	hColorsTrie.SetValue("rosybrown", 0xBC8F8F);
+	hColorsTrie.SetValue("royalblue", 0x4169E1);
+	hColorsTrie.SetValue("saddlebrown", 0x8B4513);
+	hColorsTrie.SetValue("salmon", 0xFA8072);
+	hColorsTrie.SetValue("sandybrown", 0xF4A460);
+	hColorsTrie.SetValue("seagreen", 0x2E8B57);
+	hColorsTrie.SetValue("seashell", 0xFFF5EE);
+	hColorsTrie.SetValue("selfmade", 0x70B04A); // same as Self-Made item quality in TF2
+	hColorsTrie.SetValue("sienna", 0xA0522D);
+	hColorsTrie.SetValue("silver", 0xC0C0C0);
+	hColorsTrie.SetValue("skyblue", 0x87CEEB);
+	hColorsTrie.SetValue("slateblue", 0x6A5ACD);
+	hColorsTrie.SetValue("slategray", 0x708090);
+	hColorsTrie.SetValue("snow", 0xFFFAFA);
+	hColorsTrie.SetValue("springgreen", 0x00FF7F);
+	hColorsTrie.SetValue("steelblue", 0x4682B4);
+	hColorsTrie.SetValue("strange", 0xCF6A32); // same as Strange item quality in TF2
+	hColorsTrie.SetValue("tan", 0xD2B48C);
+	hColorsTrie.SetValue("teal", 0x008080);
+	hColorsTrie.SetValue("thistle", 0xD8BFD8);
+	hColorsTrie.SetValue("tomato", 0xFF6347);
+	hColorsTrie.SetValue("turquoise", 0x40E0D0);
+	hColorsTrie.SetValue("unique", 0xFFD700); // same as Unique item quality in TF2
+	hColorsTrie.SetValue("unusual", 0x8650AC); // same as Unusual item quality in TF2
+	hColorsTrie.SetValue("valve", 0xA50F79); // same as Valve item quality in TF2
+	hColorsTrie.SetValue("vintage", 0x476291); // same as Vintage item quality in TF2
+	hColorsTrie.SetValue("violet", 0xEE82EE);
+	hColorsTrie.SetValue("wheat", 0xF5DEB3);
+	hColorsTrie.SetValue("white", 0xFFFFFF);
+	hColorsTrie.SetValue("whitesmoke", 0xF5F5F5);
+	hColorsTrie.SetValue("yellow", 0xFFFF00);
+	hColorsTrie.SetValue("yellowgreen", 0x9ACD32);
 	
 	return hColorsTrie;
 }

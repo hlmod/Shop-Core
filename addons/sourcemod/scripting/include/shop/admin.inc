@@ -7,7 +7,7 @@
  *	-
  *	@noreturn
 */
-functag public AdminDisplay(client, String:buffer[], maxlength);
+typedef AdminDisplay = function void (int client, char[] buffer, int maxlength);
 
 /**
  *	Called when an item from admin panel is being selected
@@ -16,7 +16,7 @@ functag public AdminDisplay(client, String:buffer[], maxlength);
  *	-
  *	@return true to allow performing and false to block
 */
-functag public bool:AdminSelect(client);
+typedef AdminSelect = function bool (int client);
 
 /**
  *	Adds an item to the admin panel
@@ -26,7 +26,7 @@ functag public bool:AdminSelect(client);
  *	-
  *	@noreturn
 */
-native Shop_AddToAdminMenu(AdminDisplay:callback_display, AdminSelect:callback_select);
+native void Shop_AddToAdminMenu(AdminDisplay callback_display, AdminSelect callback_select);
 
 /**
  *	Removes an item from the admin panel
@@ -36,7 +36,7 @@ native Shop_AddToAdminMenu(AdminDisplay:callback_display, AdminSelect:callback_s
  *	-
  *	@return true on success, false otherwise
 */
-native bool:Shop_RemoveFromAdminMenu(AdminDisplay:callback_display, AdminSelect:callback_select);
+native bool Shop_RemoveFromAdminMenu(AdminDisplay callback_display, AdminSelect callback_select);
 
 /**
  *	Shows admin panel to a player
@@ -45,4 +45,4 @@ native bool:Shop_RemoveFromAdminMenu(AdminDisplay:callback_display, AdminSelect:
  *	-
  *	@noreturn
 */
-native Shop_ShowAdminMenu(client);
+native void Shop_ShowAdminMenu(int client);
