@@ -1,32 +1,22 @@
-
-Helpers_GetCSGame()
+int Helpers_GetCSGame()
 {
-	if (GetFeatureStatus(FeatureType_Native, "GetEngineVersion") == FeatureStatus_Available) 
-	{ 
-		switch (GetEngineVersion()) 
-		{ 
-			case Engine_SourceSDK2006: return GAME_CSS_34; 
-			case Engine_CSS: return GAME_CSS; 
-			case Engine_CSGO: return GAME_CSGO; 
-		} 
-	} 
-	else if (GetFeatureStatus(FeatureType_Native, "GuessSDKVersion") == FeatureStatus_Available) 
-	{ 
-		switch (GuessSDKVersion())
-		{ 
-			case SOURCE_SDK_EPISODE1: return GAME_CSS_34;
-			case SOURCE_SDK_CSS: return GAME_CSS;
-			case SOURCE_SDK_CSGO: return GAME_CSGO;
+	if (GetFeatureStatus(FeatureType_Native, "GetEngineVersion") == FeatureStatus_Available)
+	{
+		switch (GetEngineVersion())
+		{
+			case Engine_SourceSDK2006: return GAME_CSS_34;
+			case Engine_CSS: return GAME_CSS;
+			case Engine_CSGO: return GAME_CSGO;
 		}
 	}
 	return GAME_UNDEFINED;
 }
 
-stock bool:Helpers_IsPluginValid(Handle:plugin)
+stock bool Helpers_IsPluginValid(Handle plugin)
 {
 	/* Check if the plugin handle is pointing to a valid plugin. */
-	new Handle:hIterator = GetPluginIterator();
-	new bool:bIsValid = false;
+	Handle hIterator = GetPluginIterator();
+	bool bIsValid = false;
 	
 	while (MorePlugins(hIterator))
 	{
@@ -37,11 +27,11 @@ stock bool:Helpers_IsPluginValid(Handle:plugin)
 		}
 	}
 	
-	CloseHandle(hIterator);
+	delete hIterator;
 	return bIsValid;
 }
 
-stock bool:Helpers_CheckClient(client, String:error[], length)
+stock bool Helpers_CheckClient(int client, char[] error, int length)
 {
 	if (client < 1 || client > MaxClients)
 	{
@@ -64,12 +54,12 @@ stock bool:Helpers_CheckClient(client, String:error[], length)
 	return true;
 }
 
-stock Helpers_GetTimeFromStamp(String:buffer[], maxlength, timestamp, source_client = LANG_SERVER)
+stock void Helpers_GetTimeFromStamp(char[] buffer, int maxlength, int timestamp, int source_client = LANG_SERVER)
 {
 	if (timestamp > 31536000)
 	{
-		new years = timestamp / 31536000;
-		new days = timestamp / 86400 % 365;
+		int years = timestamp / 31536000;
+		int days = timestamp / 86400 % 365;
 		if (days > 0)
 		{
 			FormatEx(buffer, maxlength, "%d%T %d%T", years, "y.", source_client, days, "d.", source_client);
@@ -82,8 +72,8 @@ stock Helpers_GetTimeFromStamp(String:buffer[], maxlength, timestamp, source_cli
 	}
 	if (timestamp > 86400)
 	{
-		new days = timestamp / 86400 % 365;
-		new hours = (timestamp / 3600) % 24;
+		int days = timestamp / 86400 % 365;
+		int hours = (timestamp / 3600) % 24;
 		if (hours > 0)
 		{
 			FormatEx(buffer, maxlength, "%d%T %d%T", days, "d.", source_client, hours, "h.", source_client);
@@ -96,9 +86,9 @@ stock Helpers_GetTimeFromStamp(String:buffer[], maxlength, timestamp, source_cli
 	}
 	else
 	{
-		new Hours = (timestamp / 3600);
-		new Mins = (timestamp / 60) % 60;
-		new Secs = timestamp % 60;
+		int Hours = (timestamp / 3600);
+		int Mins = (timestamp / 60) % 60;
+		int Secs = timestamp % 60;
 		
 		if (Hours > 0)
 		{
@@ -111,12 +101,12 @@ stock Helpers_GetTimeFromStamp(String:buffer[], maxlength, timestamp, source_cli
 	}
 }
 
-stock bool:Helpers_AddTargetsToMenu(Handle:menu, source_client, bool:credits = false)
+stock bool Helpers_AddTargetsToMenu(Menu menu, int source_client, bool credits = false)
 {
-	new bool:result = false;
+	bool result = false;
 	
-	decl String:userid[9], String:buffer[MAX_NAME_LENGTH+21];
-	for (new i = 1; i <= MaxClients; i++)
+	char userid[9], buffer[MAX_NAME_LENGTH+21];
+	for (int i = 1; i <= MaxClients; i++)
 	{
 		if (IsAuthorizedIn(i) && (i == source_client || CanUserTarget(source_client, i)))
 		{
@@ -130,7 +120,7 @@ stock bool:Helpers_AddTargetsToMenu(Handle:menu, source_client, bool:credits = f
 				GetClientName(i, buffer, sizeof(buffer));
 			}
 			
-			AddMenuItem(menu, userid, buffer);
+			menu.AddItem(userid, buffer);
 			
 			result = true;
 		}
@@ -139,14 +129,27 @@ stock bool:Helpers_AddTargetsToMenu(Handle:menu, source_client, bool:credits = f
 	return result;
 }
 
-stock Helpers_GetRandomIntEx(min, max)
+stock int Helpers_GetRandomIntEx(int min, int max)
 {
-	new random = GetURandomInt();
+	int random = GetURandomInt();
 	
 	if (!random)
 		random++;
 		
-	new number = RoundToCeil(float(random) / (float(2147483647) / float(max - min + 1))) + min - 1;
+	int number = RoundToCeil(float(random) / (float(2147483647) / float(max - min + 1))) + min - 1;
 	
 	return number;
+}
+
+/**
+ * Makes a negative integer number to a positive integer number.
+ * This is faster than Sourcemod's native FloatAbs() for integers.
+ * Use FloatAbs() for Float numbers.
+ *
+ * @param number		A number that can be positive or negative.
+ * @return				Positive number.
+ */
+stock int Helpers_Math_Abs(int value)
+{
+	return (value ^ (value >> 31)) - (value >> 31);
 }

@@ -12,7 +12,7 @@ enum ShopDBType
  *	-
  *	@return	Database Handle
 */
-native Handle:Shop_GetDatabase();
+native Database Shop_GetDatabase();
 
 /**
  *	Gets the database type. See ShopDBType enumeration
@@ -21,7 +21,7 @@ native Handle:Shop_GetDatabase();
  *	-
  *	@return	Database type
 */
-native ShopDBType:Shop_GetDatabaseType();
+native ShopDBType Shop_GetDatabaseType();
 
 /**
  *	Get the database prefix
@@ -31,4 +31,4 @@ native ShopDBType:Shop_GetDatabaseType();
  *	-
  *	@return	Number of bytes written
 */
-native Shop_GetDatabasePrefix(String:buffer[], maxlength);
+native int Shop_GetDatabasePrefix(char[] buffer, int maxlength);
