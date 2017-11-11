@@ -74,6 +74,18 @@ public int Admin_ShowAdminMenu(Handle plugin, int numParams)
 	Admin_ShowMenu(client);
 }
 
+void Admin_UnregisterMe(Handle hPlugin)
+{
+	int index = -1;
+	while ((index = g_hAdminArray.FindValue(hPlugin)) != -1)
+	{
+		delete view_as<Handle>(g_hAdminArray.Get(index+1));
+
+		g_hAdminArray.Erase(index);
+		g_hAdminArray.Erase(index);
+	}
+}
+
 void Admin_OnSettingsLoad(KeyValues kv)
 {
 	count_menu = new Menu(Admin_MenuCount_Handler, MENU_ACTIONS_DEFAULT|MenuAction_Display);
