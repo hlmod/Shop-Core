@@ -125,6 +125,15 @@ public Functions_OnConVarChange(Handle:convar, const String:oldValue[], const St
 	}
 }
 
+Functions_UnregisterMe(Handle:hPlugin)
+{
+	new index = -1;
+	while ((index = FindValueInArray(g_hFuncArray, hPlugin)) != -1)
+	{
+		RemoveFromArray(g_hFuncArray, index);
+	}
+}
+
 Functions_OnMapEnd()
 {
 	for (new i = 1; i <= MaxClients; i++)

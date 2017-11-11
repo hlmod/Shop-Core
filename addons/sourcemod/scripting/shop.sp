@@ -94,6 +94,7 @@ public Native_IsStarted(Handle:plugin, params)
 public Native_UnregisterMe(Handle:plugin, params)
 {
 	ItemManager_UnregisterMe(plugin);
+	Functions_UnregisterMe(plugin);
 }
 
 public Native_ShowItemPanel(Handle:plugin, params)
