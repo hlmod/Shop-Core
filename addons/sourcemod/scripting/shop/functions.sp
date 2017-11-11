@@ -43,8 +43,8 @@ public int Functions_RemoveFromMenuNative(Handle plugin, int numParams)
 		Function func_select = dp.ReadFunction();
 		if (func_disp == GetNativeFunction(1) && func_select == GetNativeFunction(2))
 		{
-			g_hFuncArray.Erase(index);
 			g_hFuncArray.Erase(index+1);
+			g_hFuncArray.Erase(index);
 			delete dp;
 			return true;
 		}
