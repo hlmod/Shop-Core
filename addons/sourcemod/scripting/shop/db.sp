@@ -370,7 +370,8 @@ public void DB_CheckTable(Database db, DBResultSet results, const char[] error, 
 	
 	DB_RunBackup();
 	
-	OnReadyToStart();
+//	OnReadyToStart();
+	DB_CreateTables();
 }
 
 public void DB_CheckTable2(Database db, DBResultSet results, const char[] error, any data)
@@ -411,19 +412,19 @@ void DB_CreateTables()
 	if (db_type == DB_MySQL)
 	{
 		FormatEx(s_Query, sizeof(s_Query), "CREATE TABLE IF NOT EXISTS `%sboughts` (\
-							  `player_id` int(5) NOT NULL,\
-							  `item_id` int(5) NOT NULL,\
-							  `count` int(4) NOT NULL,\
-							  `duration` int(8) NOT NULL,\
-							  `timeleft` int(8) NOT NULL,\
-							  `buy_price` int(5) NOT NULL,\
-							  `sell_price` int(5) NOT NULL,\
-							  `buy_time` int(10)\
+							  `player_id` int NOT NULL,\
+							  `item_id` int NOT NULL,\
+							  `count` int NOT NULL,\
+							  `duration` int NOT NULL,\
+							  `timeleft` int NOT NULL,\
+							  `buy_price` int NOT NULL,\
+							  `sell_price` int NOT NULL,\
+							  `buy_time` int\
 							) ENGINE=InnoDB DEFAULT CHARSET=utf8;", g_sDbPrefix);
 		DB_TQuery(DB_OnPlayersTableLoad, s_Query, 1);
 		
 		FormatEx(s_Query, sizeof(s_Query), "CREATE TABLE IF NOT EXISTS `%sitems` (\
-							  `id` int(5) NOT NULL AUTO_INCREMENT,\
+							  `id` int NOT NULL AUTO_INCREMENT,\
 							  `category` varchar(64) NOT NULL,\
 							  `item` varchar(64) NOT NULL,\
 							  PRIMARY KEY (`id`)\
@@ -431,15 +432,24 @@ void DB_CreateTables()
 		DB_TQuery(DB_OnPlayersTableLoad, s_Query, 2);
 		
 		FormatEx(s_Query, sizeof(s_Query), "CREATE TABLE IF NOT EXISTS `%splayers` (\
-							  `id` int(5) NOT NULL AUTO_INCREMENT,\
+							  `id` int NOT NULL AUTO_INCREMENT,\
 							  `name` varchar(32) NOT NULL DEFAULT 'unknown',\
 							  `auth` varchar(22) NOT NULL,\
-							  `money` int(12) NOT NULL,\
-							  `lastconnect` int(10),\
+							  `money` int NOT NULL,\
+							  `lastconnect` int,\
 							  PRIMARY KEY (`id`), \
 								UNIQUE KEY `auth` (`auth`) \
 							) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;", g_sDbPrefix);
 		DB_TQuery(DB_OnPlayersTableLoad, s_Query, 3);
+		
+		FormatEx(s_Query, sizeof(s_Query), "CREATE TABLE IF NOT EXISTS `%stoggles` (\
+							  `id` int NOT NULL AUTO_INCREMENT,\
+							  `player_id` int NOT NULL,\
+							  `item_id` int NOT NULL,\
+							  `state` tinyint NOT NULL DEFAULT 0,\
+							  PRIMARY KEY (`id`) \
+							) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;", g_sDbPrefix);
+		DB_TQuery(DB_OnPlayersTableLoad, s_Query, 4);
 	}
 	else
 	{
@@ -467,6 +477,13 @@ void DB_CreateTables()
 							  `money` NUMERIC DEFAULT '0',\
 							  `lastconnect` INTEGER NOT NULL);", g_sDbPrefix);
 		DB_TQuery(DB_OnPlayersTableLoad, s_Query, 3);
+		
+		FormatEx(s_Query, sizeof(s_Query), "CREATE TABLE IF NOT EXISTS `%stoggles` (\
+							  `id` INTEGER PRIMARY KEY AUTOINCREMENT,\
+							  `player_id` INTEGER NOT NULL,\
+							  `item_id` INTEGER NOT NULL,\
+							  `state` INTEGER NOT NULL DEFAULT 0);", g_sDbPrefix);
+		DB_TQuery(DB_OnPlayersTableLoad, s_Query, 4);
 	}
 	
 	isLoading = false;
@@ -483,7 +500,7 @@ public void DB_OnPlayersTableLoad(Database db, DBResultSet results, const char[]
 		return;
 	}
 	
-	if (data != 3)
+	if (data != 4)
 	{
 		return;
 	}

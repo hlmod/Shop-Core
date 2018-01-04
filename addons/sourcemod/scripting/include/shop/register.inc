@@ -60,6 +60,15 @@ native bool Shop_StartItem(CategoryId category_id, const char[] item);
 native void Shop_SetInfo(const char[] name, const char[] description, int price, int sell_price = -1, ItemType type, int value = 1);
 
 /**
+ *	Sets the item luck chance.
+ *	-
+ *	@param luck_chance			Luck chance to set. From 0 to 100. 0 can not be lucked and 100 is always lucked by the general chance set in cvar. Default item chance is 100
+ *	-
+ *	@noreturn
+*/
+native void Shop_SetLuckChance(int luck_chance);
+
+/**
  *	Sets the item callbacks
  *	-
  *	@param register				Callback called when the item is registered

@@ -7,13 +7,14 @@ Handle h_fwdOnAuthorized,
 	h_fwdOnItemElapsed,
 	h_fwdOnItemBuy,
 	h_fwdOnItemSell,
-	h_fwdOnLuckProcess,
-	h_fwdOnItemLuck,
-	h_fwdOnItemLucked,
+	h_fwdOnClientLuckProcess,
+	h_fwdOnClientShouldLuckItem,
+	h_fwdOnClientItemLucked,
 	h_fwdOnItemTransfer,
 	h_fwdOnItemTransfered,
 	h_fwdOnCreditsTransfer,
 	h_fwdOnCreditsTransfered,
+	h_fwdOnCreditsSet,
 	h_fwdOnCreditsGiven,
 	h_fwdOnCreditsTaken;
 
@@ -28,13 +29,14 @@ void Forward_OnPluginStart()
 	h_fwdOnItemSell = CreateGlobalForward("Shop_OnItemSell", ET_Hook, Param_Cell, Param_Cell, Param_String, Param_Cell, Param_String, Param_Cell, Param_CellByRef);
 	h_fwdOnItemToggled = CreateGlobalForward("Shop_OnItemToggled", ET_Ignore, Param_Cell, Param_Cell, Param_String, Param_Cell, Param_String, Param_Cell);
 	h_fwdOnItemElapsed = CreateGlobalForward("Shop_OnItemElapsed", ET_Ignore, Param_Cell, Param_Cell, Param_String, Param_Cell, Param_String);
-	h_fwdOnLuckProcess = CreateGlobalForward("Shop_OnLuckProcess", ET_Hook, Param_Cell);
-	h_fwdOnItemLuck = CreateGlobalForward("Shop_OnItemLuck", ET_Hook, Param_Cell, Param_Cell);
-	h_fwdOnItemLucked = CreateGlobalForward("Shop_OnItemLucked", ET_Ignore, Param_Cell, Param_Cell);
+	h_fwdOnClientLuckProcess = CreateGlobalForward("Shop_OnClientLuckProcess", ET_Hook, Param_Cell);
+	h_fwdOnClientShouldLuckItem = CreateGlobalForward("Shop_OnClientShouldLuckItem", ET_Hook, Param_Cell, Param_Cell);
+	h_fwdOnClientItemLucked = CreateGlobalForward("Shop_OnClientItemLucked", ET_Ignore, Param_Cell, Param_Cell);
 	h_fwdOnItemTransfer = CreateGlobalForward("Shop_OnItemTransfer", ET_Hook, Param_Cell, Param_Cell, Param_Cell);
 	h_fwdOnItemTransfered = CreateGlobalForward("Shop_OnItemTransfered", ET_Ignore, Param_Cell, Param_Cell, Param_Cell);
-	h_fwdOnCreditsTransfer = CreateGlobalForward("Shop_OnCreditsTransfer", ET_Hook, Param_Cell, Param_Cell, Param_CellByRef, Param_CellByRef);
-	h_fwdOnCreditsTransfered = CreateGlobalForward("Shop_OnCreditsTransfered", ET_Ignore, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
+	h_fwdOnCreditsTransfer = CreateGlobalForward("Shop_OnCreditsTransfer", ET_Hook, Param_Cell, Param_Cell, Param_CellByRef, Param_CellByRef, Param_CellByRef, Param_Cell);
+	h_fwdOnCreditsTransfered = CreateGlobalForward("Shop_OnCreditsTransfered", ET_Ignore, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
+	h_fwdOnCreditsSet = CreateGlobalForward("Shop_OnCreditsSet", ET_Hook, Param_Cell, Param_CellByRef, Param_Cell);
 	h_fwdOnCreditsGiven = CreateGlobalForward("Shop_OnCreditsGiven", ET_Hook, Param_Cell, Param_CellByRef, Param_Cell);
 	h_fwdOnCreditsTaken = CreateGlobalForward("Shop_OnCreditsTaken", ET_Hook, Param_Cell, Param_CellByRef, Param_Cell);
 }
@@ -61,7 +63,7 @@ void Forward_OnItemTransfered(int client, int target, int item_id)
 	Call_Finish();
 }
 
-Action Forward_OnCreditsTransfer(int client, int target, int &credits_give, int &credits_remove)
+Action Forward_OnCreditsTransfer(int client, int target, int &credits_give, int &credits_remove, int &credits_commission, bool bPercent)
 {
 	Action result = Plugin_Continue;
 	
@@ -70,37 +72,40 @@ Action Forward_OnCreditsTransfer(int client, int target, int &credits_give, int 
 	Call_PushCell(target);
 	Call_PushCellRef(credits_give);
 	Call_PushCellRef(credits_remove);
+	Call_PushCellRef(credits_commission);
+	Call_PushCell(bPercent);
 	Call_Finish(result);
 	
 	return result;
 }
 
-void Forward_OnCreditsTransfered(int client, int target, int credits_give, int credits_remove)
+void Forward_OnCreditsTransfered(int client, int target, int credits_give, int credits_remove, int credits_commission)
 {
 	Call_StartForward(h_fwdOnCreditsTransfered);
 	Call_PushCell(client);
 	Call_PushCell(target);
 	Call_PushCell(credits_give);
 	Call_PushCell(credits_remove);
+	Call_PushCell(credits_commission);
 	Call_Finish();
 }
 
-bool Forward_OnLuckProcess(int client)
+bool Forward_OnClientLuckProcess(int client)
 {
 	bool result = true;
 	
-	Call_StartForward(h_fwdOnLuckProcess);
+	Call_StartForward(h_fwdOnClientLuckProcess);
 	Call_PushCell(client);
 	Call_Finish(result);
 	
 	return result;
 }
 
-bool Forward_OnItemLuck(int client, int item_id)
+bool Forward_OnClientShouldLuckItem(int client, int item_id)
 {
 	bool result = true;
 	
-	Call_StartForward(h_fwdOnItemLuck);
+	Call_StartForward(h_fwdOnClientShouldLuckItem);
 	Call_PushCell(client);
 	Call_PushCell(item_id);
 	Call_Finish(result);
@@ -108,9 +113,9 @@ bool Forward_OnItemLuck(int client, int item_id)
 	return result;
 }
 
-void Forward_OnItemLucked(int client, int item_id)
+void Forward_OnClientItemLucked(int client, int item_id)
 {
-	Call_StartForward(h_fwdOnItemLucked);
+	Call_StartForward(h_fwdOnClientItemLucked);
 	Call_PushCell(client);
 	Call_PushCell(item_id);
 	Call_Finish();
@@ -180,6 +185,19 @@ Action Forward_OnCreditsTaken(int client, int &credits, int by_who)
 	Action result = Plugin_Continue;
 	
 	Call_StartForward(h_fwdOnCreditsTaken);
+	Call_PushCell(client);
+	Call_PushCellRef(credits);
+	Call_PushCell(by_who);
+	Call_Finish(result);
+	
+	return result;
+}
+
+Action Forward_OnCreditsSet(int client, int &credits, int by_who)
+{
+	Action result = Plugin_Continue;
+	
+	Call_StartForward(h_fwdOnCreditsSet);
 	Call_PushCell(client);
 	Call_PushCellRef(credits);
 	Call_PushCell(by_who);

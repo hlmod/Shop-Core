@@ -9,7 +9,7 @@
 #endif
 #define _shop_included
 
-#define SHOP_VERSION					"3.0B3:11-11-2017"
+#define SHOP_VERSION					"3.0B3:04-01-2018"
 
 #define SHOP_MAX_STRING_LENGTH	64
 
@@ -51,7 +51,7 @@ enum ShopMenu
 	Menu_Buy,
 	Menu_Inventory,
 	Menu_Functions,
-	Menu_AdditionalFunctions,
+	Menu_ExtraFunctions,
 	Menu_AdminPanel,
 	Menu_CreditsTransfer,
 	Menu_ItemTransfer
@@ -106,26 +106,40 @@ forward bool Shop_OnMenuTitle(int client, ShopMenu menu_action, const char[] tit
 /**
  *	Called when credits are being sent to a player
  *	-
- *	@param client			Client index who is sending credits
- *	@param target			Client index to whom credits being sent
- *	@param amount_give		Amount of credits being given to a target player. By reference
- *	@param amount_remove	Amount of credits being taken from performing player. By reference
+ *	@param client				Client index who is sending credits
+ *	@param target				Client index to whom credits being sent
+ *	@param amount_give			Amount of credits being given to a target player. By reference
+ *	@param amount_remove		Amount of credits being taken from performing player.
+ *	@param amount_commission	Amount of credits the commission was set. By reference
+ *	@param bPercent				Whether the commission was set by the percent By reference
  *	-
  *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block
 */
-forward Action Shop_OnCreditsTransfer(int client, int target, int &amount_give, int &amount_remove);
+forward Action Shop_OnCreditsTransfer(int client, int target, int &amount_give, int &amount_remove, int &amount_commission, bool bPercent);
 
 /**
  *	Called when credits has been sent to a player
  *	-
- *	@param client			Client index who sent credits
- *	@param target			Client index to whom credits were sent
- *	@param amount_give		Amount of credits has been given to a target player
- *	@param amount_remove	Amount of credits has been taken from a performing player
+ *	@param client				Client index who sent credits
+ *	@param target				Client index to whom credits were sent
+ *	@param amount_give			Amount of credits has been given to a target player
+ *	@param amount_remove		Amount of credits has been taken from a performing player
+  *	@param amount_commission	Amount of credits the commission was set
  *	-
  *	@noreturn
 */
-forward void Shop_OnCreditsTransfered(int client, int target, int amount_give, int amount_remove);
+forward void Shop_OnCreditsTransfered(int client, int target, int amount_give, int amount_remove, int amount_commission);
+
+/**
+ *	Called when a player is being set credits to
+ *	-
+ *	@param client			Client index who is being set to
+ *	@param credits			Amount of credits a client is being set to. By reference
+ *	@param by_who			See CREDITS_BY_* definitions for more info and any higher value is the admin index
+ *	-
+ *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block
+*/
+forward Action Shop_OnCreditsSet(int client, int &credits, int by_who);
 
 /**
  *	Called when a player is being given credits to
@@ -156,7 +170,7 @@ forward Action Shop_OnCreditsTaken(int client, int &credits, int by_who);
  *	-
  *	@return true to allow performing and false to block
 */
-forward bool Shop_OnLuckProcess(int client);
+forward bool Shop_OnClientLuckProcess(int client);
 
 /**
  *	Called when a player is nearly to win an item
@@ -166,7 +180,7 @@ forward bool Shop_OnLuckProcess(int client);
  *	-
  *	@return true to allow and false to block
 */
-forward bool Shop_OnItemLuck(int client, ItemId item_id);
+forward bool Shop_OnClientShouldLuckItem(int client, ItemId item_id);
 
 /**
  *	Called when a player has won an item
@@ -176,7 +190,7 @@ forward bool Shop_OnItemLuck(int client, ItemId item_id);
  *	-
  *	@noreturn
 */
-forward void Shop_OnItemLucked(int client, ItemId item_id);
+forward void Shop_OnClientItemLucked(int client, ItemId item_id);
 
 /**
  *	Checks whether the shop has been started
@@ -293,6 +307,7 @@ public void __pl_shop_SetNTVOptional()
 	MarkNativeAsOptional("Shop_RegisterCategory");
 	MarkNativeAsOptional("Shop_StartItem");
 	MarkNativeAsOptional("Shop_SetInfo");
+	MarkNativeAsOptional("Shop_SetLuckChance");
 	MarkNativeAsOptional("Shop_SetCallbacks");
 	MarkNativeAsOptional("Shop_SetCustomInfo");
 	MarkNativeAsOptional("Shop_SetCustomInfoFloat");
@@ -311,12 +326,15 @@ public void __pl_shop_SetNTVOptional()
 	MarkNativeAsOptional("Shop_SetItemPrice");
 	MarkNativeAsOptional("Shop_GetItemSellPrice");
 	MarkNativeAsOptional("Shop_SetItemSellPrice");
+	MarkNativeAsOptional("Shop_GetItemLuckChance");
+	MarkNativeAsOptional("Shop_SetItemLuckChance");
 	MarkNativeAsOptional("Shop_GetItemValue");
 	MarkNativeAsOptional("Shop_SetItemValue");
 	MarkNativeAsOptional("Shop_IsItemExists");
 	MarkNativeAsOptional("Shop_IsValidCategory");
 	MarkNativeAsOptional("Shop_GetItemId");
 	MarkNativeAsOptional("Shop_GetItemById");
+	MarkNativeAsOptional("Shop_GetItemType");
 	MarkNativeAsOptional("Shop_GetItemCategoryId");
 	MarkNativeAsOptional("Shop_GetCategoryId");
 	MarkNativeAsOptional("Shop_GetCategoryById");
@@ -337,7 +355,9 @@ public void __pl_shop_SetNTVOptional()
 	MarkNativeAsOptional("Shop_TakeClientCredits");
 	MarkNativeAsOptional("Shop_GetClientCredits");
 	MarkNativeAsOptional("Shop_SetClientCredits");
+	MarkNativeAsOptional("Shop_GiveClientItem");
 	MarkNativeAsOptional("Shop_BuyClientItem");
+	MarkNativeAsOptional("Shop_SellClientItem");
 	MarkNativeAsOptional("Shop_RemoveClientItem");
 	MarkNativeAsOptional("Shop_GetClientItemCount");
 	MarkNativeAsOptional("Shop_UseClientItem");

@@ -220,6 +220,25 @@ native int Shop_GetItemPrice(ItemId item_id);
 native void Shop_SetItemPrice(ItemId item_id, int price);
 
 /**
+ *	Gets an item luck chance
+ *	-
+ *	@param item_id				Item id
+ *	-
+ *	@return Luck chance of the item. From 0 to 100
+*/
+native int Shop_GetItemLuckChance(ItemId item_id);
+
+/**
+ *	Sets an item luck chance
+ *	-
+ *	@param item_id				Item id
+ *	@param luck_chance			Luck chance to set. From 0 to 100. 0 can not be lucked and 100 is always lucked by the general chance set in cvar. Default item chance is 100
+ *	-
+ *	@noreturn
+*/
+native void Shop_SetItemLuckChance(ItemId item_id, int luck_chance);
+
+/**
  *	Gets an item sell price
  *	-
  *	@param item_id				Item id
@@ -303,6 +322,15 @@ native ItemId Shop_GetItemId(CategoryId category_id, const char[] item);
  *	@return Number of bytes written
 */
 native int Shop_GetItemById(ItemId item_id, char[] buffer, int maxlength);
+
+/**
+ *	Gets the item type
+ *	-
+ *	@param item_id				Item id to get for
+ *	-
+ *	@return Item type of the item. See ItemType enumeration
+*/
+native ItemType Shop_GetItemType(ItemId item_id);
 
 /**
  *	Get unique name of item

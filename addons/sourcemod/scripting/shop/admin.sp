@@ -183,7 +183,7 @@ public int Admin_MenuCount_Handler(Menu menu, MenuAction action, int param1, int
 				}
 				case SET_CREDITS :
 				{
-					SetCredits(target, StringToInt(info), true);
+					SetCredits(target, StringToInt(info), param1);
 					Admin_ShowMenu(param1);
 				}
 			}

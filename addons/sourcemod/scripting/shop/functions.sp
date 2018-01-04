@@ -437,7 +437,7 @@ void Functions_ShowPanel(int client)
 	
 	panel.DrawItem(" ", ITEMDRAW_SPACER|ITEMDRAW_RAWLINE);
 	
-	panel.CurrentKey = g_iExitButton;
+	panel.CurrentKey = g_iMaxPageItems;
 	FormatEx(buffer, sizeof(buffer), "%t", "Exit");
 	panel.DrawItem(buffer);
 	
@@ -466,27 +466,17 @@ public int Functions_PanelHandler(Menu menu, MenuAction action, int param1, int 
 						return;
 					}
 					
-					int amount_remove, amount_give;
+					int amount_remove = g_iCreditsTransferAmount[param1];
+					int amount_give = g_iCreditsTransferAmount[param1];
+					int amount_commission = g_iCreditsTransferCommission[param1];
 					
-					if (g_bTransMode == false)
-					{
-						amount_remove = g_iCreditsTransferAmount[param1];
-						amount_give = g_iCreditsTransferAmount[param1]-g_iCreditsTransferCommission[param1];
-					}
-					else
-					{
-						amount_remove = g_iCreditsTransferAmount[param1]+g_iCreditsTransferCommission[param1];
-						amount_give = g_iCreditsTransferAmount[param1];
-					}
-					
-					int dummy_remove = amount_remove;
-					int dummy_give = amount_give;
-					switch (OnCreditsTransfer(param1, target, amount_give, amount_remove))
+					switch (OnCreditsTransfer(param1, target, amount_give, amount_remove, amount_commission, !g_bTransMode))
 					{
 						case Plugin_Continue :
 						{
-							amount_remove = dummy_remove;
-							amount_give = dummy_give;
+							amount_remove = g_iCreditsTransferAmount[param1];
+							amount_give = g_iCreditsTransferAmount[param1];
+							amount_commission = g_iCreditsTransferCommission[param1];
 						}
 						case Plugin_Handled, Plugin_Stop :
 						{
@@ -496,14 +486,27 @@ public int Functions_PanelHandler(Menu menu, MenuAction action, int param1, int 
 						}
 					}
 					
+					if (!g_bTransMode)
+					{
+						amount_give -= amount_commission;
+					}
+					else
+					{
+						amount_remove += amount_commission;
+					}
+					
 					RemoveCredits(param1, amount_remove, CREDITS_BY_TRANSFER);
 					GiveCredits(target, amount_give, CREDITS_BY_TRANSFER);
 					
-					OnCreditsTransfered(param1, target, amount_give, amount_remove);
+					OnCreditsTransfered(param1, target, amount_give, amount_remove, amount_commission);
 					
 					CPrintToChat(param1, "%t", "TransferSuccess", amount_give, target);
 					CPrintToChat(target, "%t", "ReceiveSuccess", amount_give, param1);
-					
+					if (!g_bTransMode && amount_commission > 0)
+					{
+						CPrintToChat(target, "%t", "ReceiveCommission", amount_commission);
+					}
+
 					Functions_OnClientDisconnect_Post(param1);
 					Functions_ShowMenu(param1);
 				}
@@ -512,9 +515,12 @@ public int Functions_PanelHandler(Menu menu, MenuAction action, int param1, int 
 					Functions_OnClientDisconnect_Post(param1);
 					Functions_ShowMenu(param1);
 				}
-				case 10 :
+				default:
 				{
-					Functions_OnClientDisconnect_Post(param1);
+					if(param2 == g_iMaxPageItems)
+					{
+						Functions_OnClientDisconnect_Post(param1);
+					}
 				}
 			}
 		}
@@ -542,14 +548,14 @@ Action Functions_OnClientSayCommand(int client, const char[] text)
 	}
 	
 	g_iCreditsTransferAmount[client] = StringToInt(text);
-	
+
 	if(g_iCreditsTransferAmount[client] < 2)
 	{
 		Functions_OnClientDisconnect_Post(client); // call this, if transaction revoked.
 		CPrintToChat(client, "%t", "IncorrectCredits");
 		return Plugin_Handled;
 	}
-	
+
 	// I don't know why, but sourcemod allowes negative values for send. So this KOCTbIJIb must fix this.
 	g_iCreditsTransferAmount[client] = Helpers_Math_Abs(g_iCreditsTransferAmount[client]);
 	
@@ -574,26 +580,20 @@ Action Functions_OnClientSayCommand(int client, const char[] text)
 
 void Functions_SetupLuck(int client)
 {
-	if (!OnLuckProcess(client))
+	if (!OnClientLuckProcess(client))
 	{
 		return;
 	}
-
-	ArrayList hArray;
 	int size;
-	hArray = Shop_CreateArrayOfItems(size);
+	ArrayList hArray = Shop_CreateArrayOfItems(size);
 	SortADTArray(hArray, Sort_Random, Sort_Integer);
 	
 	if (!size)
 	{
 		delete hArray;
-		
 		CPrintToChat(client, "%t", "EmptyShop");
-		
 		return;
 	}
-	
-	int item_id;
 	
 	int dummy;
 	ItemType type;
@@ -602,25 +602,16 @@ void Functions_SetupLuck(int client)
 		dummy = hArray.Get(i);
 		type = GetItemType(dummy);
 		
-		if (type != Item_Finite && type != Item_BuyOnly && ClientHasItem(client, dummy))
+		if (type != Item_Finite && type != Item_BuyOnly && ClientHasItem(client, dummy) || GetItemLuckChance(dummy) == 0 || !OnClientShouldLuckItem(client, dummy))
 		{
-			continue;
+			hArray.Erase(i--);
+			size--;
 		}
-		
-		if(ItemManager_GetCanLuck(dummy) == false)
-		{
-			continue;
-		}
-
-		item_id = dummy;
-		
-		break;
 	}
-	
-	delete hArray;
-	
-	if (!item_id)
+
+	if (!size)
 	{
+		delete hArray;
 		CPrintToChat(client, "%t", "NothingToLuck");
 		
 		return;
@@ -628,6 +619,7 @@ void Functions_SetupLuck(int client)
 
 	if (GetRandomIntEx(1, 100) > g_hLuckChance.IntValue)
 	{
+		delete hArray;
 		RemoveCredits(client, g_hLuckCredits.IntValue, CREDITS_BY_LUCK);
 		
 		CPrintToChat(client, "%t", "Looser");
@@ -635,17 +627,38 @@ void Functions_SetupLuck(int client)
 		return;
 	}
 	
-	if (!OnItemLuck(client, item_id))
+	int item_id, item_luck_chance;
+	while (size > 0)
 	{
-		return;
+		SortADTArray(hArray, Sort_Random, Sort_Integer);
+		
+		dummy = GetArrayCell(hArray, 0);
+		item_luck_chance = GetItemLuckChance(dummy);
+		
+		if (GetRandomIntEx(1, 100) > item_luck_chance)
+		{
+			if (size < 2)
+			{
+				delete hArray;
+				RemoveCredits(client, g_hLuckCredits.IntValue, CREDITS_BY_LUCK);
+				CPrintToChat(client, "%t", "Looser");
+				return;
+			}
+			hArray.Erase(0);
+			size--;
+		}
+		
+		item_id = dummy;
+		
+		break;
 	}
-	
+
 	RemoveCredits(client, g_hLuckCredits.IntValue, CREDITS_BY_LUCK);
-	
+
 	GiveItem(client, item_id);
-	
-	OnItemLucked(client, item_id);
-	
+
+	OnClientItemLucked(client, item_id);
+
 	char category[SHOP_MAX_STRING_LENGTH], item[SHOP_MAX_STRING_LENGTH];
 	GetCategoryDisplay(GetItemCategoryId(item_id), client, category, sizeof(category));
 	GetItemDisplay(item_id, client, item, sizeof(item));

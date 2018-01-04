@@ -106,6 +106,10 @@ public Action Commands_GiveCredits(int client, int args)
 		{
 			CPrintToChat(client, "%t", "TargetNotFound", pattern);
 		}
+		else
+		{
+			ReplyToCommand(client, "%t", "TargetNotFound", pattern);
+		}
 	}
 	else
 	{
@@ -122,6 +126,10 @@ public Action Commands_GiveCredits(int client, int args)
 		if (client)
 		{
 			CPrintToChat(client, "%t", "give_credits_success", imoney, buffer);
+		}
+		else
+		{
+			ReplyToCommand(client, "%t", "give_credits_success", imoney, buffer);
 		}
 	}
 	
@@ -160,6 +168,10 @@ public Action Commands_TakeCredits(int client, int args)
 		{
 			CPrintToChat(client, "%t", "TargetNotFound", pattern);
 		}
+		else
+		{
+			ReplyToCommand(client, "%t", "TargetNotFound", pattern);
+		}
 	}
 	else
 	{
@@ -176,6 +188,10 @@ public Action Commands_TakeCredits(int client, int args)
 		if (client)
 		{
 			CPrintToChat(client, "%t", "remove_credits_success", imoney, buffer);
+		}
+		else
+		{
+			ReplyToCommand(client, "%t", "remove_credits_success", imoney, buffer);
 		}
 	}
 	
@@ -214,6 +230,10 @@ public Action Commands_SetCredits(int client, int args)
 		{
 			CPrintToChat(client, "%t", "TargetNotFound", pattern);
 		}
+		else
+		{
+			ReplyToCommand(client, "%t", "TargetNotFound", pattern);
+		}
 	}
 	else
 	{
@@ -230,6 +250,10 @@ public Action Commands_SetCredits(int client, int args)
 		if (client)
 		{
 			CPrintToChat(client, "%t", "set_credits_success", imoney, buffer);
+		}
+		else
+		{
+			ReplyToCommand(client, "%t", "set_credits_success", imoney, buffer);
 		}
 	}
 	

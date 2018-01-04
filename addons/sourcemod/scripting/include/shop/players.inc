@@ -11,12 +11,13 @@ native int Shop_GetClientId(int client);
  *	Sets timeleft for an item. 0 to set no timelimit
  *	-
  *	@param client			Client index to set to
- *	@param item_id		Item id to set for
- *	@param timeleft		Timeleft to set. 0 to make it forever
+ *	@param item_id			Item id to set for
+ *	@param timeleft			Timeleft to set. 0 to make it forever
+ *	@param reset_duration	Reset duration
  *	-
  *	@return True on success and false it client has not this item
 */
-native bool Shop_SetClientItemTimeleft(int client, ItemId item_id, int timeleft);
+native bool Shop_SetClientItemTimeleft(int client, ItemId item_id, int timeleft, bool reset_duration = true);
 
 /**
  *	Gets timeleft for an item
@@ -139,6 +140,16 @@ native int Shop_GetClientCredits(int client);
 native void Shop_SetClientCredits(int client, int credits);
 
 /**
+ *	Gives a player an item
+ *	-
+ *	@param client			Client index
+ *	@param item_id			The item id
+ *	-
+ *	@return	True if the player has successfuly been given, false otherwise
+*/
+native bool Shop_GiveClientItem(int client, ItemId item_id);
+
+/**
  *	Forces the player to buy the item from the shop
  *	-
  *	@param client			Client index
@@ -147,6 +158,16 @@ native void Shop_SetClientCredits(int client, int credits);
  *	@return	True if the player successfuly bought, false otherwise
 */
 native bool Shop_BuyClientItem(int client, ItemId item_id);
+
+/**
+ *	Forces the player to sell the item from the inventory
+ *	-
+ *	@param client			Client index
+ *	@param item_id			The item id
+ *	-
+ *	@return	True if the player successfuly sold, false otherwise
+*/
+native bool Shop_SellClientItem(int client, ItemId item_id);
 
 /**
  *	Remove the item from the player's inventory

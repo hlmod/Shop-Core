@@ -1,17 +1,3 @@
-int Helpers_GetCSGame()
-{
-	if (GetFeatureStatus(FeatureType_Native, "GetEngineVersion") == FeatureStatus_Available)
-	{
-		switch (GetEngineVersion())
-		{
-			case Engine_SourceSDK2006: return GAME_CSS_34;
-			case Engine_CSS: return GAME_CSS;
-			case Engine_CSGO: return GAME_CSGO;
-		}
-	}
-	return GAME_UNDEFINED;
-}
-
 stock bool Helpers_IsPluginValid(Handle plugin)
 {
 	/* Check if the plugin handle is pointing to a valid plugin. */

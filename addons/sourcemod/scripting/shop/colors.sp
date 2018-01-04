@@ -1,12 +1,19 @@
 #include <regex>
 
+static bool bProto;
+
+void InitChat()
+{
+	bProto = (CanTestFeatures() && GetFeatureStatus(FeatureType_Native, "GetUserMessageType") == FeatureStatus_Available && GetUserMessageType() == UM_Protobuf);
+}
+
 void CPrintToChat(int client, const char[] sFormat, any ...)
 {
 	char sMessage[512];
 	SetGlobalTransTarget(client);
 	VFormat(sMessage, sizeof(sMessage), sFormat, 3);
 
-	Format(sMessage, sizeof(sMessage), Engine_Version == GAME_CSGO ? " \x01%s":"\x01%s", sMessage);
+	Format(sMessage, sizeof(sMessage), Engine_Version == Engine_CSGO ? " \x01%s":"\x01%s", sMessage);
 	
 	ReplaceString(sMessage, sizeof(sMessage), "\\n", "\n");
 	ReplaceString(sMessage, sizeof(sMessage), "{DEFAULT}", "\x01", false);
@@ -14,7 +21,7 @@ void CPrintToChat(int client, const char[] sFormat, any ...)
 	
 	switch(Engine_Version)
 	{
-		case GAME_CSS_34:
+		case Engine_SourceSDK2006:
 		{
 			ReplaceString(sMessage, sizeof(sMessage), "{LIGHTGREEN}", "\x03", false);
 			int iColor = ReplaceColors(sMessage, sizeof(sMessage));
@@ -28,7 +35,7 @@ void CPrintToChat(int client, const char[] sFormat, any ...)
 				}
 			}
 		}
-		case GAME_CSS:
+		case Engine_CSS:
 		{
 			ReplaceString(sMessage, sizeof(sMessage), "#", "\x07");
 
@@ -73,7 +80,7 @@ void CPrintToChat(int client, const char[] sFormat, any ...)
 				SayText2(client, 0, sMessage);
 			}
 		}
-		case GAME_CSGO:
+		case Engine_CSGO:
 		{
 			static char sColorName[][] =
 							{
@@ -168,7 +175,7 @@ void SayText2(int client, int iAuthor = 0, const char[] sMessage)
 	
 	Handle hBuffer;
 	hBuffer = StartMessage("SayText2", clients, 1, USERMSG_RELIABLE|USERMSG_BLOCKHOOKS);
-	if(Engine_Version == GAME_CSGO)
+	if(bProto)
 	{
 		PbSetInt(hBuffer, "ent_idx", iAuthor);
 		PbSetBool(hBuffer, "chat", true);
