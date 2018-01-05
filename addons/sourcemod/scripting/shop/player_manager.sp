@@ -596,6 +596,8 @@ public Action PlayerManager_OnPlayerItemElapsed(Handle timer, DataPack dp)
 	char s_Query[256];
 	FormatEx(s_Query, sizeof(s_Query), "DELETE FROM `%sboughts` WHERE `player_id` = '%d' AND `item_id` = '%d';", g_sDbPrefix, i_Id[client], item_id);
 	TQueryEx(s_Query);
+
+	PlayerManager_DBToggleItem(client, item_id, false);
 	
 	h_KvClientItems[client].Rewind();
 	if (h_KvClientItems[client].JumpToKey(sItemId))
@@ -1260,6 +1262,8 @@ public int PlayerManager_GetItemsFromDB(Database owner, DBResultSet hndl, const 
 		{
 			FormatEx(s_Query, sizeof(s_Query), "DELETE FROM `%sboughts` WHERE `player_id` = '%d' AND `item_id` = '%d';", g_sDbPrefix, i_Id[client], item_id);
 			TQueryEx(s_Query);
+
+			PlayerManager_DBToggleItem(client, item_id, false);
 			continue;
 		}
 		
