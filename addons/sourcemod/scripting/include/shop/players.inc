@@ -140,16 +140,6 @@ native int Shop_GetClientCredits(int client);
 native void Shop_SetClientCredits(int client, int credits);
 
 /**
- *	Gives a player an item
- *	-
- *	@param client			Client index
- *	@param item_id			The item id
- *	-
- *	@return	True if the player has successfuly been given, false otherwise
-*/
-native bool Shop_GiveClientItem(int client, ItemId item_id);
-
-/**
  *	Forces the player to buy the item from the shop
  *	-
  *	@param client			Client index

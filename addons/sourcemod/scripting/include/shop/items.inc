@@ -285,15 +285,6 @@ native void Shop_SetItemValue(ItemId item_id, int value);
 native bool Shop_IsItemExists(ItemId item_id);
 
 /**
- *	Получает тип предмета
- *	-
- *	@param item_id				Item id
- *	-
- *	@return Тип предмета
-*/
-native ItemType Shop_GetItemType(ItemId item_id);
-
-/**
  *	Whether the category is valid (registered)
  *	-
  *	@param category_id				Category id
