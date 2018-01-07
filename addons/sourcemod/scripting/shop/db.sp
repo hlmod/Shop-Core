@@ -89,6 +89,10 @@ public Action DB_Command_Clear(int argc)
 						FormatEx(s_Query, sizeof(s_Query), "TRUNCATE TABLE `%splayers`;", g_sDbPrefix);
 						DB_TQuery(DB_Clear, s_Query, iDays);
 						num_rows++;
+
+						FormatEx(s_Query, sizeof(s_Query), "TRUNCATE TABLE `%stoggles`;", g_sDbPrefix);
+						DB_TQuery(DB_Clear, s_Query, iDays);
+						num_rows++;
 					}
 					else
 					{
@@ -97,6 +101,10 @@ public Action DB_Command_Clear(int argc)
 						num_rows++;
 						
 						FormatEx(s_Query, sizeof(s_Query), "DELETE FROM `%splayers`;", g_sDbPrefix);
+						DB_TQuery(DB_Clear, s_Query, iDays);
+						num_rows++;
+
+						FormatEx(s_Query, sizeof(s_Query), "DELETE FROM `%stoggles`;", g_sDbPrefix);
 						DB_TQuery(DB_Clear, s_Query, iDays);
 						num_rows++;
 					}
@@ -196,6 +204,10 @@ public void DB_Clear(Database db, DBResultSet results, const char[] error, any d
 					num_rows++;
 					
 					FormatEx(s_Query, sizeof(s_Query), "DELETE FROM `%splayers` WHERE `id` = '%d';", g_sDbPrefix, id);
+					DB_TQuery(DB_Clear, s_Query, -1);
+					num_rows++;
+
+					FormatEx(s_Query, sizeof(s_Query), "DELETE FROM `%stoggles` WHERE `player_id` = '%d';", g_sDbPrefix, id);
 					DB_TQuery(DB_Clear, s_Query, -1);
 					num_rows++;
 				}
