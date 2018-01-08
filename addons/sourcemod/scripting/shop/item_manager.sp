@@ -684,21 +684,20 @@ public int ItemManager_GetItemCustomInfo(Handle plugin, int numParams)
 {
 	char buffer[SHOP_MAX_STRING_LENGTH];
 	IntToString(GetNativeCell(1), buffer, sizeof(buffer));
-	
+
 	if (!h_KvItems.JumpToKey(buffer))
 		ThrowNativeError(SP_ERROR_NATIVE, "Item id %s is invalid", buffer);
-	
+
 	int result = GetNativeCell(3);
-	
-	h_KvItems.Rewind();
+
 	if (h_KvItems.JumpToKey("CustomInfo"))
 	{
 		GetNativeString(2, buffer, sizeof(buffer));
 		result = h_KvItems.GetNum(buffer, result);
 	}
-	
+
 	h_KvItems.Rewind();
-	
+
 	return result;
 }
 
@@ -714,7 +713,6 @@ public int ItemManager_SetItemCustomInfo(Handle plugin, int numParams)
 	
 	bool result = false;
 	
-	h_KvItems.Rewind();
 	if (h_KvItems.JumpToKey("CustomInfo", true))
 	{
 		GetNativeString(2, buffer, sizeof(buffer));
