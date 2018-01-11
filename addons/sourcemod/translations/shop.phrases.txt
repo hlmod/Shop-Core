@@ -66,9 +66,9 @@
 	"ReceiveCommission"
 	{
 		"#format"	"{1:i}"
-		"ru"		"{green}[Shop]{default}Комиссия составила: {green}{1} {default}кредит(-ов)"
-		"ua"		"{green}[Shop]{default}Комісія склала: {green}{1} {default}кредит(-ів)"
-		"en"		"{green}[Shop]{default}Withholding fee: {green}{1} {default}credits"
+		"ru"		"{green}[Shop]{default} Комиссия составила: {green}{1} {default}кредит(-ов)"
+		"ua"		"{green}[Shop]{default} Комісія склала: {green}{1} {default}кредит(-ів)"
+		"en"		"{green}[Shop]{default} Withholding fee: {green}{1} {default}credits"
 	}
 	"receive_item"
 	{
