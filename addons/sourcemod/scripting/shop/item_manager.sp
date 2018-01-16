@@ -436,7 +436,7 @@ public int ItemManager_SetCustomInfoFloat(Handle plugin, int numParams)
 	GetNativeString(1, info, sizeof(info));
 	
 	plugin_kv.JumpToKey("CustomInfo", true);
-	plugin_kv.SetNum(info, GetNativeCell(2));
+	plugin_kv.SetFloat(info, GetNativeCell(2));
 	plugin_kv.GoBack();
 }
 
