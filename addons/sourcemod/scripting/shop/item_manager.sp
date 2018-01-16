@@ -788,7 +788,7 @@ public int ItemManager_SetItemCustomInfoFloat(Handle plugin, int numParams)
 	if (h_KvItems.JumpToKey("CustomInfo", true))
 	{
 		GetNativeString(2, buffer, sizeof(buffer));
-		h_KvItems.SetNum(buffer, GetNativeCell(3));
+		h_KvItems.SetFloat(buffer, GetNativeCell(3));
 		
 		result = true;
 	}
