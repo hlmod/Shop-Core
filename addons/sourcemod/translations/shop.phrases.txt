@@ -63,6 +63,13 @@
 		"ua"		"{green}[Shop]{default} Ви успішно отримали {green}{1}{default} кредит(-ів) від гравця {green}{2}{default}!"
 		"en"		"{green}[Shop]{default} You have successfully received {green}{1}{default} credits from {green}{2}{default}!"
 	}
+	"ReceiveCommission"
+	{
+		"#format"	"{1:i}"
+		"ru"		"{green}[Shop]{default} Комиссия составила: {green}{1} {default}кредит(-ов)"
+		"ua"		"{green}[Shop]{default} Комісія склала: {green}{1} {default}кредит(-ів)"
+		"en"		"{green}[Shop]{default} Withholding fee: {green}{1} {default}credits"
+	}
 	"receive_item"
 	{
 		"#format"   "{1:N},{2:s},{3:s}"
