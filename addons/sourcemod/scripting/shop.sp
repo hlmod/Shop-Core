@@ -7,6 +7,7 @@
 EngineVersion Engine_Version = Engine_Unknown;
 
 int g_iMaxPageItems = 10;
+#define INVALID_DP_POS view_as<DataPackPos>(-1)
 
 int global_timer;
 Panel panel_info;
@@ -173,6 +174,7 @@ public void OnPluginStart()
 	g_iMaxPageItems = GetMaxPageItems(GetMenuStyleHandle(MenuStyle_Default));
 
 	InitChat();
+	Admin_OnPluginStart();
 	DB_OnPluginStart();
 	Forward_OnPluginStart();
 	Functions_OnPluginStart();

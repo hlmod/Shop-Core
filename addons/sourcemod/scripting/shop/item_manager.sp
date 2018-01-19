@@ -3,15 +3,30 @@ ArrayList h_arCategories;
 StringMap h_trieCategories;
 KeyValues h_KvItems;
 
-#define ITEM_DATAPACKPOS_REGISTER 0
-#define ITEM_DATAPACKPOS_USE 9
-#define ITEM_DATAPACKPOS_SHOULD_DISPLAY 18
-#define ITEM_DATAPACKPOS_DISPLAY 27
-#define ITEM_DATAPACKPOS_DESC 36
-#define ITEM_DATAPACKPOS_COMMON 45
-#define ITEM_DATAPACKPOS_BUY 54
-#define ITEM_DATAPACKPOS_SELL 63
-#define ITEM_DATAPACKPOS_ELAPSE 72
+/**
+ * For SM 1.10
+ * Items
+ */
+stock DataPackPos ITEM_DATAPACKPOS_REGISTER			= INVALID_DP_POS;
+stock DataPackPos ITEM_DATAPACKPOS_USE 				= INVALID_DP_POS;
+stock DataPackPos ITEM_DATAPACKPOS_SHOULD_DISPLAY		= INVALID_DP_POS;
+stock DataPackPos ITEM_DATAPACKPOS_DISPLAY				= INVALID_DP_POS;
+stock DataPackPos ITEM_DATAPACKPOS_DESC				= INVALID_DP_POS;
+stock DataPackPos ITEM_DATAPACKPOS_COMMON				= INVALID_DP_POS;
+stock DataPackPos ITEM_DATAPACKPOS_BUY					= INVALID_DP_POS;
+stock DataPackPos ITEM_DATAPACKPOS_SELL				= INVALID_DP_POS;
+stock DataPackPos ITEM_DATAPACKPOS_ELAPSE				= INVALID_DP_POS;
+
+/**
+ * For SM 1.10
+ * Categories
+ */
+stock DataPackPos CATEGORY_DATAPACKPOS_PLUGIN			= INVALID_DP_POS;
+stock DataPackPos CATEGORY_DATAPACKPOS_DISPLAY			= INVALID_DP_POS;
+stock DataPackPos CATEGORY_DATAPACKPOS_DESCRIPTION		= INVALID_DP_POS;
+stock DataPackPos CATEGORY_DATAPACKPOS_SHOULD_DISPLAY	= INVALID_DP_POS;
+stock DataPackPos CATEGORY_DATAPACKPOS_SELECT			= INVALID_DP_POS;
+stock DataPackPos CATEGORY_DATAPACKPOS_ITEMSCOUNT		= INVALID_DP_POS;
 
 void ItemManager_CreateNatives()
 {
@@ -74,11 +89,72 @@ void ItemManager_CreateNatives()
 	
 	CreateNative("Shop_FillArrayByItems", ItemManager_FillArrayByItemsNative);
 	CreateNative("Shop_FormatItem", ItemManager_FormatItemNative);
+
+	/**
+	 * For SM 1.10
+	 * Items
+	 */
+	DataPack hPack = new DataPack();
+
+	hPack.WriteCell(0);
+	ITEM_DATAPACKPOS_REGISTER = hPack.Position;
+
+	hPack.WriteCell(0);
+	ITEM_DATAPACKPOS_USE = hPack.Position;
+
+	hPack.WriteCell(0);
+	ITEM_DATAPACKPOS_SHOULD_DISPLAY = hPack.Position;
+
+	hPack.WriteCell(0);
+	ITEM_DATAPACKPOS_DISPLAY = hPack.Position;
+
+	hPack.WriteCell(0);
+	ITEM_DATAPACKPOS_DESC = hPack.Position;
+
+	hPack.WriteCell(0);
+	ITEM_DATAPACKPOS_COMMON = hPack.Position;
+
+	hPack.WriteCell(0);
+	ITEM_DATAPACKPOS_BUY = hPack.Position;
+
+	hPack.WriteCell(0);
+	ITEM_DATAPACKPOS_SELL = hPack.Position;
+
+	hPack.WriteCell(0);
+	ITEM_DATAPACKPOS_ELAPSE = hPack.Position;
+
+	hPack.Reset(true);
+
+	/**
+	 * For SM 1.10
+	 * Categories
+	 */
+	hPack.WriteCell(0);
+	CATEGORY_DATAPACKPOS_PLUGIN = hPack.Position;
+
+	hPack.WriteCell(0);
+	CATEGORY_DATAPACKPOS_DISPLAY = hPack.Position;
+
+	hPack.WriteCell(0);
+	CATEGORY_DATAPACKPOS_DESCRIPTION = hPack.Position;
+
+	hPack.WriteCell(0);
+	CATEGORY_DATAPACKPOS_SHOULD_DISPLAY = hPack.Position;
+
+	hPack.WriteCell(0);
+	CATEGORY_DATAPACKPOS_SELECT = hPack.Position;
+
+	hPack.WriteCell(0);
+	CATEGORY_DATAPACKPOS_ITEMSCOUNT = hPack.Position;
+
+	delete hPack;
 }
 
 void ItemManager_OnPluginStart()
 {
 	RegServerCmd("sm_items_dump", ItemManager_Dump);
+
+
 }
 
 public Action ItemManager_Dump(int argc)
@@ -264,7 +340,7 @@ bool ItemManager_OnCategorySelect(int client, int category_id, ShopMenu menu)
 		tmp.Reset(); // Deleting of Datapack in Shop_UnregisterMe()...
 		
 		Handle plugin = tmp.ReadCell();
-		tmp.Position += view_as<DataPackPos>(27); // Skip 3 functions here, so 9 + 9 + 9
+		tmp.Position = CATEGORY_DATAPACKPOS_SELECT;
 		
 		Function func_Select = tmp.ReadFunction();
 		if (func_Select != INVALID_FUNCTION)
@@ -510,7 +586,7 @@ public int ItemManager_EndItem(Handle plugin, int numParams)
 	if (dpCallback == null)
 		ThrowNativeError(SP_ERROR_NATIVE, "Callbacks for this item not found");
 	
-	dpCallback.Position = view_as<DataPackPos>(ITEM_DATAPACKPOS_USE);
+	dpCallback.Position = ITEM_DATAPACKPOS_USE;
 	Function func_use = dpCallback.ReadFunction();
 	if (type != Item_None && type != Item_BuyOnly && func_use == INVALID_FUNCTION)
 	{
@@ -525,7 +601,7 @@ public int ItemManager_EndItem(Handle plugin, int numParams)
 		ThrowNativeError(SP_ERROR_NATIVE, "Using item type other than none, ItemUseToggle callback must to be set");
 	}
 	
-	dpCallback.Position = view_as<DataPackPos>(ITEM_DATAPACKPOS_BUY);
+	dpCallback.Position = ITEM_DATAPACKPOS_BUY;
 	Function func_buy = dpCallback.ReadFunction();
 	if (type == Item_BuyOnly && func_buy == INVALID_FUNCTION)
 	{
@@ -540,7 +616,7 @@ public int ItemManager_EndItem(Handle plugin, int numParams)
 		ThrowNativeError(SP_ERROR_NATIVE, "Using item type BuyOnly, OnBuy callback must to be set");
 	}
 	
-	dpCallback.Position = view_as<DataPackPos>(ITEM_DATAPACKPOS_REGISTER);
+	dpCallback.Position = ITEM_DATAPACKPOS_REGISTER;
 	Function func_register = dpCallback.ReadFunction();
 	
 	DataPack dp = new DataPack();
@@ -1301,7 +1377,7 @@ public int ItemManager_FormatItemNative(Handle plugin, int numParams)
 	if (dpCallback == null)
 		ThrowNativeError(SP_ERROR_NATIVE, "Can't format, callbacks for this item not found");
 	
-	dpCallback.Position = view_as<DataPackPos>(ITEM_DATAPACKPOS_DISPLAY);
+	dpCallback.Position = ITEM_DATAPACKPOS_DISPLAY;
 	Function callback_display = dpCallback.ReadFunction();
 	
 	h_KvItems.Rewind();
@@ -1381,7 +1457,7 @@ bool ItemManager_FillCategories(Menu menu, int source_client, bool inventory = f
 				Function func_display = dp.ReadFunction(); // Category display
 				Function func_desc = dp.ReadFunction(); // Category description
 				Function func_should = dp.ReadFunction(); // Category should display
-				dp.Position += view_as<DataPackPos>(9); // to skip Category select
+				dp.Position = CATEGORY_DATAPACKPOS_ITEMSCOUNT; // to skip Category select
 				int icat_size = dp.ReadCell(); // Real count of items in category
 				
 				if (!showAll)
@@ -1525,7 +1601,7 @@ bool ItemManager_GetItemDisplay(int item_id, int source_client, char[] buffer, i
 	if (dpCallback == null)
 		ThrowNativeError(SP_ERROR_NATIVE, "Callbacks for this item not found");
 	
-	dpCallback.Position = view_as<DataPackPos>(ITEM_DATAPACKPOS_DISPLAY);
+	dpCallback.Position = ITEM_DATAPACKPOS_DISPLAY;
 	Function callback_display = dpCallback.ReadFunction();
 	
 	h_KvItems.Rewind();
@@ -1565,10 +1641,10 @@ bool ItemManager_FillItemsOfCategory(Menu menu, int client, int source_client, i
 			if (dpCallback == null)
 				ThrowNativeError(SP_ERROR_NATIVE, "Callbacks for this item not found");
 			
-			dpCallback.Position = view_as<DataPackPos>(ITEM_DATAPACKPOS_DISPLAY);
+			dpCallback.Position = ITEM_DATAPACKPOS_DISPLAY;
 			Function callback_display = dpCallback.ReadFunction();
 			
-			dpCallback.Position = view_as<DataPackPos>(ITEM_DATAPACKPOS_SHOULD_DISPLAY);
+			dpCallback.Position = ITEM_DATAPACKPOS_SHOULD_DISPLAY;
 			Function callback_should = dpCallback.ReadFunction();
 			
 			h_KvItems.Rewind();
@@ -1622,7 +1698,7 @@ Panel ItemManager_CreateItemPanelInfo(int source_client, int item_id, ShopMenu m
 	if (dpCallback == null)
 		ThrowNativeError(SP_ERROR_NATIVE, "Callbacks for this item not found");
 	
-	dpCallback.Position = view_as<DataPackPos>(ITEM_DATAPACKPOS_DISPLAY);
+	dpCallback.Position = ITEM_DATAPACKPOS_DISPLAY;
 	Function callback = dpCallback.ReadFunction();
 	
 	h_KvItems.Rewind();
@@ -1675,7 +1751,7 @@ Panel ItemManager_CreateItemPanelInfo(int source_client, int item_id, ShopMenu m
 	
 	h_KvItems.GetString("description", buffer, sizeof(buffer));
 	
-	dpCallback.Position = view_as<DataPackPos>(ITEM_DATAPACKPOS_DESC);
+	dpCallback.Position = ITEM_DATAPACKPOS_DESC;
 	callback = dpCallback.ReadFunction();
 	
 	h_KvItems.Rewind();
@@ -1906,10 +1982,10 @@ void ItemManager_OnPlayerItemElapsed(int client, int item_id)
 	if (dpCallback == null)
 		ThrowNativeError(SP_ERROR_NATIVE, "Callbacks for this item not found");
 	
-	dpCallback.Position = view_as<DataPackPos>(ITEM_DATAPACKPOS_ELAPSE);
+	dpCallback.Position = ITEM_DATAPACKPOS_ELAPSE;
 	Function callback_elapse = dpCallback.ReadFunction();
 	
-	dpCallback.Position = view_as<DataPackPos>(ITEM_DATAPACKPOS_USE);
+	dpCallback.Position = ITEM_DATAPACKPOS_USE;
 	Function callback_use = dpCallback.ReadFunction();
 	
 	int category_id = h_KvItems.GetNum("category_id", -1);
@@ -1966,7 +2042,7 @@ stock void ItemManager_OnUseToggleCategory(int client, int category_id)
 		if (dpCallback == null)
 			ThrowNativeError(SP_ERROR_NATIVE, "Callbacks for this item not found");
 		
-		dpCallback.Position = view_as<DataPackPos>(ITEM_DATAPACKPOS_USE);
+		dpCallback.Position = ITEM_DATAPACKPOS_USE;
 		Function callback = dpCallback.ReadFunction();
 		
 		if (plugin != null && callback != INVALID_FUNCTION)
@@ -2025,7 +2101,7 @@ stock ShopAction ItemManager_OnUseToggleItemEx(int client, const char[] sItemId,
 	if (dpCallback == null)
 		ThrowNativeError(SP_ERROR_NATIVE, "Callbacks for this item not found");
 	
-	dpCallback.Position = view_as<DataPackPos>(ITEM_DATAPACKPOS_USE);
+	dpCallback.Position = ITEM_DATAPACKPOS_USE;
 	Function callback = dpCallback.ReadFunction();
 	
 	int category_id = h_KvItems.GetNum("category_id", -1);
@@ -2095,7 +2171,7 @@ bool ItemManager_CanPreview(int item_id)
 	if (dpCallback == null)
 		ThrowNativeError(SP_ERROR_NATIVE, "Callbacks for this item not found");
 	
-	dpCallback.Position = view_as<DataPackPos>(ITEM_DATAPACKPOS_COMMON);
+	dpCallback.Position = ITEM_DATAPACKPOS_COMMON;
 	
 	bool result = view_as<bool>(dpCallback.ReadFunction() != INVALID_FUNCTION);
 	
@@ -2116,7 +2192,7 @@ void ItemManager_SetupPreviewEx(int client, const char[] sItemId)
 	if (dpCallback == null)
 		ThrowNativeError(SP_ERROR_NATIVE, "Callbacks for this item not found");
 	
-	dpCallback.Position = view_as<DataPackPos>(ITEM_DATAPACKPOS_COMMON);
+	dpCallback.Position = ITEM_DATAPACKPOS_COMMON;
 	Function callback = dpCallback.ReadFunction();
 	
 	if (plugin != null && callback != INVALID_FUNCTION)
@@ -2159,7 +2235,7 @@ bool ItemManager_OnItemBuyEx(int client, int category_id, const char[] category,
 	if (dpCallback == null)
 		ThrowNativeError(SP_ERROR_NATIVE, "Callbacks for this item not found");
 	
-	dpCallback.Position = view_as<DataPackPos>(ITEM_DATAPACKPOS_BUY);
+	dpCallback.Position = ITEM_DATAPACKPOS_BUY;
 	Function callback = dpCallback.ReadFunction();
 	
 	h_KvItems.Rewind();
@@ -2199,7 +2275,7 @@ bool ItemManager_OnItemSellEx(int client, int category_id, const char[] category
 	if (dpCallback == null)
 		ThrowNativeError(SP_ERROR_NATIVE, "Callbacks for this item not found");
 	
-	dpCallback.Position = view_as<DataPackPos>(ITEM_DATAPACKPOS_SELL);
+	dpCallback.Position = ITEM_DATAPACKPOS_SELL;
 	Function callback = dpCallback.ReadFunction();
 	
 	h_KvItems.Rewind();

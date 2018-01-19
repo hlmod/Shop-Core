@@ -2,6 +2,13 @@ ConVar g_hTransCredits, g_hLuckCredits, g_hLuckChance;
 bool g_bTransMode;
 int g_iTransCredits;
 
+/**
+ * For SM 1.10
+ */
+stock DataPackPos FUNCTIONS_DP_PLUGIN 		= INVALID_DP_POS;
+stock DataPackPos FUNCTIONS_DP_FUNCDISPLAY	= INVALID_DP_POS;
+stock DataPackPos FUNCTIONS_DP_FUNCSELECT		= INVALID_DP_POS;
+
 bool g_bListenChat[MAXPLAYERS+1];
 int g_iCreditsTransferTarget[MAXPLAYERS+1],
 	g_iCreditsTransferAmount[MAXPLAYERS+1],
@@ -84,6 +91,22 @@ void Functions_OnPluginStart()
 	
 	g_hLuckCredits = CreateConVar("sm_shop_luck_credits", "500", "How many credits the luck cost", 0, true, 0.0);
 	g_hLuckChance = CreateConVar("sm_shop_luck_chance", "20", "How many chance the luck can be succeded", 0, true, 1.0, true, 100.0);
+
+	/**
+	 * For SM 1.10
+	 */
+	DataPack hPack = new DataPack();
+
+	hPack.WriteCell(0);
+	FUNCTIONS_DP_PLUGIN = hPack.Position;
+
+	hPack.WriteCell(0);
+	FUNCTIONS_DP_FUNCDISPLAY = hPack.Position;
+
+	hPack.WriteCell(0);
+	FUNCTIONS_DP_FUNCSELECT = hPack.Position;
+
+	delete hPack;
 }
 
 public void Functions_OnConVarChange(ConVar convar, const char[] oldValue, const char[] newValue)
@@ -248,7 +271,7 @@ public int Functions_Menu_Handler(Menu menu, MenuAction action, int param1, int 
 					{
 						dp.Reset();
 						Handle plugin = dp.ReadCell();
-						dp.Position += view_as<DataPackPos>(9); // skip func_display
+						dp.Position = FUNCTIONS_DP_FUNCSELECT; // skip func_display
 						Function func_select = dp.ReadFunction();
 						Call_StartFunction(plugin, func_select);
 						Call_PushCell(param1);

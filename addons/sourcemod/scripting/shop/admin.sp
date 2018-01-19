@@ -16,6 +16,13 @@ AdminEnum g_iOpt[MAXPLAYERS+1][AdminEnum];
 
 Menu count_menu;
 
+/**
+ * For SM 1.10
+ */
+stock DataPackPos ADMIN_DP_PLUGIN			= INVALID_DP_POS;
+stock DataPackPos ADMIN_DP_FUNCDISPLAY	= INVALID_DP_POS;
+stock DataPackPos ADMIN_DP_FUNCSELECT		= INVALID_DP_POS;
+
 ArrayList g_hAdminArray;
 
 void Admin_CreateNatives()
@@ -25,6 +32,24 @@ void Admin_CreateNatives()
 	CreateNative("Shop_AddToAdminMenu", Admin_AddToMenuNative);
 	CreateNative("Shop_RemoveFromAdminMenu", Admin_RemoveFromMenuNative);
 	CreateNative("Shop_ShowAdminMenu", Admin_ShowAdminMenu);
+}
+
+void Admin_OnPluginStart() {
+	/**
+	 * For SM 1.10
+	 */
+	DataPack hPack = new DataPack();
+
+	hPack.WriteCell(0);
+	ADMIN_DP_PLUGIN = hPack.Position;
+
+	hPack.WriteCell(0);
+	ADMIN_DP_FUNCDISPLAY = hPack.Position;
+
+	hPack.WriteCell(0);
+	ADMIN_DP_FUNCSELECT = hPack.Position;
+
+	delete hPack;
 }
 
 public int Admin_AddToMenuNative(Handle plugin, int numParams)
@@ -46,7 +71,7 @@ public int Admin_RemoveFromMenuNative(Handle plugin, int numParams)
 	{
 		dp = g_hAdminArray.Get(index+1);
 		dp.Reset();
-		dp.Position += view_as<DataPackPos>(9); // skip Handle plugin
+		dp.Position = ADMIN_DP_FUNCDISPLAY; // skip Handle plugin
 		Function func_disp = dp.ReadFunction();
 		Function func_select = dp.ReadFunction();
 		if (func_disp == GetNativeFunction(1) && func_select == GetNativeFunction(2))
@@ -297,7 +322,7 @@ public int Admin_Menu_Handler(Menu menu, MenuAction action, int param1, int para
 						dp.Reset();
 						Handle plugin = dp.ReadCell();
 						
-						dp.Position += view_as<DataPackPos>(9); // Skip func_diplay
+						dp.Position = ADMIN_DP_FUNCSELECT; // Skip func_diplay
 						Function func_select = dp.ReadFunction();
 						
 						Call_StartFunction(plugin, func_select);
