@@ -33,11 +33,12 @@ native int Shop_GetClientItemTimeleft(int client, ItemId item_id);
  *	Gets an absolute sell price for an item a player hold
  *	-
  *	@param client			Client index to get from
- *	@param item_id		Item id to get for
+ *	@param item_id			Item id to get for
+ *  @param isGold			True to retrieve gold value, false to get credits
  *	-
  *	@return sell price of the item
 */
-native int Shop_GetClientItemSellPrice(int client, ItemId item_id);
+native int Shop_GetClientItemSellPrice(int client, ItemId item_id, bool isGold = false);
 
 /**
  *	Whether a player has toggled on an item
@@ -138,6 +139,47 @@ native int Shop_GetClientCredits(int client);
  *	@noreturn
 */
 native void Shop_SetClientCredits(int client, int credits);
+
+/**
+ *	Gives certain amount of gold to the player
+ *	-
+ *	@param client			Client index
+ *	@param amount			Amount to give
+ *	@param by_who			Optional param to set by who the gold being given from
+ *	-
+ *	@return	New amount of gold
+*/
+native int Shop_GiveClientGold(int client, int amount, int by_who = CREDITS_BY_NATIVE);
+
+/**
+ *	Takes certain amount of gold from the player
+ *	-
+ *	@param client			Client index
+ *	@param amount			Amount to take
+ *	@param by_who			Optional param to set by who the gold being given from
+ *	-
+ *	@return	New amount of gold
+*/
+native int Shop_TakeClientGold(int client, int amount, int by_who = CREDITS_BY_NATIVE);
+
+/**
+ *	Gets the amount of gold of the player
+ *	-
+ *	@param client			Client index
+ *	-
+ *	@return	Amount of gold a player has, -1 on failure
+*/
+native int Shop_GetClientGold(int client);
+
+/**
+ *	Sets the amount of gold to the player
+ *	-
+ *	@param client			Client index
+ *	@param amount			Amount of gold to set
+ *	-
+ *	@noreturn
+*/
+native void Shop_SetClientGold(int client, int amount);
 
 /**
  *	Forces the player to buy the item from the shop

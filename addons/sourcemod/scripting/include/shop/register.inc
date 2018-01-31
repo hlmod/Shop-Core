@@ -13,8 +13,8 @@ typedef ItemCommon = function void(int client, CategoryId category_id, const cha
 typedef ItemShouldDisplayCallback = function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ShopMenu menu);
 typedef ItemDisplayCallback = function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ShopMenu menu, bool &disabled, const char[] name, char[] buffer, int maxlen);
 typedef ItemDescriptionCallback = function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ShopMenu menu, const char[] description, char[] buffer, int maxlen);
-typedef ItemBuyCallback = function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ItemType type, int price, int sell_price, int value);
-typedef ItemSellCallback = function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ItemType type, int sell_price);
+typedef ItemBuyCallback = function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ItemType type, int price, int sell_price, int value, int gold_price, int gold_sell_price);
+typedef ItemSellCallback = function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ItemType type, int sell_price, int gold_sell_price);
 
 /**
  *	Registers new category id
@@ -54,10 +54,12 @@ native bool Shop_StartItem(CategoryId category_id, const char[] item);
  *	@param sell_price			Item sell price. 0 to make item free and -1 to make it unsaleable. Can not be higher than price
  *	@param type					Item type. See ItemType enum
  *	@param value				Sets count if the item type is finite and sets duration if the item is togglable or non-togglable
+ *	@param gold_price			Item price. Can be -1 to make in unbuyable for gold
+ *	@param gold_sell_price		Item sell price. 0 to make item free and -1 to make it unsaleable. Can not be higher than price
  *	-
  *	@noreturn
 */
-native void Shop_SetInfo(const char[] name, const char[] description, int price, int sell_price = -1, ItemType type, int value = 1);
+native void Shop_SetInfo(const char[] name, const char[] description, int price, int sell_price = -1, ItemType type, int value = 1, int gold_price = -1, int gold_sell_price = -1);
 
 /**
  *	Sets the item luck chance.
