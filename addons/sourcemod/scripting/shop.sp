@@ -39,12 +39,14 @@ ConVar g_hHideCategoriesItemsCount;
 #include "shop/item_manager.sp"
 #include "shop/player_manager.sp"
 
+#define SHOP_VERSION "3.0B5:31-01-2018"
+
 public Plugin myinfo =
 {
 	name = "[Shop] Core",
 	description = "An advanced in game market",
 	author = "FrozDark (Fork by R1KO & White Wolf)",
-	version = "3.0B5:31-01-2018",
+	version = SHOP_VERSION,
 	url = "http://www.hlmod.ru/"
 };
 
