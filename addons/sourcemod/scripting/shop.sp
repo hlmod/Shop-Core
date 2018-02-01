@@ -7,7 +7,7 @@
 EngineVersion Engine_Version = Engine_Unknown;
 
 int g_iMaxPageItems = 10;
-#define INVALID_DP_POS view_as<DataPackPos>(-1)
+#define INVALID_DP_POS	view_as<DataPackPos>(-1)
 
 int global_timer;
 Panel panel_info;

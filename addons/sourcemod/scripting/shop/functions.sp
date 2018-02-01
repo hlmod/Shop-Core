@@ -97,14 +97,14 @@ void Functions_OnPluginStart()
 	 */
 	DataPack hPack = new DataPack();
 
-	hPack.WriteCell(0);
 	FUNCTIONS_DP_PLUGIN = hPack.Position;
-
 	hPack.WriteCell(0);
+
 	FUNCTIONS_DP_FUNCDISPLAY = hPack.Position;
-
 	hPack.WriteCell(0);
+
 	FUNCTIONS_DP_FUNCSELECT = hPack.Position;
+	hPack.WriteCell(0);
 
 	delete hPack;
 }

@@ -89,6 +89,11 @@ void ItemManager_CreateNatives()
 	
 	CreateNative("Shop_FillArrayByItems", ItemManager_FillArrayByItemsNative);
 	CreateNative("Shop_FormatItem", ItemManager_FormatItemNative);
+}
+
+void ItemManager_OnPluginStart()
+{
+	RegServerCmd("sm_items_dump", ItemManager_Dump);
 
 	/**
 	 * For SM 1.10
@@ -96,32 +101,32 @@ void ItemManager_CreateNatives()
 	 */
 	DataPack hPack = new DataPack();
 
-	hPack.WriteCell(0);
 	ITEM_DATAPACKPOS_REGISTER = hPack.Position;
-
 	hPack.WriteCell(0);
+
 	ITEM_DATAPACKPOS_USE = hPack.Position;
-
 	hPack.WriteCell(0);
+
 	ITEM_DATAPACKPOS_SHOULD_DISPLAY = hPack.Position;
-
 	hPack.WriteCell(0);
+
 	ITEM_DATAPACKPOS_DISPLAY = hPack.Position;
-
 	hPack.WriteCell(0);
+
 	ITEM_DATAPACKPOS_DESC = hPack.Position;
-
 	hPack.WriteCell(0);
+
 	ITEM_DATAPACKPOS_COMMON = hPack.Position;
-
 	hPack.WriteCell(0);
+
 	ITEM_DATAPACKPOS_BUY = hPack.Position;
-
 	hPack.WriteCell(0);
+
 	ITEM_DATAPACKPOS_SELL = hPack.Position;
-
 	hPack.WriteCell(0);
+
 	ITEM_DATAPACKPOS_ELAPSE = hPack.Position;
+	hPack.WriteCell(0);
 
 	hPack.Reset(true);
 
@@ -129,32 +134,25 @@ void ItemManager_CreateNatives()
 	 * For SM 1.10
 	 * Categories
 	 */
-	hPack.WriteCell(0);
 	CATEGORY_DATAPACKPOS_PLUGIN = hPack.Position;
-
 	hPack.WriteCell(0);
+
 	CATEGORY_DATAPACKPOS_DISPLAY = hPack.Position;
-
 	hPack.WriteCell(0);
+
 	CATEGORY_DATAPACKPOS_DESCRIPTION = hPack.Position;
-
 	hPack.WriteCell(0);
+
 	CATEGORY_DATAPACKPOS_SHOULD_DISPLAY = hPack.Position;
-
 	hPack.WriteCell(0);
+
 	CATEGORY_DATAPACKPOS_SELECT = hPack.Position;
-
 	hPack.WriteCell(0);
+
 	CATEGORY_DATAPACKPOS_ITEMSCOUNT = hPack.Position;
+	hPack.WriteCell(0);
 
 	delete hPack;
-}
-
-void ItemManager_OnPluginStart()
-{
-	RegServerCmd("sm_items_dump", ItemManager_Dump);
-
-
 }
 
 public Action ItemManager_Dump(int argc)

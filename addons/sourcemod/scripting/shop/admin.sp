@@ -40,14 +40,14 @@ void Admin_OnPluginStart() {
 	 */
 	DataPack hPack = new DataPack();
 
-	hPack.WriteCell(0);
 	ADMIN_DP_PLUGIN = hPack.Position;
-
 	hPack.WriteCell(0);
+
 	ADMIN_DP_FUNCDISPLAY = hPack.Position;
-
 	hPack.WriteCell(0);
+
 	ADMIN_DP_FUNCSELECT = hPack.Position;
+	hPack.WriteCell(0);
 
 	delete hPack;
 }
