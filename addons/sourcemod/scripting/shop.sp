@@ -39,6 +39,8 @@ ConVar g_hHideCategoriesItemsCount;
 #include "shop/item_manager.sp"
 #include "shop/player_manager.sp"
 
+#define SHOP_VERSION "3.0B5:31-01-2018"
+
 public Plugin myinfo =
 {
 	name = "[Shop] Core",

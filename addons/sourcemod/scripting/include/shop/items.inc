@@ -53,10 +53,12 @@ forward bool Shop_OnItemDescription(int client, ShopMenu menu_action, CategoryId
  *	@param price			Price of the item. Set by reference
  *	@param sell_price		Sell price of the item. Set by reference
  *	@param value			Count if the item is finite and duration if the item is togglable or non-togglable. Set by reference
+ *	@param gold_price		Gold price of the item. Set by reference
+*	@param gold_sell_price	Gold sell price of the item. Set by reference
  *	-
  *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block. Plugin_Continue otherwise
 */
-forward Action Shop_OnItemBuy(int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ItemType type, int &price, int &sell_price, int &value);
+forward Action Shop_OnItemBuy(int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ItemType type, int &price, int &sell_price, int &value, int &gold_price, int &gold_sell_price);
 
 /**
  *	Called when an item is being bought
@@ -68,10 +70,11 @@ forward Action Shop_OnItemBuy(int client, CategoryId category_id, const char[] c
  *	@param item				Item's unique name
  *	@param type				Item type
  *	@param sell_price		Sell price of the item. Set by reference
+ *	@param gold_sell_price  Gold sell price of the item. Set by reference
  *	-
  *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block. Plugin_Continue otherwise
 */
-forward Action Shop_OnItemSell(int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ItemType type, int &sell_price);
+forward Action Shop_OnItemSell(int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ItemType type, int &sell_price, int &gold_sell_price);
 
 /**
  *	Called when an item has been toggled
@@ -201,7 +204,7 @@ native bool Shop_SetItemCustomInfoString(ItemId item_id, const char[] info, cons
 native bool Shop_KvCopySubKeysItemCustomInfo(ItemId item_id, KeyValues kv);
 
 /**
- *	Gets an item price
+ *	Gets an item credits price
  *	-
  *	@param item_id				Item id
  *	-
@@ -210,7 +213,7 @@ native bool Shop_KvCopySubKeysItemCustomInfo(ItemId item_id, KeyValues kv);
 native int Shop_GetItemPrice(ItemId item_id);
 
 /**
- *	Sets an item price
+ *	Sets an item credits price
  *	-
  *	@param item_id				Item id
  *	@param price				Price to set
@@ -218,6 +221,25 @@ native int Shop_GetItemPrice(ItemId item_id);
  *	@noreturn
 */
 native void Shop_SetItemPrice(ItemId item_id, int price);
+
+/**
+ *	Gets an item gold price
+ *	-
+ *	@param item_id				Item id
+ *	-
+ *	@return Price of the item
+*/
+native int Shop_GetItemGoldPrice(ItemId item_id);
+
+/**
+ *	Sets an item gold price
+ *	-
+ *	@param item_id				Item id
+ *	@param price				Price to set
+ *	-
+ *	@noreturn
+*/
+native void Shop_SetItemGoldPrice(ItemId item_id, int price);
 
 /**
  *	Gets an item luck chance
@@ -239,7 +261,7 @@ native int Shop_GetItemLuckChance(ItemId item_id);
 native void Shop_SetItemLuckChance(ItemId item_id, int luck_chance);
 
 /**
- *	Gets an item sell price
+ *	Gets an item credits sell price
  *	-
  *	@param item_id				Item id
  *	-
@@ -248,7 +270,7 @@ native void Shop_SetItemLuckChance(ItemId item_id, int luck_chance);
 native int Shop_GetItemSellPrice(ItemId item_id);
 
 /**
- *	Sets an item sell price
+ *	Sets an item credits sell price
  *	-
  *	@param item_id				Item id
  *	@param sell_price			Sell price to set
@@ -256,6 +278,25 @@ native int Shop_GetItemSellPrice(ItemId item_id);
  *	@noreturn
 */
 native void Shop_SetItemSellPrice(ItemId item_id, int sell_price);
+
+/**
+ *	Gets an item gold sell price
+ *	-
+ *	@param item_id				Item id
+ *	-
+ *	@return Gold sell price of the item
+*/
+native int Shop_GetItemGoldSellPrice(ItemId item_id);
+
+/**
+ *	Sets an item gold sell price
+ *	-
+ *	@param item_id				Item id
+ *	@param sell_price			Gold sell price to set
+ *	-
+ *	@noreturn
+*/
+native void Shop_SetItemGoldSellPrice(ItemId item_id, int sell_price);
 
 /**
  *	Gets an item count if item is finite and duration if item is togglable or non-togglable (-1 if duration is unlimited)

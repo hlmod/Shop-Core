@@ -9,8 +9,6 @@
 #endif
 #define _shop_included
 
-#define SHOP_VERSION					"3.0B4:17-01-2018"
-
 #define SHOP_MAX_STRING_LENGTH	64
 
 enum CategoryId
@@ -162,6 +160,39 @@ forward Action Shop_OnCreditsGiven(int client, int &credits, int by_who);
  *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block
 */
 forward Action Shop_OnCreditsTaken(int client, int &credits, int by_who);
+
+/**
+ *	Called when a player is being set gold to
+ *	-
+ *	@param client			Client index who is being set to
+ *	@param amount			Amount of gold a client is being set to. By reference
+ *	@param by_who			See CREDITS_BY_* definitions for more info and any higher value is the admin index
+ *	-
+ *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block
+*/
+forward Action Shop_OnGoldSet(int client, int &amount, int by_who);
+
+/**
+ *	Called when a player is being given gold to
+ *	-
+ *	@param client			Client index who is being given to
+ *	@param amount			Amount of gold a client is being given to. By reference
+ *	@param by_who			See CREDITS_BY_* definitions for more info and any higher values is the admin index
+ *	-
+ *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block
+*/
+forward Action Shop_OnGoldGiven(int client, int &amount, int by_who);
+
+/**
+ *	Called when a player is being taken gold from
+ *	-
+ *	@param client			Client index who is being taken from
+ *	@param amount			Amount of gold a client is being taken for. By reference
+ *	@param by_who			See CREDITS_BY_* definitions for more info and any higher value is the admin index
+ *	-
+ *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block
+*/
+forward Action Shop_OnGoldTaken(int client, int &amount, int by_who);
 
 /**
  *	Called when a player is trying to try a luck
@@ -324,8 +355,12 @@ public void __pl_shop_SetNTVOptional()
 	MarkNativeAsOptional("Shop_KvCopySubKeysItemCustomInfo");
 	MarkNativeAsOptional("Shop_GetItemPrice");
 	MarkNativeAsOptional("Shop_SetItemPrice");
+	MarkNativeAsOptional("Shop_GetItemGoldPrice");
+	MarkNativeAsOptional("Shop_SetItemGoldPrice");
 	MarkNativeAsOptional("Shop_GetItemSellPrice");
 	MarkNativeAsOptional("Shop_SetItemSellPrice");
+	MarkNativeAsOptional("Shop_GetItemGoldSellPrice");
+	MarkNativeAsOptional("Shop_SetItemGoldSellPrice");
 	MarkNativeAsOptional("Shop_GetItemLuckChance");
 	MarkNativeAsOptional("Shop_SetItemLuckChance");
 	MarkNativeAsOptional("Shop_GetItemValue");
@@ -355,6 +390,10 @@ public void __pl_shop_SetNTVOptional()
 	MarkNativeAsOptional("Shop_TakeClientCredits");
 	MarkNativeAsOptional("Shop_GetClientCredits");
 	MarkNativeAsOptional("Shop_SetClientCredits");
+	MarkNativeAsOptional("Shop_GiveClientGold");
+	MarkNativeAsOptional("Shop_TakeClientGold");
+	MarkNativeAsOptional("Shop_GetClientGold");
+	MarkNativeAsOptional("Shop_SetClientGold");
 	MarkNativeAsOptional("Shop_GiveClientItem");
 	MarkNativeAsOptional("Shop_BuyClientItem");
 	MarkNativeAsOptional("Shop_SellClientItem");
