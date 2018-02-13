@@ -1,9 +1,9 @@
 #pragma semicolon 1
 
+#include <SteamWorks> // pretty old
 #pragma newdecls required
 #include <sourcemod>
 #include <shop>
-#include <SteamWorks>
 
 EngineVersion Engine_Version = Engine_Unknown;
 
