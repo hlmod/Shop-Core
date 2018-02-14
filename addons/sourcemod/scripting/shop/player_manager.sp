@@ -1225,7 +1225,9 @@ public void PlayerManager_GetTogglesFromDB(Database owner, DBResultSet hndl, con
 
 void PlayerManager_LoadClientItems(int client)
 {
+	#if defined DEBUG
 	PrintToChatAll("PlayerManager_LoadClientItems is here");
+	#endif
 	char s_Query[256];
 	FormatEx(s_Query, sizeof(s_Query), "SELECT `item_id`, `count`, `duration`, `timeleft`, `buy_price`, `sell_price`, `buy_time` FROM `%sboughts`, `%sitems` WHERE `id` = `item_id` AND `player_id` = '%i';", g_sDbPrefix, g_sDbPrefix, i_Id[client]);
 	TQuery(PlayerManager_GetItemsFromDB, s_Query, GetClientSerial(client));
@@ -1233,14 +1235,17 @@ void PlayerManager_LoadClientItems(int client)
 
 public int PlayerManager_GetItemsFromDB(Database owner, DBResultSet hndl, const char[] error, any serial)
 {
+	#if defined DEBUG
 	PrintToChatAll("[PlayerManager_GetItemsFromDB] Pre, owner is not yet available");
+	#endif
 	if (owner == null)
 	{
 		TryConnect();
 		return;
 	}
-	
+	#if defined DEBUG
 	PrintToChatAll("[PlayerManager_GetItemsFromDB] Pre, hndl is not yet available");
+	#endif
 	if (hndl == null || error[0])
 	{
 		LogError("PlayerManager_GetItemsFromDB: %s", error);
@@ -1251,7 +1256,9 @@ public int PlayerManager_GetItemsFromDB(Database owner, DBResultSet hndl, const 
 	if (!client)
 		return;
 	
-	PrintToChatAll("[PlayerManager_GetItemsFromDB] Pre start for hndl, owner is not yet available");
+	#if defined DEBUG
+	PrintToChatAll("[PlayerManager_GetItemsFromDB] Post for hndl, owner is available");
+	#endif
 	char sItemId[16], s_Query[256];
 	while (SQL_FetchRow(hndl))
 	{
@@ -1331,7 +1338,7 @@ public int PlayerManager_GetItemsFromDB(Database owner, DBResultSet hndl, const 
 			ToggleItem(client, item_id, Toggle_On, true, true);
 		}
 	}
-	PrintToChatAll("[PlayerManager_GetItemsFromDB] Post, owner is not yet available");
+	PrintToChatAll("[PlayerManager_GetItemsFromDB] Post, items loaded and toggled status retrieved.");
 	g_bAuthorized[client] = true;
 	OnAuthorized(client);
 }
