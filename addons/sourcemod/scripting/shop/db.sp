@@ -140,7 +140,7 @@ public Action DB_Command_Clear(int argc)
 				{
 					PrintToServer("[Shop] Current clearing option is set to - Clear from inactive players for more than %d %s!", iDays, (iDays == 1) ? "day" : "days");
 				}
-				PrintToServer("[Shop] Type sm_shop_clear_db 'ok' to process the query or 'cancel' to cancel the process!");
+				PrintToServer("[Shop] Type sm_shop_clear_db 'ok' to process the query or 'deny' to cancel the process!");
 			}
 			
 			return Plugin_Handled;
