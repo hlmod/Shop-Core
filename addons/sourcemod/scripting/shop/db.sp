@@ -127,7 +127,7 @@ public Action DB_Command_Clear(int argc)
 			{
 				iDays = -1;
 				
-				PrintToServer("[Shop] Database clear cancelled!");
+				PrintToServer("[Shop] Database clear canceled!");
 			}
 			else
 			{
