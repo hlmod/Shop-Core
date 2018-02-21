@@ -1007,7 +1007,7 @@ void PlayerManager_DatabaseClear()
 	}
 }
 
-bool PlayerManager_IsInGame(int player_id)
+stock bool PlayerManager_IsInGame(int player_id)
 {
 	for (int i = 1; i <= MaxClients; i++)
 	{

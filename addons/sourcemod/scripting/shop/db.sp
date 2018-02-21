@@ -84,39 +84,40 @@ public Action DB_Command_Clear(int argc)
 					{
 						FormatEx(s_Query, sizeof(s_Query), "TRUNCATE TABLE `%sboughts`;", g_sDbPrefix);
 						DB_TQuery(DB_Clear, s_Query, iDays);
-						num_rows++;
-						
+
 						FormatEx(s_Query, sizeof(s_Query), "TRUNCATE TABLE `%splayers`;", g_sDbPrefix);
 						DB_TQuery(DB_Clear, s_Query, iDays);
-						num_rows++;
 
 						FormatEx(s_Query, sizeof(s_Query), "TRUNCATE TABLE `%stoggles`;", g_sDbPrefix);
 						DB_TQuery(DB_Clear, s_Query, iDays);
-						num_rows++;
 					}
 					else
 					{
 						FormatEx(s_Query, sizeof(s_Query), "DELETE FROM `%sboughts`;", g_sDbPrefix);
 						DB_TQuery(DB_Clear, s_Query, iDays);
-						num_rows++;
 						
 						FormatEx(s_Query, sizeof(s_Query), "DELETE FROM `%splayers`;", g_sDbPrefix);
 						DB_TQuery(DB_Clear, s_Query, iDays);
-						num_rows++;
 
 						FormatEx(s_Query, sizeof(s_Query), "DELETE FROM `%stoggles`;", g_sDbPrefix);
 						DB_TQuery(DB_Clear, s_Query, iDays);
-						num_rows++;
 					}
-					
+
+					num_rows += 3;
 					PrintToServer("[Shop] Full clearing database...");
 				}
 				else
 				{
-					FormatEx(s_Query, sizeof(s_Query), "SELECT `id` FROM `%splayers` WHERE %d - `lastconnect` > %d;", g_sDbPrefix, global_timer, iDays*86400);
+					FormatEx(s_Query, sizeof(s_Query), "DELETE FROM `%sboughts` WHERE `player_id` IN (SELECT `id` FROM `%splayers` WHERE %d - `lastconnect` > %d);", g_sDbPrefix, g_sDbPrefix, global_timer, iDays*86400);
 					DB_TQuery(DB_Clear, s_Query, iDays);
-					num_rows++;
-					
+
+					FormatEx(s_Query, sizeof(s_Query), "DELETE FROM `%stoggles` WHERE `player_id` IN (SELECT `id` FROM `%splayers` WHERE %d - `lastconnect` > %d);", g_sDbPrefix, g_sDbPrefix, global_timer, iDays*86400);
+					DB_TQuery(DB_Clear, s_Query, iDays);
+
+					FormatEx(s_Query, sizeof(s_Query), "DELETE FROM `%splayers` WHERE %d - `lastconnect` > %d;", g_sDbPrefix, global_timer, iDays*86400);
+					DB_TQuery(DB_Clear, s_Query, iDays);
+					num_rows += 3;
+
 					PrintToServer("[Shop] Clearing database from inactive players for more than %d %s!", iDays, (iDays == 1) ? "day" : "days");
 				}
 				
@@ -126,7 +127,7 @@ public Action DB_Command_Clear(int argc)
 			{
 				iDays = -1;
 				
-				PrintToServer("[Shop] Database clear denied!");
+				PrintToServer("[Shop] Database clear cancelled!");
 			}
 			else
 			{
@@ -139,7 +140,7 @@ public Action DB_Command_Clear(int argc)
 				{
 					PrintToServer("[Shop] Current clearing option is set to - Clear from inactive players for more than %d %s!", iDays, (iDays == 1) ? "day" : "days");
 				}
-				PrintToServer("[Shop] Type sm_shop_clear_db 'ok' to process the query or 'deny' to cancel the process!");
+				PrintToServer("[Shop] Type sm_shop_clear_db 'ok' to process the query or 'cancel' to cancel the process!");
 			}
 			
 			return Plugin_Handled;
@@ -165,58 +166,21 @@ public Action DB_Command_Clear(int argc)
 public void DB_Clear(Database db, DBResultSet results, const char[] error, any data)
 {
 	if (num_rows) num_rows--;
-	
 	if (error[0])
 	{
 		LogError("DB_Clear %d: %s", data, error);
 		return;
 	}
-	
-	if (!num_rows)
-	{
-		switch (data)
-		{
-			case -1 :
-			{
-				PrintToServer("[Shop] Database is cleared!");
-				return;
-			}
-			case 0 :
-			{
-				DatabaseClear();
-				PrintToServer("[Shop] Database is fully cleared!");
-				return;
-			}
-		}
-		
-		if (results.RowCount > 0)
-		{
-			char s_Query[128];
-			int id;
-			while (results.FetchRow())
-			{
-				id = results.FetchInt(0);
-				
-				if (!IsInGame(id))
-				{
-					FormatEx(s_Query, sizeof(s_Query), "DELETE FROM `%sboughts` WHERE `player_id` = '%d';", g_sDbPrefix, id);
-					DB_TQuery(DB_Clear, s_Query, -1);
-					num_rows++;
-					
-					FormatEx(s_Query, sizeof(s_Query), "DELETE FROM `%splayers` WHERE `id` = '%d';", g_sDbPrefix, id);
-					DB_TQuery(DB_Clear, s_Query, -1);
-					num_rows++;
 
-					FormatEx(s_Query, sizeof(s_Query), "DELETE FROM `%stoggles` WHERE `player_id` = '%d';", g_sDbPrefix, id);
-					DB_TQuery(DB_Clear, s_Query, -1);
-					num_rows++;
-				}
-			}
-		}
-		else
-		{
-			PrintToServer("[Shop] Database is already clear from inactive players for more than %d %s!", data, (data == 1) ? "day" : "days");
-		}
+	if (num_rows) return;
+	if (data == 0)
+	{
+		DatabaseClear();
+		PrintToServer("[Shop] Database is fully cleared!");
+	}
+	else
+	{
+		PrintToServer("[Shop] Database is cleared!");
 	}
 }
 
