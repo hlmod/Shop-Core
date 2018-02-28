@@ -384,7 +384,7 @@ void DatabaseClear()
 	PlayerManager_DatabaseClear();
 }
 
-bool IsInGame(int player_id)
+stock bool IsInGame(int player_id)
 {
 	return PlayerManager_IsInGame(player_id);
 }
