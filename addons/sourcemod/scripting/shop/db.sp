@@ -245,18 +245,6 @@ public void DB_Connect(Database db, const char[] error, any data)
 	char driver[16];
 	DBDriver dbdriver = db.Driver;
 	dbdriver.GetIdentifier(driver, sizeof(driver));
-	/* switch (data)
-	{
-		case 1 :
-		{
-			// SQL_GetDriverIdent(owner, driver, sizeof(driver));
-			dbdriver.GetIdentifier(driver, sizeof(driver));
-		}
-		default :
-		{
-			SQL_ReadDriver(db, driver, sizeof(driver));
-		}
-	} */
 	
 	if (StrEqual(driver, "mysql", false))
 	{
