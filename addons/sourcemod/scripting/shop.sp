@@ -1,5 +1,6 @@
 #pragma semicolon 1
 
+#include <SteamWorks> // pretty old
 #pragma newdecls required
 #include <sourcemod>
 #include <shop>
@@ -39,8 +40,9 @@ ConVar g_hHideCategoriesItemsCount;
 #include "shop/functions.sp"
 #include "shop/item_manager.sp"
 #include "shop/player_manager.sp"
+#include "shop/stats.sp"
 
-#define SHOP_VERSION "3.0B5:31-01-2018"
+#define SHOP_VERSION "3.0B6" // 12.02.2018
 
 public Plugin myinfo =
 {
@@ -270,6 +272,9 @@ public void OnConVarChange(ConVar convar, const char[] oldValue, const char[] ne
 
 public void OnMapStart()
 {
+	// Stats work
+	SteamWorks_SteamServersConnected();
+
 	DB_OnMapStart();
 	
 	if (panel_info != null)
