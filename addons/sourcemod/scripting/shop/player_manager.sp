@@ -426,7 +426,7 @@ bool PlayerManager_ToggleItem(int client, int item_id, ShopAction action, bool l
 	return PlayerManager_ToggleItemEx(client, sItemId, action, load);
 }
 */
-bool PlayerManager_ToggleItemEx(int client, const char[] sItemId, ShopAction action, bool load = false, bool ingore = false)
+bool PlayerManager_ToggleItemEx(int client, const char[] sItemId, ShopAction action, bool load = false, bool ignore = false)
 {
 	char sId[16];
 	IntToString(i_Id[client], sId, sizeof(sId));
@@ -478,7 +478,7 @@ bool PlayerManager_ToggleItemEx(int client, const char[] sItemId, ShopAction act
 				
 				PlayerManager_DBToggleItemEx(client, sItemId, true);
 				
-				if (!ingore)
+				if (!ignore)
 					OnItemEquipped(client, item_id);
 				
 				result = true;
@@ -514,7 +514,7 @@ bool PlayerManager_ToggleItemEx(int client, const char[] sItemId, ShopAction act
 				
 				PlayerManager_DBToggleItemEx(client, sItemId, false);
 
-				if (!ingore)
+				if (!ignore)
 					OnItemDequipped(client, item_id);
 				
 				result = true;
@@ -1007,7 +1007,7 @@ void PlayerManager_DatabaseClear()
 	}
 }
 
-bool PlayerManager_IsInGame(int player_id)
+stock bool PlayerManager_IsInGame(int player_id)
 {
 	for (int i = 1; i <= MaxClients; i++)
 	{

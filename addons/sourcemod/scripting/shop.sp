@@ -1,5 +1,6 @@
 #pragma semicolon 1
 
+#include <SteamWorks> // pretty old
 #pragma newdecls required
 #include <sourcemod>
 #include <shop>
@@ -9,6 +10,7 @@
 EngineVersion Engine_Version = Engine_Unknown;
 
 int g_iMaxPageItems = 10;
+#define INVALID_DP_POS	view_as<DataPackPos>(-1)
 
 int global_timer;
 Panel panel_info;
@@ -40,8 +42,9 @@ ConVar g_hHideCategoriesItemsCount;
 #include "shop/functions.sp"
 #include "shop/item_manager.sp"
 #include "shop/player_manager.sp"
+#include "shop/stats.sp"
 
-#define SHOP_VERSION "3.0B5:09-02-2018"
+#define SHOP_VERSION "3.0B6" // 12.02.2018
 
 public Plugin myinfo =
 {
@@ -177,6 +180,7 @@ public void OnPluginStart()
 	g_iMaxPageItems = GetMaxPageItems(GetMenuStyleHandle(MenuStyle_Default));
 
 	InitChat();
+	Admin_OnPluginStart();
 	DB_OnPluginStart();
 	Forward_OnPluginStart();
 	Functions_OnPluginStart();
@@ -270,6 +274,9 @@ public void OnConVarChange(ConVar convar, const char[] oldValue, const char[] ne
 
 public void OnMapStart()
 {
+	// Stats work
+	SteamWorks_SteamServersConnected();
+
 	DB_OnMapStart();
 	
 	if (panel_info != null)
@@ -384,7 +391,7 @@ void DatabaseClear()
 	PlayerManager_DatabaseClear();
 }
 
-bool IsInGame(int player_id)
+stock bool IsInGame(int player_id)
 {
 	return PlayerManager_IsInGame(player_id);
 }

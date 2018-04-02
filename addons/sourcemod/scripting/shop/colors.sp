@@ -35,12 +35,12 @@ void CPrintToChat(int client, const char[] sFormat, any ...)
 				}
 			}
 		}
-		case Engine_CSS:
+		case Engine_CSS, Engine_TF2, Engine_HL2DM, Engine_DODS:
 		{
 			ReplaceString(sMessage, sizeof(sMessage), "#", "\x07");
 
-			Regex hRegex;
-			StringMap hColorsTrie;
+			static Regex hRegex;
+			static StringMap hColorsTrie;
 	
 			if(!hColorsTrie)
 			{
