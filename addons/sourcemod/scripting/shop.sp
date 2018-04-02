@@ -5,8 +5,6 @@
 #include <sourcemod>
 #include <shop>
 
-#define DEBUG 1
-
 EngineVersion Engine_Version = Engine_Unknown;
 
 int g_iMaxPageItems = 10;
