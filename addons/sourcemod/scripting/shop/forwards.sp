@@ -267,7 +267,7 @@ void Forward_NotifyShopLoaded()
 		
 		Function func = GetFunctionByName(plugin, "Shop_Started");
 		
-		if (func != INVALID_FUNCTION)
+		if (IsCallValid(plugin, func))
 		{
 			Call_StartFunction(plugin, func);
 			Call_Finish();

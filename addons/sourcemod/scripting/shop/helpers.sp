@@ -8,7 +8,7 @@ stock bool Helpers_IsPluginValid(Handle plugin)
 	{
 		if (plugin == ReadPlugin(hIterator))
 		{
-			bIsValid = true;
+			bIsValid = (GetPluginStatus(plugin) == Plugin_Running);
 			break;
 		}
 	}

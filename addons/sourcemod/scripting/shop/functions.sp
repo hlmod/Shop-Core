@@ -217,18 +217,21 @@ void Functions_ShowMenu(int client, int pos = 0)
 	{
 		DataPack dp;
 		char id[16], display[64];
-		display[0] = '\0';
 		for (int i = 1; i < size; i+=2)
 		{
 			dp = g_hFuncArray.Get(i);
 			dp.Reset();
 			Handle plugin = dp.ReadCell();
 			Function callback = dp.ReadFunction();
-			Call_StartFunction(plugin, callback);
-			Call_PushCell(client);
-			Call_PushStringEx(display, sizeof(display), SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
-			Call_PushCell(sizeof(display));
-			Call_Finish();
+
+			display[0] = 0;
+			if (IsCallValid(plugin, callback)) {
+				Call_StartFunction(plugin, callback);
+				Call_PushCell(client);
+				Call_PushStringEx(display, sizeof(display), SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
+				Call_PushCell(sizeof(display));
+				Call_Finish();
+			}
 			
 			if (!display[0])
 				continue;
@@ -273,9 +276,12 @@ public int Functions_Menu_Handler(Menu menu, MenuAction action, int param1, int 
 						Handle plugin = dp.ReadCell();
 						dp.Position = FUNCTIONS_DP_FUNCSELECT; // skip func_display
 						Function func_select = dp.ReadFunction();
-						Call_StartFunction(plugin, func_select);
-						Call_PushCell(param1);
-						Call_Finish(result);
+
+						if (IsCallValid(plugin, func_select)) {
+							Call_StartFunction(plugin, func_select);
+							Call_PushCell(param1);
+							Call_Finish(result);
+						}
 					}
 					
 					if (!result)

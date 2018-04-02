@@ -341,7 +341,7 @@ bool ItemManager_OnCategorySelect(int client, int category_id, ShopMenu menu)
 		tmp.Position = CATEGORY_DATAPACKPOS_SELECT;
 		
 		Function func_Select = tmp.ReadFunction();
-		if (func_Select != INVALID_FUNCTION)
+		if (IsCallValid(plugin, func_Select))
 		{
 			Call_StartFunction(plugin, func_Select);
 			Call_PushCell(client);
@@ -743,7 +743,7 @@ public int ItemManager_OnItemRegistered(Handle owner, Handle hndl, const char[] 
 	
 	OnItemRegistered(id);
 	
-	if (callback != INVALID_FUNCTION)
+	if (IsCallValid(plugin, callback))
 	{
 		Call_StartFunction(plugin, callback);
 		Call_PushCell(category_id);
@@ -1475,7 +1475,7 @@ bool ItemManager_FillCategories(Menu menu, int source_client, bool inventory = f
 					delete items;
 				}
 			
-				if (func_should != INVALID_FUNCTION)
+				if (IsCallValid(cat_plugin, func_should))
 				{
 					Call_StartFunction(cat_plugin, func_should);
 					Call_PushCell(source_client);
@@ -1995,7 +1995,7 @@ void ItemManager_OnPlayerItemElapsed(int client, int item_id)
 	
 	CallItemElapsedForward(client, category_id, category, item_id, item);
 	
-	if (callback_elapse != INVALID_FUNCTION)
+	if (IsCallValid(plugin, callback_elapse))
 	{
 		Call_StartFunction(plugin, callback_elapse);
 		Call_PushCell(client);
@@ -2006,7 +2006,7 @@ void ItemManager_OnPlayerItemElapsed(int client, int item_id)
 		Call_Finish();
 	}
 	
-	if (callback_use != INVALID_FUNCTION)
+	if (IsCallValid(plugin, callback_use))
 	{
 		Call_StartFunction(plugin, callback_use);
 		Call_PushCell(client);
@@ -2043,7 +2043,7 @@ stock void ItemManager_OnUseToggleCategory(int client, int category_id)
 		dpCallback.Position = ITEM_DATAPACKPOS_USE;
 		Function callback = dpCallback.ReadFunction();
 		
-		if (plugin != null && callback != INVALID_FUNCTION)
+		if (IsCallValid(plugin, callback))
 		{
 			ItemManager_GetCategoryById(category_id, category, sizeof(category));
 			h_KvItems.GetString("item", item, sizeof(item));
@@ -2108,7 +2108,7 @@ stock ShopAction ItemManager_OnUseToggleItemEx(int client, const char[] sItemId,
 	
 	h_KvItems.Rewind();
 	
-	if (plugin != null && callback != INVALID_FUNCTION)
+	if (IsCallValid(plugin, callback))
 	{
 		char category[SHOP_MAX_STRING_LENGTH];
 		ItemManager_GetCategoryById(category_id, category, sizeof(category));
@@ -2193,7 +2193,7 @@ void ItemManager_SetupPreviewEx(int client, const char[] sItemId)
 	dpCallback.Position = ITEM_DATAPACKPOS_COMMON;
 	Function callback = dpCallback.ReadFunction();
 	
-	if (plugin != null && callback != INVALID_FUNCTION)
+	if (IsCallValid(plugin, callback))
 	{
 		int category_id = h_KvItems.GetNum("category_id", -1);
 		
@@ -2240,7 +2240,7 @@ bool ItemManager_OnItemBuyEx(int client, int category_id, const char[] category,
 	
 	bool result = true;
 	
-	if (plugin != null && callback != INVALID_FUNCTION)
+	if (IsCallValid(plugin, callback))
 	{
 		Call_StartFunction(plugin, callback);
 		Call_PushCell(client);
@@ -2280,7 +2280,7 @@ bool ItemManager_OnItemSellEx(int client, int category_id, const char[] category
 	
 	bool result = true;
 	
-	if (plugin != null && callback != INVALID_FUNCTION)
+	if (IsCallValid(plugin, callback))
 	{
 		Call_StartFunction(plugin, callback);
 		Call_PushCell(client);
@@ -2300,7 +2300,7 @@ bool ItemManager_OnItemShouldDisplay(Handle plugin, Function callback, int clien
 {
 	bool result = true;
 	
-	if (plugin != null && callback != INVALID_FUNCTION)
+	if (IsCallValid(plugin, callback))
 	{
 		Call_StartFunction(plugin, callback);
 		Call_PushCell(client);
@@ -2319,7 +2319,7 @@ bool ItemManager_OnItemDisplay(Handle plugin, Function callback, int client, int
 {
 	bool result = false;
 	
-	if (plugin != null && callback != INVALID_FUNCTION)
+	if (IsCallValid(plugin, callback))
 	{
 		Call_StartFunction(plugin, callback);
 		Call_PushCell(client);
@@ -2347,7 +2347,7 @@ bool ItemManager_OnItemDescription(Handle plugin, Function callback, int client,
 {
 	bool result = false;
 	
-	if (plugin != null && callback != INVALID_FUNCTION)
+	if (IsCallValid(plugin, callback))
 	{
 		Call_StartFunction(plugin, callback);
 		Call_PushCell(client);
@@ -2374,7 +2374,7 @@ bool ItemManager_OnCategoryDisplay(Handle plugin, Function callback, int client,
 {
 	bool result = false;
 	
-	if (plugin != null && callback != INVALID_FUNCTION)
+	if (IsCallValid(plugin, callback))
 	{
 		Call_StartFunction(plugin, callback);
 		Call_PushCell(client);
@@ -2398,7 +2398,7 @@ bool ItemManager_OnCategoryDescription(Handle plugin, Function callback, int cli
 {
 	bool result = false;
 	
-	if (plugin != null && callback != INVALID_FUNCTION)
+	if (IsCallValid(plugin, callback))
 	{
 		Call_StartFunction(plugin, callback);
 		Call_PushCell(client);
