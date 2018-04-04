@@ -254,7 +254,7 @@ void Admin_ShowMenu(int client, int pos = 0)
 	{
 		DataPack dp;
 		char id[16], display[64];
-		display[0] = '\0';
+
 		for (int i = 1; i < size; i+=2)
 		{
 			dp = g_hAdminArray.Get(i);
@@ -262,11 +262,15 @@ void Admin_ShowMenu(int client, int pos = 0)
 			dp.Reset();
 			Handle plugin = dp.ReadCell();
 			Function func_disp = dp.ReadFunction();
-			Call_StartFunction(plugin, func_disp);
-			Call_PushCell(client);
-			Call_PushStringEx(display, sizeof(display), SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
-			Call_PushCell(sizeof(display));
-			Call_Finish();
+
+			display[0] = 0;
+			if (IsCallValid(plugin, func_disp)) {
+				Call_StartFunction(plugin, func_disp);
+				Call_PushCell(client);
+				Call_PushStringEx(display, sizeof(display), SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
+				Call_PushCell(sizeof(display));
+				Call_Finish();
+			}
 			
 			if (!display[0])
 				continue;
@@ -324,10 +328,12 @@ public int Admin_Menu_Handler(Menu menu, MenuAction action, int param1, int para
 						
 						dp.Position = ADMIN_DP_FUNCSELECT; // Skip func_diplay
 						Function func_select = dp.ReadFunction();
-						
-						Call_StartFunction(plugin, func_select);
-						Call_PushCell(param1);
-						Call_Finish(result);
+
+						if (IsCallValid(plugin, func_select)) {
+							Call_StartFunction(plugin, func_select);
+							Call_PushCell(param1);
+							Call_Finish(result);
+						}
 					}
 					
 					if (!result)

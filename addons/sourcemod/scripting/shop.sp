@@ -2025,6 +2025,13 @@ void TryConnect()
 	DB_TryConnect();
 }
 
+bool IsCallValid(Handle plugin, Function ptrFunction) {
+	return (
+		ptrFunction != INVALID_FUNCTION &&
+		Helpers_IsPluginValid(plugin)
+	);
+}
+
 bool IsPluginValid(Handle plugin)
 {
 	return Helpers_IsPluginValid(plugin);
