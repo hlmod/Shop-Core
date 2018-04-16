@@ -1101,10 +1101,10 @@ public int PlayerManager_AuthorizeClient(Database owner, DBResultSet hndl, const
 			iCredits[client] = hndl.FetchInt(0);
 			i_Id[client] = hndl.FetchInt(1);
 
-			PlayerManager_LoadClientToggles(client);
-			
 			FormatEx(s_Query, sizeof(s_Query), "UPDATE `%splayers` SET `name` = '%s', `lastconnect` = '%d' WHERE `id` = '%i';", g_sDbPrefix, buffer, global_timer, i_Id[client]);
 			TQueryEx(s_Query);
+			
+			PlayerManager_LoadClientToggles(client);
 		}
 		case 1 :
 		{
@@ -1114,8 +1114,6 @@ public int PlayerManager_AuthorizeClient(Database owner, DBResultSet hndl, const
 		}
 	}
 	delete dp;
-	
-	OnAuthorized(client);
 }
 
 stock void PlayerManager_DBToggleItem(int client, int item_id, bool bState)
@@ -1239,7 +1237,6 @@ public int PlayerManager_GetItemsFromDB(Database owner, DBResultSet hndl, const 
 		TryConnect();
 		return;
 	}
-	
 	if (hndl == null || error[0])
 	{
 		LogError("PlayerManager_GetItemsFromDB: %s", error);
@@ -1329,9 +1326,7 @@ public int PlayerManager_GetItemsFromDB(Database owner, DBResultSet hndl, const 
 			ToggleItem(client, item_id, Toggle_On, true, true);
 		}
 	}
-
 	g_bAuthorized[client] = true;
-	OnAuthorized(client);
 }
 
 void PlayerManager_ClearPlayer(int client)
