@@ -42,7 +42,7 @@ ConVar g_hHideCategoriesItemsCount;
 #include "shop/player_manager.sp"
 #include "shop/stats.sp"
 
-#define SHOP_VERSION "3.0B6" // 12.02.2018
+#define SHOP_VERSION "3.0B7" // 18.04.2018
 
 public Plugin myinfo =
 {

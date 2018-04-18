@@ -465,7 +465,6 @@ public int ItemManager_SetInfo(Handle plugin, int numParams)
 		plugin_kv.SetNum("count", 1);
 	}
 	
-	plugin_kv.SetNum("can_luck", 1);
 	plugin_kv.SetNum("hide", 0);
 }
 
@@ -558,14 +557,6 @@ public int ItemManager_SetCallbacks(Handle plugin, int numParams)
 	hPack.WriteFunction(GetNativeFunction(9));
 	
 	plugin_kv.SetNum("callbacks", view_as<int>(hPack));
-}
-
-public int ItemManager_SetCanLuck(Handle plugin, int numParams)
-{
-	if (plugin_kv == null)
-		ThrowNativeError(SP_ERROR_NATIVE, "No item is being registered");
-	
-	plugin_kv.SetNum("can_luck", GetNativeCell(1));
 }
 
 public int ItemManager_SetHide(Handle plugin, int numParams)
@@ -1205,36 +1196,6 @@ public int ItemManager_GetItemNameById(Handle plugin, int numParams)
 	return bytes;
 }
 
-public int ItemManager_GetItemCanLuck(Handle plugin, int numParams)
-{
-	char sItemId[SHOP_MAX_STRING_LENGTH];
-	IntToString(GetNativeCell(1), sItemId, sizeof(sItemId));
-
-	h_KvItems.Rewind();
-	if (!h_KvItems.JumpToKey(sItemId))
-		ThrowNativeError(SP_ERROR_NATIVE, "Item id %s is invalid", sItemId);
-	
-	bool bResult = view_as<bool>(h_KvItems.GetNum("can_luck", 1));
-	
-	h_KvItems.Rewind();
-
-	return bResult;
-}
-
-public int ItemManager_SetItemCanLuck(Handle plugin, int numParams)
-{
-	char sItemId[SHOP_MAX_STRING_LENGTH];
-	IntToString(GetNativeCell(1), sItemId, sizeof(sItemId));
-
-	h_KvItems.Rewind();
-	if (!h_KvItems.JumpToKey(sItemId))
-		ThrowNativeError(SP_ERROR_NATIVE, "Item id %s is invalid", sItemId);
-
-	h_KvItems.SetNum("can_luck", GetNativeCell(2));
-	
-	h_KvItems.Rewind();
-}
-
 public int ItemManager_GetItemHide(Handle plugin, int numParams)
 {
 	char sItemId[SHOP_MAX_STRING_LENGTH];
@@ -1855,7 +1816,7 @@ int ItemManager_GetLuckChanceEx(const char[] sItemId)
 	h_KvItems.Rewind();
 	if (!h_KvItems.JumpToKey(sItemId))
 	{
-		return -1;
+		return 0;
 	}
 	
 	int result = h_KvItems.GetNum("luck_chance", 100);
