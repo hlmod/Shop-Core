@@ -50,12 +50,12 @@ native bool Shop_StartItem(CategoryId category_id, const char[] item);
  *	-
  *	@param name					Default display name
  *	@param description			Default description
- *	@param price				Item price. Can not be lower than sell_price
- *	@param sell_price			Item sell price. 0 to make item free and -1 to make it unsaleable. Can not be higher than price
+ *	@param price				Item price. Can not be lower than sell_price (on gold version can be lower and -1 for disable price by gold)
+ *	@param sell_price			Item sell price. 0 to make item free and -1 to make it unsaleable by credits. Can not be higher than price
  *	@param type					Item type. See ItemType enum
  *	@param value				Sets count if the item type is finite and sets duration if the item is togglable or non-togglable
- *	@param gold_price			Item price. Can be -1 to make in unbuyable for gold
- *	@param gold_sell_price		Item sell price. 0 to make item free and -1 to make it unsaleable. Can not be higher than price
+ *	@param gold_price			Item price. Can be -1 to make in unbuyable by gold
+ *	@param gold_sell_price		Item sell price. 0 to make item free by gold price and -1 to disable sell by gold. Can not be higher than price
  *	-
  *	@noreturn
 */
@@ -95,20 +95,10 @@ native void Shop_SetCallbacks(ItemRegister register=INVALID_FUNCTION,
 							ItemSellCallback sell=INVALID_FUNCTION,
 							ItemCommon elapse=INVALID_FUNCTION);
 
-
 /**
- *	Устанавливет возможность получения предмета в "Испытать удачу"
+ *	Allows to hide item in buy panel, givable only by native or admin panel
  *	-
- *	@param bCanLuck			true - можно, false - нет
- *	-
- *	@noreturn
-*/
-native void Shop_SetCanLuck(bool bCanLuck);
-
-/**
- *	Позволяет скрыть предмет из списка покупок. Выдача только через админ-панель
- *	-
- *	@param state			true - спрятать, false - нет
+ *	@param state			true - hide, false - show
  *	-
  *	@noreturn
 */
