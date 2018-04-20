@@ -3,7 +3,7 @@ site_url: https://hlmod.ru
 site_description: Shop Core documentation
 site_author: TiBarification
 repo_url: https://github.com/R1KO/Shop-Core
-edit_uri: tree/docs/src
+edit_uri: tree/mkdocs/docs
 repo_name: GitHub
 
 # Copyright
