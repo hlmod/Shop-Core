@@ -1,0 +1,55 @@
+site_name: Shop Core Docs
+site_url: https://hlmod.ru
+site_description: Shop Core documentation
+site_author: TiBarification
+repo_url: https://github.com/R1KO/Shop-Core
+edit_uri: tree/docs/src
+repo_name: GitHub
+
+# Copyright
+copyright: 'Copyright &copy; 2017 - 2018 TiBarification'
+theme:
+  name: 'material'
+  feature:
+    tabs: true
+  language: 'en'
+  palette:
+    primary: 'indigo'
+    accent: 'indigo'
+  font:
+    text: 'Roboto'
+    code: 'Roboto Mono'
+
+# Customization
+extra:
+  social:
+    - type: 'github'
+      link: 'https://github.com/TiBarification'
+markdown_extensions:
+ - markdown.extensions.admonition
+ - markdown.extensions.attr_list
+ - markdown.extensions.def_list
+ - markdown.extensions.tables
+ - markdown.extensions.abbr
+ - markdown.extensions.footnotes
+ - markdown.extensions.smarty:
+    smart_quotes: false
+ - markdown.extensions.toc:
+    permalink: true
+ - pymdownx.extrarawhtml:
+ - pymdownx.superfences:
+    preserve_tabs: true
+ - pymdownx.highlight:
+    css_class: codehilite
+    linenums: true
+    guess_lang: true
+ - pymdownx.inlinehilite
+ - pymdownx.critic
+ - pymdownx.details
+ - pymdownx.tilde
+ - pymdownx.caret
+ - pymdownx.smartsymbols
+ - pymdownx.mark
+ - pymdownx.striphtml
+pages:
+    - Home: index.md

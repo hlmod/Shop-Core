@@ -1,0 +1,6 @@
+*.dat
+*.smx
+
+*.zip
+.vscode/
+site/
