@@ -1,10 +1,12 @@
 #pragma semicolon 1
 
-#include <SteamWorks> // pretty old
-#pragma newdecls required
 #include <sourcemod>
 #include <shop>
+#undef REQUIRE_PLUGIN
+#tryinclude <SteamWorks>
+#define REQUIRE_PLUGIN
 
+#pragma newdecls required
 EngineVersion Engine_Version = Engine_Unknown;
 
 int g_iMaxPageItems = 10;
@@ -40,7 +42,9 @@ ConVar g_hHideCategoriesItemsCount;
 #include "shop/functions.sp"
 #include "shop/item_manager.sp"
 #include "shop/player_manager.sp"
+#if defined _SteamWorks_Included
 #include "shop/stats.sp"
+#endif
 
 #define SHOP_VERSION "3.0B7" // 18.04.2018
 
@@ -82,6 +86,14 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 	MarkNativeAsOptional("PbSetBool");
 	MarkNativeAsOptional("PbSetString");
 	MarkNativeAsOptional("PbAddString");
+	
+	#if defined _SteamWorks_Included
+	// SteamWorks
+	MarkNativeAsOptional("SteamWorks_GetPublicIP");
+	MarkNativeAsOptional("SteamWorks_CreateHTTPRequest");
+	MarkNativeAsOptional("SteamWorks_SetHTTPRequestRawPostBody");
+	MarkNativeAsOptional("SteamWorks_SendHTTPRequest");
+	#endif
 }
 
 public int Native_IsStarted(Handle plugin, int params)
@@ -198,26 +210,6 @@ public void OnPluginStart()
 	CreateConfigs();
 }
 
-/*public OnAllPluginsLoaded()
-{
-	#if defined _updater_included
-	if (LibraryExists("updater"))
-	{
-		Updater_AddPlugin(UPDATE_URL);
-	}
-	#endif
-}
-
-public OnLibraryAdded(const String:name[])
-{
-	#if defined _updater_included
-	if (!strcmp(name, "updater"))
-	{
-        Updater_AddPlugin(UPDATE_URL);
-	}
-	#endif
-}*/
-
 public void OnPluginEnd()
 {
 	PlayerManager_OnPluginEnd();
@@ -272,8 +264,10 @@ public void OnConVarChange(ConVar convar, const char[] oldValue, const char[] ne
 
 public void OnMapStart()
 {
+	#if defined _INCLUDE_included
 	// Stats work
 	SteamWorks_SteamServersConnected();
+	#endif
 
 	DB_OnMapStart();
 	
