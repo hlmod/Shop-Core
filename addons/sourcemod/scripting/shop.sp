@@ -86,14 +86,6 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 	MarkNativeAsOptional("PbSetBool");
 	MarkNativeAsOptional("PbSetString");
 	MarkNativeAsOptional("PbAddString");
-	
-	#if defined _SteamWorks_Included
-	// SteamWorks
-	MarkNativeAsOptional("SteamWorks_GetPublicIP");
-	MarkNativeAsOptional("SteamWorks_CreateHTTPRequest");
-	MarkNativeAsOptional("SteamWorks_SetHTTPRequestRawPostBody");
-	MarkNativeAsOptional("SteamWorks_SendHTTPRequest");
-	#endif
 }
 
 public int Native_IsStarted(Handle plugin, int params)
@@ -264,10 +256,9 @@ public void OnConVarChange(ConVar convar, const char[] oldValue, const char[] ne
 
 public void OnMapStart()
 {
-	#if defined _INCLUDE_included
 	// Stats work
-	SteamWorks_SteamServersConnected();
-	#endif
+	if (LibraryExists("SteamWorks"))
+		SteamWorks_SteamServersConnected();
 
 	DB_OnMapStart();
 	
