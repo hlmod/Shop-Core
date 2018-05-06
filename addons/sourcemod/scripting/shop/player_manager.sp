@@ -1110,10 +1110,11 @@ public int PlayerManager_AuthorizeClient(Database owner, DBResultSet hndl, const
 		{
 			iCredits[client] = dp.ReadCell();
 			i_Id[client] = hndl.InsertId;
-			OnAuthorized(client);
 		}
 	}
 	delete dp;
+
+	OnAuthorized(client);
 }
 
 stock void PlayerManager_DBToggleItem(int client, int item_id, bool bState)
