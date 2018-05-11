@@ -13,9 +13,18 @@ typedef ItemCommon = function void(int client, CategoryId category_id, const cha
 typedef ItemShouldDisplayCallback = function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ShopMenu menu);
 typedef ItemDisplayCallback = function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ShopMenu menu, bool &disabled, const char[] name, char[] buffer, int maxlen);
 typedef ItemDescriptionCallback = function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ShopMenu menu, const char[] description, char[] buffer, int maxlen);
-typedef ItemBuyCallback = function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ItemType type, int price, int sell_price, int value, int gold_price, int gold_sell_price);
-typedef ItemSellCallback = function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ItemType type, int sell_price, int gold_sell_price);
 
+typeset ItemBuyCallback
+{
+	function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ItemType type, int price, int sell_price, int value);
+	function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ItemType type, int price, int sell_price, int value, int gold_price, int gold_sell_price);
+}
+
+typeset ItemSellCallback
+{
+	function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ItemType type);
+	function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ItemType type, int sell_price, int gold_sell_price);
+}
 /**
  *	Registers new category id
  *	-
