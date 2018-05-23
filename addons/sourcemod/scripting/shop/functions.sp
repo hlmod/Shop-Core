@@ -140,7 +140,7 @@ void Functions_UnregisterMe(Handle plugin)
 	{
 		delete view_as<Handle>(g_hFuncArray.Get(index+1));
 
-		g_hFuncArray.Erase(index);
+		g_hFuncArray.Erase(index+1);
 		g_hFuncArray.Erase(index);
 	}
 }
