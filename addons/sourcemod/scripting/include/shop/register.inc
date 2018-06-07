@@ -22,7 +22,7 @@ typeset ItemBuyCallback
 
 typeset ItemSellCallback
 {
-	function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ItemType type);
+	function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ItemType type, int sell_price);
 	function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ItemType type, int sell_price, int gold_sell_price);
 }
 /**
