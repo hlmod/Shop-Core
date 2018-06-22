@@ -88,7 +88,11 @@ void ItemManager_CreateNatives()
 	CreateNative("Shop_GetCategoryNameById", ItemManager_GetCategoryNameByIdNative);
 	
 	CreateNative("Shop_FillArrayByItems", ItemManager_FillArrayByItemsNative);
+	CreateNative("Shop_FillArrayByCategoryItems", ItemManager_FillArrayByCategoryItemsNative);
+	
 	CreateNative("Shop_FormatItem", ItemManager_FormatItemNative);
+	
+	CreateNative("Shop_FillArrayByCategories", ItemManager_FillArrayByCategoriesNative);
 }
 
 void ItemManager_OnPluginStart()
@@ -1296,6 +1300,44 @@ public int ItemManager_FillArrayByItemsNative(Handle plugin, int numParams)
 	return ItemManager_FillArrayByItems(h_Array);
 }
 
+public int ItemManager_FillArrayByCategoryItemsNative(Handle plugin, int numParams)
+{
+	ArrayList h_Array = GetNativeCell(2);
+	if (h_Array == null)
+		ThrowNativeError(SP_ERROR_NATIVE, "Handle is invalid!");
+		
+	int category_id = GetNativeCell(1);
+	
+	ClearArray(h_Array);
+	return ItemManager_FillArrayCategoryByItems(category_id, h_Array);
+}
+
+int ItemManager_FillArrayCategoryByItems(int category_id, ArrayList array)
+{
+	int num = 0;
+
+	h_KvItems.Rewind();
+	if (h_KvItems.GotoFirstSubKey())
+	{
+		char sItemId[16];
+		do
+		{
+			if (h_KvItems.GetNum("category_id", -1) != category_id) continue;
+			
+			if (h_KvItems.GetSectionName(sItemId, sizeof(sItemId)))
+			{
+				array.Push(StringToInt(sItemId));
+				num++;
+			}
+		}
+		while (h_KvItems.GotoNextKey());
+		
+		h_KvItems.Rewind();
+	}
+
+	return num;
+}
+
 public int ItemManager_FormatItemNative(Handle plugin, int numParams)
 {
 	int client = GetNativeCell(1);
@@ -1346,6 +1388,16 @@ public int ItemManager_FormatItemNative(Handle plugin, int numParams)
 	SetNativeString(4, display, GetNativeCell(5));
 	
 	return true;
+}
+
+public int ItemManager_FillArrayByCategoriesNative(Handle plugin, int numParams)
+{
+	ArrayList h_Array = GetNativeCell(1);
+	if (h_Array != null)
+		delete h_Array;
+	
+	h_Array = view_as<ArrayList>(CloneHandle(view_as<Handle>(h_arCategories), plugin));
+	return h_Array.Length;
 }
 
 bool ItemManager_FillCategories(Menu menu, int source_client, bool inventory = false, bool showAll = false)

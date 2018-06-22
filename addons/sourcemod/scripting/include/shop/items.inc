@@ -463,6 +463,24 @@ native bool Shop_GetCategoryNameById(CategoryId category_id, char[] buffer, int 
 native int Shop_FillArrayByItems(ArrayList array);
 
 /**
+ *	Fills an adt_array by the item ids. Note that array is cleared before being filled
+ *	-
+ *	@param array			ADT array to use
+ *	-
+ *	@return Number of bytes that written to ArrayList
+*/
+native int Shop_FillArrayByCategoryItems(CategoryId category_id, ArrayList array);
+
+/**
+ *	Fills an adt_array by the category ids. Note that array is cleared before being filled
+ *	-
+ *	@param array			ADT array to use
+ *	-
+ *	@return Number of bytes that written to ArrayList
+*/
+native int Shop_FillArrayByCategories(ArrayList array);
+
+/**
  *	Formats item display name to use in menu
  *	-
  *	@param client			Client index to get format for
