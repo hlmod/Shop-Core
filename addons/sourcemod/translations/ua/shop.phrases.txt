@@ -1,0 +1,476 @@
+"Phrases"
+{
+	"NoAccessToCommand"
+	{
+		"ua"		"{green}[Shop]{default} У вас немає доступу до цієї команди"
+	}
+
+	"TargetNotFound"
+	{
+		"ua"		"{green}[Shop]{default} Ціль {green}{1}{default} не знайдена!"
+	}
+	"select_target"
+	{
+		"ua"		"Оберіть гравця:"
+	}
+
+	"select_category"
+	{
+		"ua"		"Оберіть категорію:"
+	}
+
+	"select_item"
+	{
+		"ua"		"Оберіть предмет:"
+	}
+
+	"no_targets"
+	{
+		"ua"		"{green}[Shop]{default} Не знайдено відповідних гравців!"
+	}
+
+	"target_left_game"
+	{
+		"ua"		"{green}[Shop]{default} Гравець покинув гру!"
+	}
+
+	"trans_credits_operation"
+	{
+		"ua"		"Надрукуйте в чаті кількість кредитів для відправки\nабо \"cancel\" для скасування!"
+	}
+
+	"TransferSuccess"
+	{
+		"ua"		"{green}[Shop]{default} Ви успішно відправили {green}{1}{default} кредит(-ів) гравцю {green}{2}{default}!"
+	}
+
+	"ReceiveSuccess"
+	{
+		"ua"		"{green}[Shop]{default} Ви успішно отримали {green}{1}{default} кредит(-ів) від гравця {green}{2}{default}!"
+	}
+
+	"ReceiveCommission"
+	{
+		"ua"		"{green}[Shop]{default} Комісія склала: {green}{1} {default}кредит(-ів)"
+	}
+
+	"receive_item"
+	{
+		"ua"		"{green}[Shop]{default} Ви успішно отримали {green}\"{3}\"{default} в категорію {green}\"{2}\"{default} від гравця {green}{1}{default}!"
+	}
+
+	"already_has"
+	{
+		"ua"		"{green}[Shop]{default} Гравець {green}{1}{default} вже має цей предмет!"
+	}
+
+	"no_item"
+	{
+		"ua"		"{green}[Shop]{default} Цей предмет відсутній в вашому інвентарі!"
+	}
+
+	"IncorrectCredits"
+	{
+		"ua"		"Не правильна кількість кредитів!"
+	}
+
+	"credits_being_transfered"
+	{
+		"ua"		"Кількість кредитів: {1}"
+	}
+
+	"credits_to_transfer"
+	{
+		"ua"		"Буде відправлено: {1}"
+	}
+
+	"credits_to_transfer_price"
+	{
+		"ua"		"Ціна відправки: {1}"
+	}
+
+	"credits_to_transfer_commission"
+	{
+		"ua"		"Комісія: {1} кредит"
+	}
+
+	"transfer_credits_left"
+	{
+		"ua"		"Залишиться: {1}"
+	}
+
+	"need_positive"
+	{
+		"ua"		"Не вистачає {1} кредит"
+	}
+
+	"confirm"
+	{
+		"ua"		"Підтвердити"
+	}
+
+	"cancel"
+	{
+		"ua"		"Скасувати"
+	}
+
+	"transfer"
+	{
+		"ua"		"Передати"
+	}
+
+	"ItemTransferMenu"
+	{
+		"ua"		"Передати предмет"
+	}
+
+	"ItemTransferMenu2"
+	{
+		"ua"		"Передати предмет\nгравцю {1}"
+	}
+
+	"give_credits"
+	{
+		"ua"		"Дати кредити"
+	}
+
+	"take_credits"
+	{
+		"ua"		"Забрати кредити"
+	}
+
+	"set_credits"
+	{
+		"ua"		"Встановити кредити"
+	}
+
+	"give_items"
+	{
+		"ua"		"Дати предмети"
+	}
+
+	"take_items"
+	{
+		"ua"		"Забрати предмети"
+	}
+
+	"give_item_success"
+	{
+		"ua"		"{green}[Shop]{default} Ви успішно дали предмет!"
+	}
+
+	"take_item_success"
+	{
+		"ua"		"{green}[Shop]{default} Ви успішно забрали предмет!"
+	}
+
+	"give_credits_success"
+	{
+		"ua"		"{green}[Shop]{default} {green}{2}{default} отримав {1} кредит!"
+	}
+
+	"remove_credits_success"
+	{
+		"ua"		"{green}[Shop]{default} Ви забрали {1} кредит у {green}{2}{default}!"
+	}
+
+	"set_credits_success"
+	{
+		"ua"		"{green}[Shop]{default} Ви встановили {1} кредит гравцеві {green}{2}{default}!"
+	}
+
+	"set_you_credits"
+	{
+		"ua"		"{green}[Shop]{default} Адмін встановив ваші кредити на {green}{1}{default}!"
+	}
+
+	"take_you_credits"
+	{
+		"ua"		"{green}[Shop]{default} Адмін забрав ваші кредити в кількості {green}{1}{default}!"
+	}
+
+	"give_you_credits"
+	{
+		"ua"		"{green}[Shop]{default} Адмін дав вам кредити в кількості {green}{1}{default}!"
+	}
+
+	"EmptyInventory"
+	{
+		"ua"		"{green}[Shop]{default} Ваш інвентар порожній!"
+	}
+
+	"EmptyShop"
+	{
+		"ua"		"{green}[Shop]{default} Крамниця порожня!"
+	}
+
+	"EmptyCategory"
+	{
+		"ua"		"{green}[Shop]{default} Категорія порожня!"
+	}
+
+	"NothingToLuck"
+	{
+		"ua"		"{green}[Shop]{default} Немає нічого, що ви могли б виграти!"
+	}
+
+	"Looser"
+	{
+		"ua"		"{green}[Shop]{default} Невдача! Ви нічого не отримали :("
+	}
+
+	"Lucker"
+	{
+		"ua"		"{green}[Shop]{default} У вас щасливий день :). Ви отримали предмет {green}\"{2}\"{default} в категорію {green}\"{1}\"{default}."
+	}
+
+	"ItemElapsed"
+	{
+		"ua"		"{green}[Shop]{default} Термін дії {green}\"{2}\"{default} з категорії {green}\"{1}\"{default} минув!"
+	}
+
+	"trans_credits"
+	{
+		"ua"		"Передати кредити"
+	}
+
+	"trans_credits_commision"
+	{
+		"ua"		"[Комісія: {1}%%]"
+	}
+
+	"trans_credits_cost"
+	{
+		"ua"		"[Ціна: {1}]"
+	}
+
+	"trans_credits_disabled"
+	{
+		"ua"		"[Вимкнений]"
+	}
+
+	"luck_disabled"
+	{
+		"ua"		"[Вимкнений]"
+	}
+
+	"try_luck"
+	{
+		"ua"		"Випробувати вдачу"
+  }
+
+	"luck_credits_chance"
+	{
+		"ua"		"[Шанс: {2}%%|Ціна: {1}]"
+	}
+
+	"Type"
+	{
+		"ua"		"Тип"
+	}
+
+	"None"
+	{
+		"ua"		"Зберігання"
+	}
+
+	"Finite"
+	{
+		"ua"		"Кількісний"
+	}
+
+	"Togglable"
+	{
+		"ua"		"Що включається" //IDK
+	}
+
+	"BuyOnly"
+	{
+		"ua"		"Тільки покупка"
+	}
+
+	"Price"
+	{
+		"ua"		"Ціна"
+	}
+
+	"Sell Price"
+	{
+		"ua"		"Ціна продажу"
+	}
+
+	"absolute_sellprice"
+	{
+		"ua"		"Ціна б/у"
+	}
+
+	"Free"
+	{
+		"ua"		"Безкоштовно"
+	}
+
+	"Unsaleable"
+	{
+		"ua"		"Не продається"
+	}
+
+	"Count"
+	{
+		"ua"		"Кількість"
+	}
+
+	"duration"
+	{
+		"ua"		"Тривалість"
+	}
+
+	"forever"
+	{
+		"ua"		"Назавжди"
+	}
+
+	"timeleft"
+	{
+		"ua"		"Залишилось"
+	}
+
+	"You have"
+	{
+		"ua"		"У вас є"
+	}
+
+	"MainMenuTitle"
+	{
+		"ua"		"Магазин"
+	}
+
+	"Shop"
+	{
+		"ua"		"Магазин"
+	}
+
+	"credits"
+	{
+		"ua"		"Кредитів: {1}"
+	}
+
+	"buy"
+	{
+		"ua"		"Придбати"
+	}
+
+	"buy_not"
+	{
+		"ua"		"Придбати [Недостатньо кредитів]"
+	}
+
+	"sell"
+	{
+		"ua"		"Продати"
+	}
+
+	"inventory"
+	{
+		"ua"		"Інвентар"
+	}
+
+	"use"
+	{
+		"ua"		"Використати"
+	}
+
+	"ToggleOn"
+	{
+		"ua"		"Увімкнути"
+	}
+
+	"ToggleOff"
+	{
+		"ua"		"Вимкнути"
+	}
+
+	"preview"
+	{
+		"ua"		"Прев'ю"
+	}
+
+	"preview_unavailable"
+	{
+		"ua"		"Прев'ю недоступне"
+	}
+
+	"functions"
+	{
+		"ua"		"Функції"
+  }
+
+	"info"
+	{
+		"ua"		"Інформація"
+	}
+
+	"admin_panel"
+	{
+		"ua"		"Панель Адміністратора"
+	}
+
+	"Back"
+	{
+		"ua"		"Назад"
+	}
+
+	"Exit"
+	{
+		"ua"		"Вихід"
+	}
+	
+	"NotEnoughCredits"
+	{
+		"ua"		"{green}[Shop] {default}Недостатньо кредитів!"
+	}
+
+	"PreviewIn"
+	{
+		"ua"		"{green}[Shop] {default}Прев'ю буде доступне через {1} сек.!"
+	}
+
+	"DataLoaded"
+	{
+		"ua"		"{green}[Shop] {default}Ваші дані магазину були завантажені! Введіть в чаті {green}!{1}{default} для доступу до магазину!"
+	}
+
+	"DataLoaded2"
+	{
+		"ua"		"{green}[Shop] {default}Ваші дані магазину були завантажені!"
+	}
+
+	"DataLoading"
+	{
+		"ua"		"{green}[Shop] {default}Ваші дані завантажуються!"
+	}
+
+	"y."
+	{
+		"ua"		"р."
+	}
+
+	"d."
+	{
+		"ua"		"д."
+	}
+
+	"h."
+	{
+		"ua"		"г."
+	}
+
+	"m."
+	{
+		"ua"		"хв."
+	}
+
+	"s."
+	{
+		"ua"		"сек."
+	}
+}
