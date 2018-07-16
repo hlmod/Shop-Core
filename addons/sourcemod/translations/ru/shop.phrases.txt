@@ -1,0 +1,475 @@
+"Phrases"
+{
+	"NoAccessToCommand"
+	{
+		"ru"		"{green}[Shop]{default} У вас нет доступа к команде!"
+	}
+
+	"TargetNotFound"
+	{
+		"ru"		"{green}[Shop]{default} Цель {green}{1}{default} не найдена!"
+	}
+
+	"select_target"
+	{
+		"ru"		"Выберите игрока:"
+	}
+
+	"select_category"
+	{
+		"ru"		"Выберите категорию:"
+	}
+
+	"select_item"
+	{
+		"ru"		"Выберите предмет:"
+	}
+
+	"no_targets"
+	{
+		"ru"		"{green}[Shop]{default} Нет подходящих игроков!"
+	}
+
+	"target_left_game"
+	{
+		"ru"		"{green}[Shop]{default} Игрок покинул игру!"
+	}
+
+	"trans_credits_operation"
+	{
+		"ru"		"Введите в чате количество кредитов для отправки\nили \"cancel\" для отмены!"
+	}
+
+	"TransferSuccess"
+	{
+		"ru"		"{green}[Shop]{default} Вы успешно отправили {green}{1}{default} кредит(-ов) игроку {green}{2}{default}!"
+	}
+
+	"ReceiveSuccess"
+	{
+		"ru"		"{green}[Shop]{default} Вы успешно получили {green}{1}{default} кредит(-ов) от игрока {green}{2}{default}!"
+  }
+
+	"ReceiveCommission"
+	{
+		"ru"		"{green}[Shop]{default} Комиссия составила: {green}{1} {default}кредит(-ов)"
+	}
+
+	"receive_item"
+	{
+		"ru"		"{green}[Shop]{default} Вы получили предмет {green}\"{3}\"{default} в категорию {green}\"{2}\"{default} от игрока {green}{1}{default}!"
+	}
+
+	"already_has"
+	{
+		"ru"		"{green}[Shop]{default} Игрок {green}{1}{default} уже имеет этот предмет!"
+	}
+
+	"no_item"
+	{
+		"ru"		"{green}[Shop]{default} Этот предмет отсутствует в вашем инвентаре!"
+	}
+
+	"IncorrectCredits"
+	{
+		"ru"		"Не верное количество кредитов!"
+	}
+
+	"credits_being_transfered"
+	{
+		"ru"		"Количество кредитов: {1}"
+	}
+
+	"credits_to_transfer"
+	{
+		"ru"		"Будет отправлено: {1}"
+	}
+
+	"credits_to_transfer_price"
+	{
+		"ru"		"Цена отправки: {1}"
+	}
+
+	"credits_to_transfer_commission"
+	{
+		"ru"		"Комиссия: {1} кредит"
+	}
+
+	"transfer_credits_left"
+	{
+		"ru"		"Останется: {1}"
+	}
+
+	"need_positive"
+	{
+		"ru"		"Нехватает {1} кредит"
+	}
+
+	"confirm"
+	{
+		"ru"		"Подтвердить"
+	}
+
+	"cancel"
+	{
+		"ru"		"Отменить"
+	}
+
+	"transfer"
+	{
+		"ru"		"Передать"
+	}
+
+	"ItemTransferMenu"
+	{
+		"ru"		"Передать предмет"
+	}
+
+	"ItemTransferMenu2"
+	{
+		"ru"		"Передать предмет\nигроку {1}"
+	}
+
+	"give_credits"
+	{
+		"ru"		"Дать кредиты"
+	}
+
+	"take_credits"
+	{
+		"ru"		"Забрать кредиты"
+	}
+
+	"set_credits"
+	{
+		"ru"		"Установить кредиты"
+	}
+
+	"give_items"
+	{
+		"ru"		"Дать предметы"
+	}
+
+	"take_items"
+	{
+		"ru"		"Забрать предметы"
+	}
+
+	"give_item_success"
+	{
+		"ru"		"{green}[Shop]{default} Вы успешно дали предмет!"
+  }
+
+	"take_item_success"
+	{
+		"ru"		"{green}[Shop]{default} Вы успешно забрали предмет!"
+	}
+
+	"give_credits_success"
+	{
+		"ru"		"{green}[Shop]{default} {green}{2}{default} получил(и) {1} кредит!"
+	}
+
+	"remove_credits_success"
+	{
+		"ru"		"{green}[Shop]{default} Вы забрали {1} кредит у {green}{2}{default}!"
+	}
+	"set_credits_success"
+	{
+		"ru"		"{green}[Shop]{default} Вы установили {1} кредит игроку {green}{2}{default}!"
+	}
+
+	"set_you_credits"
+	{
+		"ru"		"{green}[Shop]{default} Админ установил ваши кредиты на {green}{1}{default}!"
+	}
+
+	"take_you_credits"
+	{
+		"ru"		"{green}[Shop]{default} Админ забрал ваши кредиты в количестве {green}{1}{default}!"
+	}
+
+	"give_you_credits"
+	{
+		"ru"		"{green}[Shop]{default} Админ дал вам кредиты в количестве {green}{1}{default}!"
+	}
+
+	"EmptyInventory"
+	{
+		"ru"		"{green}[Shop]{default} Ваш инвентарь пуст!"
+	}
+
+	"EmptyShop"
+	{
+		"ru"		"{green}[Shop]{default} Магазин пустой!"
+	}
+
+	"EmptyCategory"
+	{
+		"ru"		"{green}[Shop]{default} Категория пуста!"
+  }
+
+	"NothingToLuck"
+	{
+		"ru"		"{green}[Shop]{default} Нет ничего, что вы могли бы выйграть!"
+	}
+
+	"Looser"
+	{
+		"ru"		"{green}[Shop]{default} Неудача! Вы ничего не получили :("
+	}
+
+	"Lucker"
+	{
+		"ru"		"{green}[Shop]{default} У вас счастливый день :). Вы получили предмет {green}\"{2}\"{default} в категорию {green}\"{1}\"{default}."
+	}
+
+	"ItemElapsed"
+	{
+		"ru"		"{green}[Shop]{default} Срок действия {green}\"{2}\"{default} из категории {green}\"{1}\"{default} истекло!"
+	}
+
+	"trans_credits"
+	{
+		"ru"		"Передать кредиты"
+	}
+
+	"trans_credits_commision"
+	{
+		"ru"		"[Комиссия: {1}%%]"
+	}
+
+	"trans_credits_cost"
+	{
+		"ru"		"[Цена: {1}]"
+	}
+
+	"trans_credits_disabled"
+	{
+		"ru"		"[Выключен]"
+	}
+
+	"luck_disabled"
+	{
+		"ru"		"[Выключен]"
+	}
+	"try_luck"
+	{
+		"ru"		"Испытать удачу"
+	}
+
+	"luck_credits_chance"
+	{
+		"ru"		"[Шанс: {2}%%|Цена: {1}]"
+	}
+
+	"Type"
+	{
+		"ru"		"Тип"
+	}
+
+	"None"
+	{
+		"ru"		"Хранение"
+	}
+
+	"Finite"
+	{
+		"ru"		"Количественный"
+	}
+
+	"Togglable"
+	{
+		"ru"		"Включаемый"
+	}
+
+	"BuyOnly"
+	{
+		"ru"		"Только покупка"
+	}
+
+	"Price"
+	{
+		"ru"		"Цена"
+	}
+
+	"Sell Price"
+	{
+		"ru"		"Цена продажи"
+  }
+
+	"absolute_sellprice"
+	{
+		"ru"		"Цена б/у"
+	}
+
+	"Free"
+	{
+		"ru"		"Бесплатно"
+  }
+
+	"Unsaleable"
+	{
+		"ru"		"Не продается"
+	}
+
+	"Count"
+	{
+		"ru"		"Количество"
+	}
+
+	"duration"
+	{
+		"ru"		"Длительность"
+	}
+
+	"forever"
+	{
+		"ru"		"Навсегда"
+	}
+
+	"timeleft"
+	{
+		"ru"		"Осталось"
+	}
+
+	"You have"
+	{
+		"ru"		"У вас"
+	}
+
+	"MainMenuTitle"
+	{
+		"ru"		"Магазин"
+	}
+
+	"Shop"
+	{
+		"ru"		"Магазин"
+	}
+
+	"credits"
+	{
+		"ru"		"Кредитов: {1}"
+	}
+
+	"buy"
+	{
+		"ru"		"Купить"
+	}
+
+	"buy_not"
+	{
+		"ru"		"Купить [Недостаточно кредитов]"
+	}
+
+	"sell"
+	{
+		"ru"		"Продать"
+	}
+
+	"inventory"
+	{
+		"ru"		"Инвентарь"
+	}
+
+	"use"
+	{
+		"ru"		"Использовать"
+	}
+
+	"ToggleOn"
+	{
+		"ru"		"Включить"
+	}
+
+	"ToggleOff"
+	{
+		"ru"		"Выключить"
+	}
+
+	"preview"
+	{
+		"ru"		"Превью"
+	}
+
+	"preview_unavailable"
+	{
+		"ru"		"Превью недоступен"
+	}
+
+	"functions"
+	{
+		"ru"		"Функции"
+	}
+
+	"info"
+	{
+		"ru"		"Информация"
+	}
+
+	"admin_panel"
+	{
+		"ru"		"Панель администратора"
+	}
+
+	"Back"
+	{
+		"ru"		"Назад"
+	}
+
+	"Exit"
+	{
+		"ru"		"Выход"
+	}
+	
+	"NotEnoughCredits"
+	{
+		"ru"		"{green}[Shop] {default}Недостаточно кредитов!"
+	}
+
+	"PreviewIn"
+	{
+		"ru"		"{green}[Shop] {default}Превью будет доступен через {1} сек.!"
+	}
+
+	"DataLoaded"
+	{
+		"ru"		"{green}[Shop] {default}Ваши данные магазина были загружены! Введите в чате {green}!{1}{default} для доступа к магазину!"
+	}
+
+	"DataLoaded2"
+	{
+		"ru"		"{green}[Shop] {default}Ваши данные магазина были загружены!"
+	}
+
+	"DataLoading"
+	{
+		"ru"		"{green}[Shop] {default}Ваши данные загружаются!"
+	}
+
+	"y."
+	{
+		"ru"		"г."
+	}
+
+	"d."
+	{
+		"ru"		"д."
+	}
+
+	"h."
+	{
+		"ru"		"ч."
+	}
+
+	"m."
+	{
+		"ru"		"мин."
+	}
+
+	"s."
+	{
+		"ru"		"сек."
+	}
+}
