@@ -2,9 +2,9 @@
 
 #include <sourcemod>
 #include <shop>
-#undef REQUIRE_PLUGIN
+#undef REQUIRE_EXTENSIONS
 #tryinclude <SteamWorks>
-#define REQUIRE_PLUGIN
+#define REQUIRE_EXTENSIONS
 
 #pragma newdecls required
 EngineVersion Engine_Version = Engine_Unknown;
@@ -256,9 +256,11 @@ public void OnConVarChange(ConVar convar, const char[] oldValue, const char[] ne
 
 public void OnMapStart()
 {
+#if defined _SteamWorks_Included
 	// Stats work
 	if (LibraryExists("SteamWorks"))
 		SteamWorks_SteamServersConnected();
+#endif
 
 	DB_OnMapStart();
 	
