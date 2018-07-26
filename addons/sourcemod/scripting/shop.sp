@@ -256,9 +256,11 @@ public void OnConVarChange(ConVar convar, const char[] oldValue, const char[] ne
 
 public void OnMapStart()
 {
+#if defined _SteamWorks_Included
 	// Stats work
 	if (LibraryExists("SteamWorks"))
 		SteamWorks_SteamServersConnected();
+#endif
 
 	DB_OnMapStart();
 	
