@@ -2,9 +2,9 @@
 
 #include <sourcemod>
 #include <shop>
-#undef REQUIRE_PLUGIN
+#undef REQUIRE_EXTENSIONS
 #tryinclude <SteamWorks>
-#define REQUIRE_PLUGIN
+#define REQUIRE_EXTENSIONS
 
 #pragma newdecls required
 EngineVersion Engine_Version = Engine_Unknown;
