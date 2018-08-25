@@ -514,10 +514,9 @@ bool PlayerManager_ToggleItemEx(int client, const char[] sItemId, ShopAction act
 						
 						DataPack dp;
 						timer = CreateDataTimer(float(timeleft), PlayerManager_OnPlayerItemElapsed, dp);
-						
-						h_KvClientItems[client].SetNum("timer", view_as<int>(timer));
 						dp.WriteCell(client);
 						dp.WriteCell(item_id);
+						h_KvClientItems[client].SetNum("timer", view_as<int>(timer));
 					}
 					h_KvClientItems[client].SetNum("started", global_timer);
 					/*else
@@ -704,10 +703,9 @@ void PlayerManager_GiveItemEx(int client, const char[] sItemId, int category_id,
 	if (duration > 0 && (g_bTimerMethod != false || type == Item_None))
 	{
 		DataPack dp;
+		Handle timer = CreateDataTimer(float(timeleft), PlayerManager_OnPlayerItemElapsed, dp);
 		dp.WriteCell(client);
 		dp.WriteCell(StringToInt(sItemId));
-		Handle timer = CreateDataTimer(float(timeleft), PlayerManager_OnPlayerItemElapsed, dp);
-		
 		h_KvClientItems[client].SetNum("timer", view_as<int>(timer));
 	}
 	h_KvClientItems[client].SetNum("buy_time", global_timer);
@@ -1367,10 +1365,9 @@ public int PlayerManager_GetItemsFromDB(Database owner, DBResultSet hndl, const 
 		{
 			DataPack dp;
 			Handle timer = CreateDataTimer(float(buy_time+duration-global_timer), PlayerManager_OnPlayerItemElapsed, dp);
-			
-			h_KvClientItems[client].SetNum("timer", view_as<int>(timer));
 			dp.WriteCell(client);
 			dp.WriteCell(item_id);
+			h_KvClientItems[client].SetNum("timer", view_as<int>(timer));
 		}
 		h_KvClientItems[client].Rewind();
 		
