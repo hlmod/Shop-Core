@@ -25,6 +25,18 @@ typeset ItemSellCallback
 	function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ItemType type, int sell_price);
 	function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ItemType type, int sell_price, int gold_sell_price);
 }
+
+/**
+ *	Called when category registered at first time
+ *  That means only once per unique name
+ *	-
+ *	@param category_id		CategoryId of category
+ *	@param name				Unique name of category
+ *	-
+ *	@noreturn
+*/
+forward void Shop_OnCategoryRegistered(CategoryId category_id, const char[] name);
+
 /**
  *	Registers new category id
  *	-

@@ -16,7 +16,8 @@ Handle h_fwdOnAuthorized,
 	h_fwdOnCreditsTransfered,
 	h_fwdOnCreditsSet,
 	h_fwdOnCreditsGiven,
-	h_fwdOnCreditsTaken;
+	h_fwdOnCreditsTaken,
+	h_fwdOnCategoryRegistered;
 
 void Forward_OnPluginStart()
 {
@@ -39,6 +40,7 @@ void Forward_OnPluginStart()
 	h_fwdOnCreditsSet = CreateGlobalForward("Shop_OnCreditsSet", ET_Hook, Param_Cell, Param_CellByRef, Param_Cell);
 	h_fwdOnCreditsGiven = CreateGlobalForward("Shop_OnCreditsGiven", ET_Hook, Param_Cell, Param_CellByRef, Param_Cell);
 	h_fwdOnCreditsTaken = CreateGlobalForward("Shop_OnCreditsTaken", ET_Hook, Param_Cell, Param_CellByRef, Param_Cell);
+	h_fwdOnCategoryRegistered = CreateGlobalForward("Shop_OnCategoryRegistered", ET_Ignore, Param_Cell, Param_String);
 }
 
 bool Forward_OnItemTransfer(int client, int target, int item_id)
@@ -329,4 +331,12 @@ Action Forward_OnItemSell(int client, int category_id, const char[] category, in
 	Call_Finish(result);
 	
 	return result;
+}
+
+void Forward_OnCategoryRegistered(int category_id, const char[] category)
+{
+	Call_StartForward(h_fwdOnCategoryRegistered);
+	Call_PushCell(category_id);
+	Call_PushString(category);
+	Call_Finish();
 }

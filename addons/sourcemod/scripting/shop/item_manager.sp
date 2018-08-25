@@ -278,7 +278,10 @@ public int ItemManager_RegisterCategory(Handle plugin, int numParams)
 	int index = h_arCategories.FindString(category);
 	
 	if (index == -1)
+	{
 		index = h_arCategories.PushString(category);
+		Forward_OnCategoryRegistered(index, category);
+	}
 	
 	if (h_trieCategories.GetValue(category, trie))
 	{
