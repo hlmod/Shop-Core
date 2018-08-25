@@ -46,7 +46,7 @@ ConVar g_hHideCategoriesItemsCount;
 #include "shop/stats.sp"
 #endif
 
-#define SHOP_VERSION "3.0C2" // 26.07.2018
+#define SHOP_VERSION "3.0C3" // 26.07.2018
 
 public Plugin myinfo =
 {
@@ -1486,7 +1486,7 @@ bool BuyItem(int client, int item_id, bool by_native)
 	
 	if (type != Item_BuyOnly)
 	{
-		PlayerManager_GiveItemEx(client, sItemId, category_id, price, sell_price, count, duration, type);
+		PlayerManager_GiveItemEx(client, sItemId, category_id, price, sell_price, count, duration, duration, type);
 	}
 	
 	RemoveCredits(client, price, CREDITS_BY_BUY_OR_SELL);
@@ -1543,7 +1543,7 @@ bool GiveItemEx(int client, const char[] sItemId)
 		}
 	}
 	
-	PlayerManager_GiveItemEx(client, sItemId, category_id, price, sell_price, count, duration, type);
+	PlayerManager_GiveItemEx(client, sItemId, category_id, price, sell_price, count, duration, duration, type);
 	
 	return true;
 }
