@@ -359,10 +359,9 @@ void PlayerManager_TransferItem(int client, int target, int item_id)
 			else
 			{
 				DataPack dp;
+				Handle timer = CreateDataTimer(float(timeleft), PlayerManager_OnPlayerItemElapsed, dp);
 				dp.WriteCell(target);
 				dp.WriteCell(item_id);
-				Handle timer = CreateDataTimer(float(timeleft), PlayerManager_OnPlayerItemElapsed, dp);
-				
 				h_KvClientItems[target].SetNum("timer", view_as<int>(timer));
 			}			
 		}
