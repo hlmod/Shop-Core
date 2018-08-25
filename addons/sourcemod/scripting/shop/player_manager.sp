@@ -358,7 +358,7 @@ void PlayerManager_TransferItem(int client, int target, int item_id)
 			}
 			else
 			{
-				DataPack dp;
+				DataPack dp = new DataPack();
 				dp.WriteCell(target);
 				dp.WriteCell(item_id);
 				Handle timer = CreateDataTimer(float(timeleft), PlayerManager_OnPlayerItemElapsed, dp);
@@ -511,9 +511,9 @@ bool PlayerManager_ToggleItemEx(int client, const char[] sItemId, ShopAction act
 						
 						Handle timer = view_as<Handle>(h_KvClientItems[client].GetNum("timer", 0));
 						if (timer != null)
-							KillTimer(timer);
+							KillTimer(timer, true);
 						
-						DataPack dp;
+						DataPack dp = new DataPack();
 						timer = CreateDataTimer(float(timeleft), PlayerManager_OnPlayerItemElapsed, dp);
 						
 						h_KvClientItems[client].SetNum("timer", view_as<int>(timer));
@@ -549,7 +549,7 @@ bool PlayerManager_ToggleItemEx(int client, const char[] sItemId, ShopAction act
 						Handle timer = view_as<Handle>(h_KvClientItems[client].GetNum("timer", 0));
 						if (timer != null)
 						{
-							KillTimer(timer);
+							KillTimer(timer, true);
 							h_KvClientItems[client].SetNum("timer", 0);
 						}
 					}
@@ -609,7 +609,7 @@ public int PlayerManager_ToggleClientCategoryOff(Handle plugin, int numParams)
 			{
 				if (h_KvClientItems[client].GetNum("method") == 0)
 				{
-					KillTimer(timer);
+					KillTimer(timer, true);
 					h_KvClientItems[client].SetNum("timer", 0);
 				}
 			}
@@ -704,7 +704,7 @@ void PlayerManager_GiveItemEx(int client, const char[] sItemId, int category_id,
 	h_KvClientItems[client].SetNum("method", g_bTimerMethod);
 	if (duration > 0 && (g_bTimerMethod != false || type == Item_None))
 	{
-		DataPack dp;
+		DataPack dp = new DataPack();
 		dp.WriteCell(client);
 		dp.WriteCell(StringToInt(sItemId));
 		Handle timer = CreateDataTimer(float(timeleft), PlayerManager_OnPlayerItemElapsed, dp);
@@ -833,7 +833,7 @@ bool PlayerManager_RemoveItemEx(int client, const char[] sItemId, int count = 1)
 	{
 		Handle timer = view_as<Handle>(h_KvClientItems[client].GetNum("timer", 0));
 		if (timer != null)
-			KillTimer(timer);
+			KillTimer(timer, true);
 		
 		category_id = h_KvClientItems[client].GetNum("category_id", -1);
 		h_KvClientItems[client].DeleteThis();
@@ -900,7 +900,7 @@ bool PlayerManager_SetItemTimeleftEx(int client, const char[] sItemId, int timel
 	
 	Handle timer = view_as<Handle>(h_KvClientItems[client].GetNum("timer", 0));
 	if (timer != null)
-		KillTimer(timer);
+		KillTimer(timer, true);
 	
 	if (timeleft < 1)
 	{
@@ -909,10 +909,10 @@ bool PlayerManager_SetItemTimeleftEx(int client, const char[] sItemId, int timel
 	}
 	else if (timer != null)
 	{
-		DataPack dp;
-		timer = CreateDataTimer(float(timeleft), PlayerManager_OnPlayerItemElapsed, dp);
+		DataPack dp = new DataPack();
 		dp.WriteCell(client);
 		dp.WriteCell(StringToInt(sItemId));
+		timer = CreateDataTimer(float(timeleft), PlayerManager_OnPlayerItemElapsed, dp);
 	}
 	else
 		timer = null;
@@ -1342,7 +1342,7 @@ public int PlayerManager_GetItemsFromDB(Database owner, DBResultSet hndl, const 
 			Handle timer = view_as<Handle>(h_KvClientItems[client].GetNum("timer", 0));
 			if (timer != null)
 			{
-				KillTimer(timer);
+				KillTimer(timer, true);
 				h_KvClientItems[client].SetNum("timer", 0);
 			}
 		}
@@ -1366,12 +1366,12 @@ public int PlayerManager_GetItemsFromDB(Database owner, DBResultSet hndl, const 
 		h_KvClientItems[client].SetNum("buy_time", buy_time);
 		if (duration > 0 && (g_bTimerMethod != false || GetItemTypeEx(sItemId) == Item_None))
 		{
-			DataPack dp;
+			DataPack dp = new DataPack();
+			dp.WriteCell(client);
+			dp.WriteCell(item_id);
 			Handle timer = CreateDataTimer(float(buy_time+duration-global_timer), PlayerManager_OnPlayerItemElapsed, dp);
 			
 			h_KvClientItems[client].SetNum("timer", view_as<int>(timer));
-			dp.WriteCell(client);
-			dp.WriteCell(item_id);
 		}
 		h_KvClientItems[client].Rewind();
 		
@@ -1444,7 +1444,7 @@ void PlayerManager_SaveInfo(int client, bool cleartimer = false)
 				Handle timer = view_as<Handle>(h_KvClientItems[client].GetNum("timer", 0));
 				if (timer != null)
 				{
-					KillTimer(timer);
+					KillTimer(timer, true);
 					h_KvClientItems[client].SetNum("timer", 0);
 				}
 			}
@@ -1496,7 +1496,7 @@ void PlayerManager_OnItemUnregistered(int item_id)
 				Handle timer = view_as<Handle>(h_KvClientItems[client].GetNum("timer", 0));
 				if (timer != null)
 				{
-					KillTimer(timer);
+					KillTimer(timer, true);
 					h_KvClientItems[client].SetNum("timer", 0);
 				}
 			}
