@@ -186,36 +186,7 @@ public int PlayerManager_RemoveClientItem(Handle plugin, int numParams)
 	
 	return PlayerManager_RemoveItem(client, item_id, count);
 }
-/*
-public int PlayerManager_GiveClientItem(Handle plugin, int numParams)
-{
-	int client;
-	char item[SHOP_MAX_STRING_LENGTH];
-	client = GetNativeCell(1);
-	if (!CheckClient(client, item, sizeof(item)))
-		ThrowNativeError(SP_ERROR_NATIVE, item);
 
-	int item_id;
-	char sItemId[16];
-	int category_id, price, sell_price, count, duration;
-	ItemType type;
-	item_id = GetNativeCell(2);
-
-	IntToString(item_id, sItemId, sizeof(sItemId));
-
-	if (!ItemManager_GetItemInfoEx(sItemId, item, sizeof(item), category_id, price, sell_price, count, duration, type))
-		return false;
-
-	if(type == Item_Togglable)
-		duration = GetNativeCell(3);
-	else if(type == Item_Finite)
-		count = GetNativeCell(3);
-
-	PlayerManager_GiveItemEx(client, sItemId, category_id, price, sell_price, count, duration, type);
-
-	return true;
-}
-*/
 public int PlayerManager_GetClientItemCount(Handle plugin, int numParams)
 {
 	int client = GetNativeCell(1);
@@ -378,29 +349,110 @@ void PlayerManager_TransferItem(int client, int target, int item_id)
 		
 		RemoveItemEx(client, sItemId);
 		
-		if (h_KvClientItems[target].GetNum("method") == 1)
+		int method = h_KvClientItems[target].GetNum("method");
+		if (method == 1)
 		{
-			DataPack dp;
-			Handle timer = CreateDataTimer(float(timeleft), PlayerManager_OnPlayerItemElapsed, dp);
-			
-			h_KvClientItems[target].SetNum("timer", view_as<int>(timer));
-			dp.WriteCell(target);
-			dp.WriteCell(item_id);
+			if (timeleft == 0)
+			{
+				h_KvClientItems[target].SetNum("timer", 0);
+			}
+			else
+			{
+				DataPack dp;
+				Handle timer = CreateDataTimer(float(timeleft), PlayerManager_OnPlayerItemElapsed, dp);
+				dp.WriteCell(target);
+				dp.WriteCell(item_id);
+				h_KvClientItems[target].SetNum("timer", view_as<int>(timer));
+			}			
 		}
 	
 		char s_Query[256];
 		FormatEx(s_Query, sizeof(s_Query), "INSERT INTO `%sboughts` (`player_id`, `item_id`, `count`, `duration`, `timeleft`, `buy_price`, `sell_price`, `buy_time`) VALUES \
 											('%d', '%s', '%d', '%d', '%d', '%d', '%d', '%d');", g_sDbPrefix, i_Id[target], sItemId, h_KvClientItems[target].GetNum("count"), h_KvClientItems[target].GetNum("duration"), timeleft, h_KvClientItems[target].GetNum("price"), h_KvClientItems[target].GetNum("sell_price"), h_KvClientItems[target].GetNum("buy_time"));
-		TQueryEx(s_Query);
 		
-		int category_id = h_KvClientItems[target].GetNum("category_id");
+		Transaction txn = new Transaction();
+		DataPack dp = new DataPack();
+		dp.WriteCell(client);
+		dp.WriteCell(target);
+		dp.WriteCell(item_id);
+		dp.WriteCell(h_KvClientItems[target].GetNum("duration"));
+		dp.WriteCell(timeleft);
+		dp.WriteCell(type);
+		dp.WriteCell(h_KvClientItems[target].GetNum("price", 0));
+		dp.WriteCell(h_KvClientItems[target].GetNum("sell_price", -1));
+		dp.WriteCell(h_KvClientItems[target].GetNum("buy_time", global_timer));
+		dp.WriteCell(h_KvClientItems[target].GetNum("category_id", -1));
 		
-		h_KvClientItems[target].Rewind();
+		txn.AddQuery(s_Query);
+		h_db.Execute(txn, TxnOnTransferSuccess, TxnOnTransferFailure, dp);
+	}
+}
+
+public void TxnOnTransferSuccess(Database db, any data, int numQueries, DBResultSet[] results, any[] queryData)
+{
+	DataPack dp = view_as<DataPack>(data);
+	int target;
+	if (dp != null)
+	{
+		dp.Reset();
+		dp.ReadCell(); // client
+		target = dp.ReadCell();
 		
-		char sCat[16];
-		IntToString(category_id, sCat, sizeof(sCat));
-		StrCat(sCat, sizeof(sCat), "c");
-		h_KvClientItems[target].SetNum(sCat, h_KvClientItems[target].GetNum(sCat, 0)+1);
+		delete dp;
+	}
+	int category_id = h_KvClientItems[target].GetNum("category_id");
+		
+	h_KvClientItems[target].Rewind();
+	
+	char sCat[16];
+	IntToString(category_id, sCat, sizeof(sCat));
+	StrCat(sCat, sizeof(sCat), "c");
+	h_KvClientItems[target].SetNum(sCat, h_KvClientItems[target].GetNum(sCat, 0)+1);
+}
+
+/* I hope we will never go here, but in case return item to previous owner */
+public void TxnOnTransferFailure(Database db, any data, int numQueries, const char[] error, int failIndex, any[] queryData)
+{
+	LogToFileEx("addons/sourcemod/shop.log", "[Item transfer error] transaction error: %s", error);
+	DataPack dp = view_as<DataPack>(data);
+	int client, target, item_id, duration, timeleft, price, sell_price, buy_time, category_id;
+	if (dp != null)
+	{
+		dp.Reset();
+		client = dp.ReadCell();
+		target = dp.ReadCell();
+		item_id = dp.ReadCell();
+		duration = dp.ReadCell();
+		ItemType type = view_as<ItemType>(dp.ReadCell());
+		timeleft = dp.ReadCell();
+		price = dp.ReadCell();
+		sell_price = dp.ReadCell();
+		buy_time = dp.ReadCell();
+		category_id = dp.ReadCell();
+		delete dp;
+		
+		char sItemId[16];
+		IntToString(item_id, sItemId, sizeof(sItemId));
+		
+		if (type == Item_Finite)
+		{
+			PlayerManager_RemoveItem(target, item_id); // remove item on target
+			PlayerManager_GiveItemEx(client, sItemId, category_id, price, sell_price, 1, 0, 0, type);
+		}
+		else
+		{
+			if (PlayerManager_IsItemToggled(target, item_id))
+				PlayerManager_ToggleItem(target, item_id, Shop_UseOff);
+			
+			PlayerManager_RemoveItem(target, item_id); // remove item on target
+			PlayerManager_GiveItemEx(client, sItemId, category_id, price, sell_price, 1, duration, timeleft, type);
+		}
+		
+		// return original buy date
+		h_KvClientItems[client].Rewind();
+		if (!h_KvClientItems[client].JumpToKey(sItemId))
+			return;
+		h_KvClientItems[client].SetNum("buy_time", buy_time);
 	}
 }
 
@@ -417,15 +469,15 @@ bool PlayerManager_IsItemToggledEx(int client, const char[] sItemId)
 	bool bToggled = false;
 	return (g_hTrieToggles[client].GetValue(sItemId, bToggled) && bToggled);
 }
-/*
-bool PlayerManager_ToggleItem(int client, int item_id, ShopAction action, bool load = false)
+
+bool PlayerManager_ToggleItem(int client, int item_id, ShopAction action, bool load = false, bool ignore = false)
 {
 	char sItemId[16];
 	IntToString(item_id, sItemId, sizeof(sItemId));
 	
-	return PlayerManager_ToggleItemEx(client, sItemId, action, load);
+	return PlayerManager_ToggleItemEx(client, sItemId, action, load, ignore);
 }
-*/
+
 bool PlayerManager_ToggleItemEx(int client, const char[] sItemId, ShopAction action, bool load = false, bool ignore = false)
 {
 	char sId[16];
@@ -462,10 +514,9 @@ bool PlayerManager_ToggleItemEx(int client, const char[] sItemId, ShopAction act
 						
 						DataPack dp;
 						timer = CreateDataTimer(float(timeleft), PlayerManager_OnPlayerItemElapsed, dp);
-						
-						h_KvClientItems[client].SetNum("timer", view_as<int>(timer));
 						dp.WriteCell(client);
 						dp.WriteCell(item_id);
+						h_KvClientItems[client].SetNum("timer", view_as<int>(timer));
 					}
 					h_KvClientItems[client].SetNum("started", global_timer);
 					/*else
@@ -637,7 +688,7 @@ stock bool PlayerManager_CanPreviewEx(int client, const char[] sItemId, int &sec
 	return result;
 }
 
-void PlayerManager_GiveItemEx(int client, const char[] sItemId, int category_id, int price, int sell_price, int count, int duration, ItemType type)
+void PlayerManager_GiveItemEx(int client, const char[] sItemId, int category_id, int price, int sell_price, int count, int duration, int timeleft, ItemType type)
 {
 	h_KvClientItems[client].Rewind();
 	h_KvClientItems[client].JumpToKey(sItemId, true);
@@ -646,17 +697,16 @@ void PlayerManager_GiveItemEx(int client, const char[] sItemId, int category_id,
 	h_KvClientItems[client].SetNum("sell_price", sell_price);
 	int has = h_KvClientItems[client].GetNum("count", 0);
 	h_KvClientItems[client].SetNum("count", has+count);
-	h_KvClientItems[client].SetNum("timeleft", duration);
 	h_KvClientItems[client].SetNum("duration", duration);
+	h_KvClientItems[client].SetNum("timeleft", timeleft);
 	h_KvClientItems[client].SetNum("method", g_bTimerMethod);
 	if (duration > 0 && (g_bTimerMethod != false || type == Item_None))
 	{
 		DataPack dp;
-		Handle timer = CreateDataTimer(float(duration), PlayerManager_OnPlayerItemElapsed, dp);
-		
-		h_KvClientItems[client].SetNum("timer", view_as<int>(timer));
+		Handle timer = CreateDataTimer(float(timeleft), PlayerManager_OnPlayerItemElapsed, dp);
 		dp.WriteCell(client);
 		dp.WriteCell(StringToInt(sItemId));
+		h_KvClientItems[client].SetNum("timer", view_as<int>(timer));
 	}
 	h_KvClientItems[client].SetNum("buy_time", global_timer);
 	h_KvClientItems[client].Rewind();
@@ -679,7 +729,7 @@ void PlayerManager_GiveItemEx(int client, const char[] sItemId, int category_id,
 		h_KvClientItems[client].SetNum(sCat, h_KvClientItems[client].GetNum(sCat, 0)+1);
 		
 		FormatEx(s_Query, sizeof(s_Query), "INSERT INTO `%sboughts` (`player_id`, `item_id`, `count`, `duration`, `timeleft`, `buy_price`, `sell_price`, `buy_time`) VALUES \
-											('%d', '%s', '%d', '%d', '%d', '%d', '%d', '%d');", g_sDbPrefix, i_Id[client], sItemId, count, duration, duration, price, sell_price, global_timer);
+											('%d', '%s', '%d', '%d', '%d', '%d', '%d', '%d');", g_sDbPrefix, i_Id[client], sItemId, count, duration, timeleft, price, sell_price, global_timer);
 		TQueryEx(s_Query);
 	}
 	else
@@ -1315,10 +1365,9 @@ public int PlayerManager_GetItemsFromDB(Database owner, DBResultSet hndl, const 
 		{
 			DataPack dp;
 			Handle timer = CreateDataTimer(float(buy_time+duration-global_timer), PlayerManager_OnPlayerItemElapsed, dp);
-			
-			h_KvClientItems[client].SetNum("timer", view_as<int>(timer));
 			dp.WriteCell(client);
 			dp.WriteCell(item_id);
+			h_KvClientItems[client].SetNum("timer", view_as<int>(timer));
 		}
 		h_KvClientItems[client].Rewind();
 		
