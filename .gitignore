@@ -4,3 +4,4 @@
 *.zip
 .vscode/
 site/
+/.vs

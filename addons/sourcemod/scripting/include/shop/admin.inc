@@ -7,7 +7,7 @@
  *	-
  *	@noreturn
 */
-typedef AdminDisplay = function void (int client, char[] buffer, int maxlength);
+typedef Shop_AdminDisplay = function void (int client, char[] buffer, int maxlength);
 
 /**
  *	Called when an item from admin panel is being selected
@@ -16,7 +16,7 @@ typedef AdminDisplay = function void (int client, char[] buffer, int maxlength);
  *	-
  *	@return true to allow performing and false to block
 */
-typedef AdminSelect = function bool (int client);
+typedef Shop_AdminSelect = function bool (int client);
 
 /**
  *	Adds an item to the admin panel
@@ -26,7 +26,7 @@ typedef AdminSelect = function bool (int client);
  *	-
  *	@noreturn
 */
-native void Shop_AddToAdminMenu(AdminDisplay callback_display, AdminSelect callback_select);
+native void Shop_AddToAdminMenu(Shop_AdminDisplay callback_display, Shop_AdminSelect callback_select);
 
 /**
  *	Removes an item from the admin panel
@@ -36,7 +36,7 @@ native void Shop_AddToAdminMenu(AdminDisplay callback_display, AdminSelect callb
  *	-
  *	@return true on success, false otherwise
 */
-native bool Shop_RemoveFromAdminMenu(AdminDisplay callback_display, AdminSelect callback_select);
+native bool Shop_RemoveFromAdminMenu(Shop_AdminDisplay callback_display, Shop_AdminSelect callback_select);
 
 /**
  *	Shows admin panel to a player
