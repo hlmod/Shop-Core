@@ -7,7 +7,7 @@
  *	-
  *	@noreturn
 */
-typedef FuncDisplay = function void (int client, char[] buffer, int maxlength);
+typedef Shop_FuncDisplay = function void (int client, char[] buffer, int maxlength);
 
 /**
  *	Called when an item from functions menu is being selected
@@ -16,7 +16,7 @@ typedef FuncDisplay = function void (int client, char[] buffer, int maxlength);
  *	-
  *	@return true to allow performing and false to block
 */
-typedef FuncSelect = function bool (int client);
+typedef Shop_FuncSelect = function bool (int client);
 
 /**
  *	Adds an item to the functions menu
@@ -26,7 +26,7 @@ typedef FuncSelect = function bool (int client);
  *	-
  *	@noreturn
 */
-native void Shop_AddToFunctionsMenu(FuncDisplay callback_display, FuncSelect callback_select);
+native void Shop_AddToFunctionsMenu(Shop_FuncDisplay callback_display, Shop_FuncSelect callback_select);
 
 /**
  *	Removes an item from the functions menu
@@ -36,7 +36,7 @@ native void Shop_AddToFunctionsMenu(FuncDisplay callback_display, FuncSelect cal
  *	-
  *	@return true on success, false otherwise
 */
-native bool Shop_RemoveFromFunctionsMenu(FuncDisplay callback_display, FuncSelect callback_select);
+native bool Shop_RemoveFromFunctionsMenu(Shop_FuncDisplay callback_display, Shop_FuncSelect callback_select);
 
 /**
  *	Shows functions menu to a player

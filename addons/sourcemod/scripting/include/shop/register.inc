@@ -1,26 +1,26 @@
-typedef CategoryDisplayCallback = function bool (int client, CategoryId category_id, const char[] category, const char[] name, char[] buffer, int maxlen);
-typedef CategoryDescriptionCallback = function bool (int client, CategoryId category_id, const char[] category, const char[] description, char[] buffer, int maxlen);
-typedef CategoryShouldDisplayCallback = function bool (int client, CategoryId category_id, const char[] category);
-typedef CategorySelectCallback = function bool (int client, CategoryId category_id, const char[] category, ShopMenu menu);
+typedef Shop_CategoryDisplayCallback = function bool (int client, CategoryId category_id, const char[] category, const char[] name, char[] buffer, int maxlen);
+typedef Shop_CategoryDescriptionCallback = function bool (int client, CategoryId category_id, const char[] category, const char[] description, char[] buffer, int maxlen);
+typedef Shop_CategoryShouldDisplayCallback = function bool (int client, CategoryId category_id, const char[] category);
+typedef Shop_CategorySelectCallback = function bool (int client, CategoryId category_id, const char[] category, ShopMenu menu);
 
-typeset ItemUseToggleCallback
+typeset Shop_ItemUseToggleCallback
 {
 	function ShopAction (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item);
 	function ShopAction (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, bool isOn, bool elapsed);
 }
-typedef ItemRegister = function void (CategoryId category_id, const char[] category, const char[] item, ItemId item_id);
-typedef ItemCommon = function void(int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item);
-typedef ItemShouldDisplayCallback = function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ShopMenu menu);
-typedef ItemDisplayCallback = function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ShopMenu menu, bool &disabled, const char[] name, char[] buffer, int maxlen);
-typedef ItemDescriptionCallback = function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ShopMenu menu, const char[] description, char[] buffer, int maxlen);
+typedef Shop_ItemRegister = function void (CategoryId category_id, const char[] category, const char[] item, ItemId item_id);
+typedef Shop_ItemCommon = function void(int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item);
+typedef Shop_ItemShouldDisplayCallback = function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ShopMenu menu);
+typedef Shop_ItemDisplayCallback = function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ShopMenu menu, bool &disabled, const char[] name, char[] buffer, int maxlen);
+typedef Shop_ItemDescriptionCallback = function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ShopMenu menu, const char[] description, char[] buffer, int maxlen);
 
-typeset ItemBuyCallback
+typeset Shop_ItemBuyCallback
 {
 	function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ItemType type, int price, int sell_price, int value);
 	function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ItemType type, int price, int sell_price, int value, int gold_price, int gold_sell_price);
 }
 
-typeset ItemSellCallback
+typeset Shop_ItemSellCallback
 {
 	function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ItemType type, int sell_price);
 	function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ItemType type, int sell_price, int gold_sell_price);
@@ -51,10 +51,10 @@ forward void Shop_OnCategoryRegistered(CategoryId category_id, const char[] name
  *	@return Category id of the category
 */
 native CategoryId Shop_RegisterCategory(const char[] category, const char[] name, const char[] description, 
-								CategoryDisplayCallback cat_display=INVALID_FUNCTION, 
-								CategoryDescriptionCallback cat_desc=INVALID_FUNCTION,
-								CategoryShouldDisplayCallback cat_should=INVALID_FUNCTION,
-								CategorySelectCallback cat_select=INVALID_FUNCTION);
+								Shop_CategoryDisplayCallback cat_display=INVALID_FUNCTION, 
+								Shop_CategoryDescriptionCallback cat_desc=INVALID_FUNCTION,
+								Shop_CategoryShouldDisplayCallback cat_should=INVALID_FUNCTION,
+								Shop_CategorySelectCallback cat_select=INVALID_FUNCTION);
 
 /**
  *	Starts an item to register
@@ -106,15 +106,15 @@ native void Shop_SetLuckChance(int luck_chance);
  *	-
  *	@noreturn
 */
-native void Shop_SetCallbacks(ItemRegister register=INVALID_FUNCTION,
-							ItemUseToggleCallback use_toggle=INVALID_FUNCTION, 
-							ItemShouldDisplayCallback should=INVALID_FUNCTION, 
-							ItemDisplayCallback display=INVALID_FUNCTION, 
-							ItemDescriptionCallback description=INVALID_FUNCTION, 
-							ItemCommon preview=INVALID_FUNCTION,
-							ItemBuyCallback buy=INVALID_FUNCTION,
-							ItemSellCallback sell=INVALID_FUNCTION,
-							ItemCommon elapse=INVALID_FUNCTION);
+native void Shop_SetCallbacks(Shop_ItemRegister register=INVALID_FUNCTION,
+							Shop_ItemUseToggleCallback use_toggle=INVALID_FUNCTION, 
+							Shop_ItemShouldDisplayCallback should=INVALID_FUNCTION, 
+							Shop_ItemDisplayCallback display=INVALID_FUNCTION, 
+							Shop_ItemDescriptionCallback description=INVALID_FUNCTION, 
+							Shop_ItemCommon preview=INVALID_FUNCTION,
+							Shop_ItemBuyCallback buy=INVALID_FUNCTION,
+							Shop_ItemSellCallback sell=INVALID_FUNCTION,
+							Shop_ItemCommon elapse=INVALID_FUNCTION);
 
 /**
  *	Allows to hide item in buy panel, givable only by native or admin panel
