@@ -596,6 +596,7 @@ Action Functions_OnClientSayCommand(int client, const char[] text)
 	if (g_bTransMode == false)
 	{
 		g_iCreditsTransferCommission[client] = g_iCreditsTransferAmount[client] * g_iTransCredits / 100;
+		g_iCreditsTransferCommission[client] = Helpers_Math_Abs(g_iCreditsTransferCommission[client]);
 	}
 	else
 	{
