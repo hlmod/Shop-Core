@@ -200,6 +200,8 @@ public void OnPluginStart()
 	AddCommandListener(Command_Say, "say_team");
 	
 	CreateConfigs();
+	
+	Engine_Version = GetEngineVersion();
 }
 
 public void OnPluginEnd()
