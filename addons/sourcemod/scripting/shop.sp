@@ -46,7 +46,7 @@ ConVar g_hHideCategoriesItemsCount;
 #include "shop/stats.sp"
 #endif
 
-#define SHOP_VERSION "3.0C4" // 20.09.2018
+#define SHOP_VERSION "3.0C5" // 03.12.2018
 
 public Plugin myinfo =
 {
@@ -200,7 +200,6 @@ public void OnPluginStart()
 	AddCommandListener(Command_Say, "say_team");
 	
 	CreateConfigs();
-	
 	Engine_Version = GetEngineVersion();
 }
 
