@@ -1,0 +1,4 @@
+* text=auto
+*.sp gitlab-language=c
+CHANGELOG.md export-ignore
+README.md export-ignore

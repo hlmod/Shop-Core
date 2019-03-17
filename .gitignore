@@ -5,3 +5,6 @@
 .vscode/
 site/
 /.vs
+
+*.exe
+.gitlab-ci.yml
