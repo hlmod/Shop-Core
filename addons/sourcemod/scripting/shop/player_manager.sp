@@ -367,7 +367,7 @@ void PlayerManager_TransferItem(int client, int target, int item_id)
 		}
 	
 		char s_Query[256];
-		FormatEx(s_Query, sizeof(s_Query), "INSERT INTO `%sboughts` (`player_id`, `item_id`, `count`, `duration`, `timeleft`, `buy_price`, `sell_price`, `buy_time`) VALUES \
+		h_db.Format(s_Query, sizeof(s_Query), "INSERT INTO `%sboughts` (`player_id`, `item_id`, `count`, `duration`, `timeleft`, `buy_price`, `sell_price`, `buy_time`) VALUES \
 											('%d', '%s', '%d', '%d', '%d', '%d', '%d', '%d');", g_sDbPrefix, i_Id[target], sItemId, h_KvClientItems[target].GetNum("count"), h_KvClientItems[target].GetNum("duration"), timeleft, h_KvClientItems[target].GetNum("price"), h_KvClientItems[target].GetNum("sell_price"), h_KvClientItems[target].GetNum("buy_time"));
 		
 		Transaction txn = new Transaction();
@@ -645,7 +645,7 @@ public Action PlayerManager_OnPlayerItemElapsed(Handle timer, DataPack dp)
 	IntToString(item_id, sItemId, sizeof(sItemId));
 	
 	char s_Query[256];
-	FormatEx(s_Query, sizeof(s_Query), "DELETE FROM `%sboughts` WHERE `player_id` = '%d' AND `item_id` = '%d';", g_sDbPrefix, i_Id[client], item_id);
+	h_db.Format(s_Query, sizeof(s_Query), "DELETE FROM `%sboughts` WHERE `player_id` = '%d' AND `item_id` = '%d';", g_sDbPrefix, i_Id[client], item_id);
 	TQueryEx(s_Query);
 
 	PlayerManager_DBToggleItem(client, item_id, false);
@@ -728,13 +728,13 @@ void PlayerManager_GiveItemEx(int client, const char[] sItemId, int category_id,
 		StrCat(sCat, sizeof(sCat), "c");
 		h_KvClientItems[client].SetNum(sCat, h_KvClientItems[client].GetNum(sCat, 0)+1);
 		
-		FormatEx(s_Query, sizeof(s_Query), "INSERT INTO `%sboughts` (`player_id`, `item_id`, `count`, `duration`, `timeleft`, `buy_price`, `sell_price`, `buy_time`) VALUES \
+		h_db.Format(s_Query, sizeof(s_Query), "INSERT INTO `%sboughts` (`player_id`, `item_id`, `count`, `duration`, `timeleft`, `buy_price`, `sell_price`, `buy_time`) VALUES \
 											('%d', '%s', '%d', '%d', '%d', '%d', '%d', '%d');", g_sDbPrefix, i_Id[client], sItemId, count, duration, timeleft, price, sell_price, global_timer);
 		TQueryEx(s_Query);
 	}
 	else
 	{
-		FormatEx(s_Query, sizeof(s_Query), "UPDATE `%sboughts` SET `count` = '%d' WHERE `player_id` = '%d' AND `item_id` = '%s';", g_sDbPrefix, has+count, i_Id[client], sItemId);
+		h_db.Format(s_Query, sizeof(s_Query), "UPDATE `%sboughts` SET `count` = '%d' WHERE `player_id` = '%d' AND `item_id` = '%s';", g_sDbPrefix, has+count, i_Id[client], sItemId);
 		TQueryEx(s_Query);
 	}
 }
@@ -837,14 +837,14 @@ bool PlayerManager_RemoveItemEx(int client, const char[] sItemId, int count = 1)
 		
 		deleted = true;
 		
-		FormatEx(s_Query, sizeof(s_Query), "DELETE FROM `%sboughts` WHERE `player_id` = '%d' AND `item_id` = '%s';", g_sDbPrefix, i_Id[client], sItemId);
+		h_db.Format(s_Query, sizeof(s_Query), "DELETE FROM `%sboughts` WHERE `player_id` = '%d' AND `item_id` = '%s';", g_sDbPrefix, i_Id[client], sItemId);
 		TQueryEx(s_Query);
 	}
 	else
 	{
 		h_KvClientItems[client].SetNum("count", left);
 		
-		FormatEx(s_Query, sizeof(s_Query), "UPDATE `%sboughts` SET `count` = '%d' WHERE `player_id` = '%d' AND `item_id` = '%s';", g_sDbPrefix, left, i_Id[client], sItemId);
+		h_db.Format(s_Query, sizeof(s_Query), "UPDATE `%sboughts` SET `count` = '%d' WHERE `player_id` = '%d' AND `item_id` = '%s';", g_sDbPrefix, left, i_Id[client], sItemId);
 		TQueryEx(s_Query);
 	}
 	
@@ -949,7 +949,7 @@ bool PlayerManager_SetItemTimeleftEx(int client, const char[] sItemId, int timel
 	h_KvClientItems[client].SetNum("timeleft", timeleft);
 
 	char s_Query[512];
-	FormatEx(s_Query, sizeof(s_Query), "UPDATE `%sboughts` SET `duration` = '%d', `timeleft` = '%d' WHERE `player_id` = '%d' AND `item_id` = '%s';", g_sDbPrefix, duration, timeleft, i_Id[client], sItemId);
+	h_db.Format(s_Query, sizeof(s_Query), "UPDATE `%sboughts` SET `duration` = '%d', `timeleft` = '%d' WHERE `player_id` = '%d' AND `item_id` = '%s';", g_sDbPrefix, duration, timeleft, i_Id[client], sItemId);
 	TQueryEx(s_Query);
 	
 	h_KvClientItems[client].Rewind();
@@ -1028,7 +1028,7 @@ void PlayerManager_SetItemCount(int client, int item_id, int count)
 		h_KvClientItems[client].Rewind();
 		
 		char s_Query[256];
-		FormatEx(s_Query, sizeof(s_Query), "UPDATE `%sboughts` SET `count` = '%d' WHERE `player_id` = '%d' AND `item_id` = '%s';", g_sDbPrefix, count, i_Id[client], sItemId);
+		h_db.Format(s_Query, sizeof(s_Query), "UPDATE `%sboughts` SET `count` = '%d' WHERE `player_id` = '%d' AND `item_id` = '%s';", g_sDbPrefix, count, i_Id[client], sItemId);
 		TQueryEx(s_Query, DBPrio_High);
 	}
 }
@@ -1041,7 +1041,7 @@ public void PlayerManager_OnPlayerName(Event event, const char[] name, bool dont
 	char newname[MAX_NAME_LENGTH*2+1], s_Query[256];
 	event.GetString("newname", s_Query, sizeof(s_Query));
 	EscapeString(s_Query, newname, sizeof(newname));
-	FormatEx(s_Query, sizeof(s_Query), "UPDATE `%splayers` SET `name` = '%s' WHERE `id` = '%i';", g_sDbPrefix, newname, i_Id[client]);
+	h_db.Format(s_Query, sizeof(s_Query), "UPDATE `%splayers` SET `name` = '%s' WHERE `id` = '%i';", g_sDbPrefix, newname, i_Id[client]);
 	TQueryEx(s_Query, DBPrio_Low);
 }
 
@@ -1084,9 +1084,9 @@ void PlayerManager_OnClientPutInServer(int client)
 	
 	char s_Query[256];
 	if (db_type == DB_MySQL)
-		FormatEx(s_Query, sizeof(s_Query), "SELECT `money`, `id` FROM `%splayers` WHERE `auth` REGEXP '^STEAM_[0-9]:%s$';", g_sDbPrefix, auth[8]);
+		h_db.Format(s_Query, sizeof(s_Query), "SELECT `money`, `id` FROM `%splayers` WHERE `auth` REGEXP '^STEAM_[0-9]:%s$';", g_sDbPrefix, auth[8]);
 	else
-		FormatEx(s_Query, sizeof(s_Query), "SELECT `money`, `id` FROM `%splayers` WHERE `auth` = '%s';", g_sDbPrefix, auth);
+		h_db.Format(s_Query, sizeof(s_Query), "SELECT `money`, `id` FROM `%splayers` WHERE `auth` = '%s';", g_sDbPrefix, auth);
 	
 	DataPack dp = new DataPack();
 	dp.WriteCell(GetClientSerial(client));
@@ -1142,7 +1142,7 @@ public int PlayerManager_AuthorizeClient(Database owner, DBResultSet hndl, const
 				dp.WriteCell(1);
 				dp.WriteCell(g_iStartCredits);
 				
-				FormatEx(s_Query, sizeof(s_Query), "INSERT INTO `%splayers` (`name`, `auth`, `money`, `lastconnect`) VALUES ('%s', '%s', '%d', '%d');", g_sDbPrefix, buffer, auth, g_iStartCredits, global_timer);
+				h_db.Format(s_Query, sizeof(s_Query), "INSERT INTO `%splayers` (`name`, `auth`, `money`, `lastconnect`) VALUES ('%s', '%s', '%d', '%d');", g_sDbPrefix, buffer, auth, g_iStartCredits, global_timer);
 				TQuery(PlayerManager_AuthorizeClient, s_Query, dp);
 				
 				return;
@@ -1151,7 +1151,7 @@ public int PlayerManager_AuthorizeClient(Database owner, DBResultSet hndl, const
 			iCredits[client] = hndl.FetchInt(0);
 			i_Id[client] = hndl.FetchInt(1);
 
-			FormatEx(s_Query, sizeof(s_Query), "UPDATE `%splayers` SET `name` = '%s', `lastconnect` = '%d' WHERE `id` = '%i';", g_sDbPrefix, buffer, global_timer, i_Id[client]);
+			h_db.Format(s_Query, sizeof(s_Query), "UPDATE `%splayers` SET `name` = '%s', `lastconnect` = '%d' WHERE `id` = '%i';", g_sDbPrefix, buffer, global_timer, i_Id[client]);
 			TQueryEx(s_Query);
 			
 			PlayerManager_LoadClientToggles(client);
@@ -1184,12 +1184,12 @@ void PlayerManager_DBToggleItemEx(int client, const char[] sItemId, bool bState)
 		dp.WriteCell(i_Id[client]);
 		dp.WriteCell(StringToInt(sItemId));
 		dp.WriteCell(bState);
-		FormatEx(s_Query, sizeof(s_Query), "SELECT `state` FROM `%stoggles` WHERE `player_id` = '%d' AND `item_id` = '%s';", g_sDbPrefix, i_Id[client], sItemId);
+		h_db.Format(s_Query, sizeof(s_Query), "SELECT `state` FROM `%stoggles` WHERE `player_id` = '%d' AND `item_id` = '%s';", g_sDbPrefix, i_Id[client], sItemId);
 		TQuery(PlayerManager_CheckToggle, s_Query, dp);
 	}
 	else
 	{
-		FormatEx(s_Query, sizeof(s_Query), "DELETE FROM `%stoggles` WHERE `player_id` = '%i' AND `item_id` = '%s';", g_sDbPrefix, i_Id[client], sItemId);
+		h_db.Format(s_Query, sizeof(s_Query), "DELETE FROM `%stoggles` WHERE `player_id` = '%i' AND `item_id` = '%s';", g_sDbPrefix, i_Id[client], sItemId);
 		TQueryEx(s_Query);
 	}
 }
@@ -1221,13 +1221,13 @@ public void PlayerManager_CheckToggle(Database owner, DBResultSet hndl, const ch
 	{
 		if (bState)
 		{
-			FormatEx(s_Query, sizeof(s_Query), "INSERT INTO `%stoggles` (`player_id`, `item_id`, `state`) VALUES ('%i', '%i', '1');", g_sDbPrefix, id, item_id);
+			h_db.Format(s_Query, sizeof(s_Query), "INSERT INTO `%stoggles` (`player_id`, `item_id`, `state`) VALUES ('%i', '%i', '1');", g_sDbPrefix, id, item_id);
 			TQueryEx(s_Query);
 		}
 	}
 	else if (!bState)
 	{
-		FormatEx(s_Query, sizeof(s_Query), "DELETE FROM `%stoggles` WHERE `player_id` = '%i' AND `item_id` = '%i';", g_sDbPrefix, id, item_id);
+		h_db.Format(s_Query, sizeof(s_Query), "DELETE FROM `%stoggles` WHERE `player_id` = '%i' AND `item_id` = '%i';", g_sDbPrefix, id, item_id);
 		TQueryEx(s_Query);
 	}
 }
@@ -1235,7 +1235,7 @@ public void PlayerManager_CheckToggle(Database owner, DBResultSet hndl, const ch
 void PlayerManager_LoadClientToggles(int client)
 {
 	char s_Query[256];
-	FormatEx(s_Query, sizeof(s_Query), "SELECT `item_id`, `state` FROM `%stoggles` WHERE `player_id` = '%i';", g_sDbPrefix, i_Id[client]);
+	h_db.Format(s_Query, sizeof(s_Query), "SELECT `item_id`, `state` FROM `%stoggles` WHERE `player_id` = '%i';", g_sDbPrefix, i_Id[client]);
 	TQuery(PlayerManager_GetTogglesFromDB, s_Query, GetClientSerial(client));
 }
 
@@ -1277,7 +1277,7 @@ public void PlayerManager_GetTogglesFromDB(Database owner, DBResultSet hndl, con
 void PlayerManager_LoadClientItems(int client)
 {
 	char s_Query[256];
-	FormatEx(s_Query, sizeof(s_Query), "SELECT `item_id`, `count`, `duration`, `timeleft`, `buy_price`, `sell_price`, `buy_time` FROM `%sboughts`, `%sitems` WHERE `id` = `item_id` AND `player_id` = '%i';", g_sDbPrefix, g_sDbPrefix, i_Id[client]);
+	h_db.Format(s_Query, sizeof(s_Query), "SELECT `item_id`, `count`, `duration`, `timeleft`, `buy_price`, `sell_price`, `buy_time` FROM `%sboughts`, `%sitems` WHERE `id` = `item_id` AND `player_id` = '%i';", g_sDbPrefix, g_sDbPrefix, i_Id[client]);
 	TQuery(PlayerManager_GetItemsFromDB, s_Query, GetClientSerial(client));
 }
 
@@ -1308,7 +1308,7 @@ public int PlayerManager_GetItemsFromDB(Database owner, DBResultSet hndl, const 
 		
 		if (duration > 0 && ((g_bTimerMethod == false && timeleft < 1) || (g_bTimerMethod != false && global_timer - buy_time > duration)))
 		{
-			FormatEx(s_Query, sizeof(s_Query), "DELETE FROM `%sboughts` WHERE `player_id` = '%d' AND `item_id` = '%d';", g_sDbPrefix, i_Id[client], item_id);
+			h_db.Format(s_Query, sizeof(s_Query), "DELETE FROM `%sboughts` WHERE `player_id` = '%d' AND `item_id` = '%d';", g_sDbPrefix, i_Id[client], item_id);
 			TQueryEx(s_Query);
 
 			PlayerManager_DBToggleItem(client, item_id, false);
@@ -1326,7 +1326,7 @@ public int PlayerManager_GetItemsFromDB(Database owner, DBResultSet hndl, const 
 			if (duration > 0)
 			{
 				int total = global_timer+duration-buy_time;
-				FormatEx(s_Query, sizeof(s_Query), "UPDATE `%sboughts` SET `duration` = '%d', `timeleft` = '%d' WHERE `player_id` = '%d' AND `item_id` = '%d';", g_sDbPrefix, total, timeleft, i_Id[client], item_id);
+				h_db.Format(s_Query, sizeof(s_Query), "UPDATE `%sboughts` SET `duration` = '%d', `timeleft` = '%d' WHERE `player_id` = '%d' AND `item_id` = '%d';", g_sDbPrefix, total, timeleft, i_Id[client], item_id);
 				TQueryEx(s_Query);
 			}
 		}
@@ -1413,7 +1413,7 @@ void PlayerManager_SaveInfo(int client, bool cleartimer = false)
 	char s_Query[256];
 	int timeleft;
 	char sItemId[16];
-	FormatEx(s_Query, sizeof(s_Query), "UPDATE `%splayers` SET `money` = '%d' WHERE `id` = '%d';", g_sDbPrefix, iCredits[client], i_Id[client]);
+	h_db.Format(s_Query, sizeof(s_Query), "UPDATE `%splayers` SET `money` = '%d' WHERE `id` = '%d';", g_sDbPrefix, iCredits[client], i_Id[client]);
 	TQueryEx(s_Query);
 	
 	h_KvClientItems[client].Rewind();
@@ -1445,7 +1445,7 @@ void PlayerManager_SaveInfo(int client, bool cleartimer = false)
 				}
 			}
 			
-			FormatEx(s_Query, sizeof(s_Query), "UPDATE `%sboughts` SET `count` = '%d', `duration` = '%d', `timeleft` = '%d', `buy_price` = '%d', `sell_price` = '%d' WHERE `player_id` = '%d' AND `item_id` = '%s';", g_sDbPrefix, h_KvClientItems[client].GetNum("count", 1), duration, timeleft, h_KvClientItems[client].GetNum("price"), h_KvClientItems[client].GetNum("sell_price"), i_Id[client], sItemId);
+			h_db.Format(s_Query, sizeof(s_Query), "UPDATE `%sboughts` SET `count` = '%d', `duration` = '%d', `timeleft` = '%d', `buy_price` = '%d', `sell_price` = '%d' WHERE `player_id` = '%d' AND `item_id` = '%s';", g_sDbPrefix, h_KvClientItems[client].GetNum("count", 1), duration, timeleft, h_KvClientItems[client].GetNum("price"), h_KvClientItems[client].GetNum("sell_price"), i_Id[client], sItemId);
 			TQueryEx(s_Query);
 		}
 		while (h_KvClientItems[client].GotoNextKey());
@@ -1461,7 +1461,7 @@ void PlayerManager_OnItemRegistered(int item_id)
 	{
 		if (!i_Id[client]) continue;
 		
-		FormatEx(s_Query, sizeof(s_Query), "SELECT `item_id`, `count`, `duration`, `timeleft`, `buy_price`, `sell_price`, `buy_time` FROM `%sboughts` WHERE `item_id` = '%i' AND `player_id` = '%i';", g_sDbPrefix, item_id, i_Id[client]);
+		h_db.Format(s_Query, sizeof(s_Query), "SELECT `item_id`, `count`, `duration`, `timeleft`, `buy_price`, `sell_price`, `buy_time` FROM `%sboughts` WHERE `item_id` = '%i' AND `player_id` = '%i';", g_sDbPrefix, item_id, i_Id[client]);
 		TQuery(PlayerManager_GetItemsFromDB, s_Query, GetClientSerial(client));
 	}
 }
@@ -1497,7 +1497,7 @@ void PlayerManager_OnItemUnregistered(int item_id)
 				}
 			}
 			
-			FormatEx(s_Query, sizeof(s_Query), "UPDATE `%sboughts` SET `count` = '%d', `duration` = '%d', `timeleft` = '%d', `buy_price` = '%d', `sell_price` = '%d' WHERE `player_id` = '%d' AND `item_id` = '%s';", g_sDbPrefix, h_KvClientItems[client].GetNum("count", 1), duration, timeleft, h_KvClientItems[client].GetNum("price"), h_KvClientItems[client].GetNum("sell_price"), i_Id[client], sItemId);
+			h_db.Format(s_Query, sizeof(s_Query), "UPDATE `%sboughts` SET `count` = '%d', `duration` = '%d', `timeleft` = '%d', `buy_price` = '%d', `sell_price` = '%d' WHERE `player_id` = '%d' AND `item_id` = '%s';", g_sDbPrefix, h_KvClientItems[client].GetNum("count", 1), duration, timeleft, h_KvClientItems[client].GetNum("price"), h_KvClientItems[client].GetNum("sell_price"), i_Id[client], sItemId);
 			TQueryEx(s_Query);
 			
 			category_id = h_KvClientItems[client].GetNum("category_id", -1);
@@ -1527,7 +1527,7 @@ stock int PlayerManager_SetCredits(int client, int credits)
 	iCredits[client] = credits;
 	
 	char s_Query[256];
-	FormatEx(s_Query, sizeof(s_Query), "UPDATE `%splayers` SET `money` = '%d' WHERE `id` = '%d';", g_sDbPrefix, iCredits[client], i_Id[client]);
+	h_db.Format(s_Query, sizeof(s_Query), "UPDATE `%splayers` SET `money` = '%d' WHERE `id` = '%d';", g_sDbPrefix, iCredits[client], i_Id[client]);
 	TQueryEx(s_Query);
 	
 	return iCredits[client];
@@ -1538,7 +1538,7 @@ void PlayerManager_GiveCredits(int client, int credits)
 	iCredits[client] += credits;
 	
 	char s_Query[256];
-	FormatEx(s_Query, sizeof(s_Query), "UPDATE `%splayers` SET `money` = '%d' WHERE `id` = '%d';", g_sDbPrefix, iCredits[client], i_Id[client]);
+	h_db.Format(s_Query, sizeof(s_Query), "UPDATE `%splayers` SET `money` = '%d' WHERE `id` = '%d';", g_sDbPrefix, iCredits[client], i_Id[client]);
 	TQueryEx(s_Query);
 }
 
@@ -1549,6 +1549,6 @@ void PlayerManager_RemoveCredits(int client, int credits)
 		iCredits[client] = 0;
 	
 	char s_Query[256];
-	FormatEx(s_Query, sizeof(s_Query), "UPDATE `%splayers` SET `money` = '%d' WHERE `id` = '%d';", g_sDbPrefix, iCredits[client], i_Id[client]);
+	h_db.Format(s_Query, sizeof(s_Query), "UPDATE `%splayers` SET `money` = '%d' WHERE `id` = '%d';", g_sDbPrefix, iCredits[client], i_Id[client]);
 	TQueryEx(s_Query);
 }

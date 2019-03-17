@@ -624,7 +624,7 @@ public int ItemManager_EndItem(Handle plugin, int numParams)
 	plugin_kv.Rewind();
 	
 	char s_Query[256];
-	FormatEx(s_Query, sizeof(s_Query), "SELECT `id` FROM `%sitems` WHERE `category` = '%s' AND `item` = '%s';", g_sDbPrefix, plugin_category, plugin_item);
+	h_db.Format(s_Query, sizeof(s_Query), "SELECT `id` FROM `%sitems` WHERE `category` = '%s' AND `item` = '%s';", g_sDbPrefix, plugin_category, plugin_item);
 	
 	TQuery(ItemManager_OnItemRegistered, s_Query, dp);
 	
@@ -678,7 +678,7 @@ public int ItemManager_OnItemRegistered(Handle owner, Handle hndl, const char[] 
 			if (!SQL_FetchRow(hndl))
 			{
 				char s_Query[256];
-				FormatEx(s_Query, sizeof(s_Query), "INSERT INTO `%sitems` (`category`, `item`) VALUES ('%s', '%s');", g_sDbPrefix, category, item);
+				h_db.Format(s_Query, sizeof(s_Query), "INSERT INTO `%sitems` (`category`, `item`) VALUES ('%s', '%s');", g_sDbPrefix, category, item);
 				
 				dp.Reset(true);
 				dp.WriteCell(category_id);

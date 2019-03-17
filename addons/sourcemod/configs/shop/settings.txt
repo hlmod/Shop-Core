@@ -1,28 +1,29 @@
 "Settings"
 {
-	"db_prefix"	"shop_"	// Префикс баз данных
+	"db_prefix"	"shop_"	// Tables prefix in database
 	
-	"Commands"	// Используемые команды
+	"Commands"	// Used commands
 	{
-		// Админские команды
-		"Give_Credits"		"sm_givecredits"	// Админ команда для того, чтобы давать кредиты игроку
-		"Take_Credits"		"sm_takecredits"	// Админ команда для того, чтобы забирать кредиты с игрока
-		"Set_Credits"		"sm_setcredits"		// Админ команда для того, чтобы выставлять определенное кол-во кредитов игроку
+		// Admin commands
+		"Give_Credits"		"sm_givecredits"	// Admin command for giving credits to player
+		"Take_Credits"		"sm_takecredits"	// Admin command for taking credits from player
+		"Set_Credits"		"sm_setcredits"		// Admin command for setting fixed amount of credits to player
 		
-		// Команды игрока
-		"Main_Menu"	"sm_shop,sm_store"	// Команда для вызова главного меню магазина. Через запятую для нескольких команд
+		// Player commands
+		"Main_Menu"	"sm_shop,sm_store"	// Command for shop menu opening, use 'comma' to multiple commands
 	}
 	
-	"Count_Menu"	// Меню с наполнениям для "Дать, Забрать, Установить кредиты"
+	"Count_Menu"	// Menu with amount of credits for giving/setting/taking
 	{
-		// "Кол-во"		"Название"
-		"1"				"1 кредит"
-		"10"			"10 кредитов"
-		"100"			"Сто"
-		"1000"			"Тысячу"
-		"10000"			"Десять тысяч"
-		"100000"		"100000 кредитов"
-		"1000000"		"Миллион"
-		// "т.д."		"т.д"
+		// "Amount"		"Text name"
+		"0"				"0 amount"
+		"1"				"1 amount"
+		"10"			"10 amount"
+		"100"			"Hundred"
+		"1000"			"Thousand"
+		"10000"			"10K"
+		"100000"		"100K"
+		"1000000"		"1M"
+		// "etc"		"etc"
 	}
 }
