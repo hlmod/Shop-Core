@@ -82,24 +82,24 @@ public Action DB_Command_Clear(int argc)
 				{
 					if (db_type == DB_MySQL)
 					{
-						FormatEx(s_Query, sizeof(s_Query), "TRUNCATE TABLE `%sboughts`;", g_sDbPrefix);
+						h_db.Format(s_Query, sizeof(s_Query), "TRUNCATE TABLE `%sboughts`;", g_sDbPrefix);
 						DB_TQuery(DB_Clear, s_Query, iDays);
 
-						FormatEx(s_Query, sizeof(s_Query), "TRUNCATE TABLE `%splayers`;", g_sDbPrefix);
+						h_db.Format(s_Query, sizeof(s_Query), "TRUNCATE TABLE `%splayers`;", g_sDbPrefix);
 						DB_TQuery(DB_Clear, s_Query, iDays);
 
-						FormatEx(s_Query, sizeof(s_Query), "TRUNCATE TABLE `%stoggles`;", g_sDbPrefix);
+						h_db.Format(s_Query, sizeof(s_Query), "TRUNCATE TABLE `%stoggles`;", g_sDbPrefix);
 						DB_TQuery(DB_Clear, s_Query, iDays);
 					}
 					else
 					{
-						FormatEx(s_Query, sizeof(s_Query), "DELETE FROM `%sboughts`;", g_sDbPrefix);
+						h_db.Format(s_Query, sizeof(s_Query), "DELETE FROM `%sboughts`;", g_sDbPrefix);
 						DB_TQuery(DB_Clear, s_Query, iDays);
 						
-						FormatEx(s_Query, sizeof(s_Query), "DELETE FROM `%splayers`;", g_sDbPrefix);
+						h_db.Format(s_Query, sizeof(s_Query), "DELETE FROM `%splayers`;", g_sDbPrefix);
 						DB_TQuery(DB_Clear, s_Query, iDays);
 
-						FormatEx(s_Query, sizeof(s_Query), "DELETE FROM `%stoggles`;", g_sDbPrefix);
+						h_db.Format(s_Query, sizeof(s_Query), "DELETE FROM `%stoggles`;", g_sDbPrefix);
 						DB_TQuery(DB_Clear, s_Query, iDays);
 					}
 
@@ -108,13 +108,13 @@ public Action DB_Command_Clear(int argc)
 				}
 				else
 				{
-					FormatEx(s_Query, sizeof(s_Query), "DELETE FROM `%sboughts` WHERE `player_id` IN (SELECT `id` FROM `%splayers` WHERE %d - `lastconnect` > %d);", g_sDbPrefix, g_sDbPrefix, global_timer, iDays*86400);
+					h_db.Format(s_Query, sizeof(s_Query), "DELETE FROM `%sboughts` WHERE `player_id` IN (SELECT `id` FROM `%splayers` WHERE %d - `lastconnect` > %d);", g_sDbPrefix, g_sDbPrefix, global_timer, iDays*86400);
 					DB_TQuery(DB_Clear, s_Query, iDays);
 
-					FormatEx(s_Query, sizeof(s_Query), "DELETE FROM `%stoggles` WHERE `player_id` IN (SELECT `id` FROM `%splayers` WHERE %d - `lastconnect` > %d);", g_sDbPrefix, g_sDbPrefix, global_timer, iDays*86400);
+					h_db.Format(s_Query, sizeof(s_Query), "DELETE FROM `%stoggles` WHERE `player_id` IN (SELECT `id` FROM `%splayers` WHERE %d - `lastconnect` > %d);", g_sDbPrefix, g_sDbPrefix, global_timer, iDays*86400);
 					DB_TQuery(DB_Clear, s_Query, iDays);
 
-					FormatEx(s_Query, sizeof(s_Query), "DELETE FROM `%splayers` WHERE %d - `lastconnect` > %d;", g_sDbPrefix, global_timer, iDays*86400);
+					h_db.Format(s_Query, sizeof(s_Query), "DELETE FROM `%splayers` WHERE %d - `lastconnect` > %d;", g_sDbPrefix, global_timer, iDays*86400);
 					DB_TQuery(DB_Clear, s_Query, iDays);
 					num_rows += 3;
 
@@ -272,14 +272,14 @@ public void DB_Connect(Database db, const char[] error, any data)
 
 		DB_TQuery(DB_GlobalTimer, "SELECT UNIX_TIMESTAMP()", _, DBPrio_High);
 		
-		FormatEx(s_Query, sizeof(s_Query), "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '%sboughts';", g_sDbPrefix);
+		h_db.Format(s_Query, sizeof(s_Query), "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '%sboughts';", g_sDbPrefix);
 		DB_TQuery(DB_CheckTable, s_Query);
 	}
 	else
 	{
 		global_timer = GetTime();
 		
-		FormatEx(s_Query, sizeof(s_Query), "PRAGMA TABLE_INFO(%sboughts);", g_sDbPrefix);
+		h_db.Format(s_Query, sizeof(s_Query), "PRAGMA TABLE_INFO(%sboughts);", g_sDbPrefix);
 		DB_TQuery(DB_CheckTable, s_Query);
 	}
 }
@@ -318,7 +318,7 @@ public void DB_CheckTable(Database db, DBResultSet results, const char[] error, 
 	{
 		if (!results.HasResults || !results.FetchRow() || results.FetchInt(0) < 1)
 		{
-			FormatEx(s_Query, sizeof(s_Query), "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '%sitems';", g_sDbPrefix);
+			h_db.Format(s_Query, sizeof(s_Query), "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '%sitems';", g_sDbPrefix);
 			DB_TQuery(DB_CheckTable2, s_Query);
 			
 			return;
@@ -326,7 +326,7 @@ public void DB_CheckTable(Database db, DBResultSet results, const char[] error, 
 	}
 	else if (!results.RowCount)
 	{
-		FormatEx(s_Query, sizeof(s_Query), "PRAGMA TABLE_INFO(%sitems);", g_sDbPrefix);
+		h_db.Format(s_Query, sizeof(s_Query), "PRAGMA TABLE_INFO(%sitems);", g_sDbPrefix);
 		DB_TQuery(DB_CheckTable2, s_Query);
 		
 		return;
@@ -375,7 +375,7 @@ void DB_CreateTables()
 	char s_Query[512];
 	if (db_type == DB_MySQL)
 	{
-		FormatEx(s_Query, sizeof(s_Query), "CREATE TABLE IF NOT EXISTS `%sboughts` (\
+		h_db.Format(s_Query, sizeof(s_Query), "CREATE TABLE IF NOT EXISTS `%sboughts` (\
 							  `player_id` int NOT NULL,\
 							  `item_id` int NOT NULL,\
 							  `count` int NOT NULL,\
@@ -387,7 +387,7 @@ void DB_CreateTables()
 							) ENGINE=InnoDB DEFAULT CHARSET=utf8;", g_sDbPrefix);
 		DB_TQuery(DB_OnPlayersTableLoad, s_Query, 1);
 		
-		FormatEx(s_Query, sizeof(s_Query), "CREATE TABLE IF NOT EXISTS `%sitems` (\
+		h_db.Format(s_Query, sizeof(s_Query), "CREATE TABLE IF NOT EXISTS `%sitems` (\
 							  `id` int NOT NULL AUTO_INCREMENT,\
 							  `category` varchar(64) NOT NULL,\
 							  `item` varchar(64) NOT NULL,\
@@ -395,7 +395,7 @@ void DB_CreateTables()
 							) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;", g_sDbPrefix);
 		DB_TQuery(DB_OnPlayersTableLoad, s_Query, 2);
 		
-		FormatEx(s_Query, sizeof(s_Query), "CREATE TABLE IF NOT EXISTS `%splayers` (\
+		h_db.Format(s_Query, sizeof(s_Query), "CREATE TABLE IF NOT EXISTS `%splayers` (\
 							  `id` int NOT NULL AUTO_INCREMENT,\
 							  `name` varchar(32) NOT NULL DEFAULT 'unknown',\
 							  `auth` varchar(22) NOT NULL,\
@@ -406,7 +406,7 @@ void DB_CreateTables()
 							) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;", g_sDbPrefix);
 		DB_TQuery(DB_OnPlayersTableLoad, s_Query, 3);
 		
-		FormatEx(s_Query, sizeof(s_Query), "CREATE TABLE IF NOT EXISTS `%stoggles` (\
+		h_db.Format(s_Query, sizeof(s_Query), "CREATE TABLE IF NOT EXISTS `%stoggles` (\
 							  `id` int NOT NULL AUTO_INCREMENT,\
 							  `player_id` int NOT NULL,\
 							  `item_id` int NOT NULL,\
@@ -417,7 +417,7 @@ void DB_CreateTables()
 	}
 	else
 	{
-		FormatEx(s_Query, sizeof(s_Query), "CREATE TABLE IF NOT EXISTS `%sboughts` (\
+		h_db.Format(s_Query, sizeof(s_Query), "CREATE TABLE IF NOT EXISTS `%sboughts` (\
 							  `player_id` NUMERIC NOT NULL,\
 							  `item_id` INTEGER NOT NULL,\
 							  `count` NUMERIC NOT NULL,\
@@ -428,13 +428,13 @@ void DB_CreateTables()
 							  `buy_time` NUMERIC NOT NULL);", g_sDbPrefix);
 		DB_TQuery(DB_OnPlayersTableLoad, s_Query, 1);
 		
-		FormatEx(s_Query, sizeof(s_Query), "CREATE TABLE IF NOT EXISTS `%sitems` (\
+		h_db.Format(s_Query, sizeof(s_Query), "CREATE TABLE IF NOT EXISTS `%sitems` (\
 							  `id` INTEGER PRIMARY KEY AUTOINCREMENT,\
 							  `category` VARCHAR NOT NULL,\
 							  `item` VARCHAR NOT NULL);", g_sDbPrefix);
 		DB_TQuery(DB_OnPlayersTableLoad, s_Query, 2);
 		
-		FormatEx(s_Query, sizeof(s_Query), "CREATE TABLE IF NOT EXISTS `%splayers` (\
+		h_db.Format(s_Query, sizeof(s_Query), "CREATE TABLE IF NOT EXISTS `%splayers` (\
 							  `id` INTEGER PRIMARY KEY AUTOINCREMENT,\
 							  `name` VARCHAR DEFAULT 'unknown',\
 							  `auth` VARCHAR UNIQUE ON CONFLICT IGNORE,\
@@ -442,7 +442,7 @@ void DB_CreateTables()
 							  `lastconnect` INTEGER NOT NULL);", g_sDbPrefix);
 		DB_TQuery(DB_OnPlayersTableLoad, s_Query, 3);
 		
-		FormatEx(s_Query, sizeof(s_Query), "CREATE TABLE IF NOT EXISTS `%stoggles` (\
+		h_db.Format(s_Query, sizeof(s_Query), "CREATE TABLE IF NOT EXISTS `%stoggles` (\
 							  `id` INTEGER PRIMARY KEY AUTOINCREMENT,\
 							  `player_id` INTEGER NOT NULL,\
 							  `item_id` INTEGER NOT NULL,\
@@ -590,15 +590,15 @@ void DB_UpgradeToNewVersion()
 	
 	if (db_type == DB_MySQL)
 	{
-		FormatEx(s_Query, sizeof(s_Query), "ALTER IGNORE TABLE `%splayers` ADD `lastconnect` int(10) NOT NULL DEFAULT '0';", g_sDbPrefix);
+		h_db.Format(s_Query, sizeof(s_Query), "ALTER IGNORE TABLE `%splayers` ADD `lastconnect` int(10) NOT NULL DEFAULT '0';", g_sDbPrefix);
 	}
 	else
 	{
-		FormatEx(s_Query, sizeof(s_Query), "ALTER TABLE `%splayers` ADD `lastconnect` NUMERIC NOT NULL DEFAULT '0'", g_sDbPrefix);
+		h_db.Format(s_Query, sizeof(s_Query), "ALTER TABLE `%splayers` ADD `lastconnect` NUMERIC NOT NULL DEFAULT '0'", g_sDbPrefix);
 	}
 	DB_TQueryEx(s_Query);
 	
-	FormatEx(s_Query, sizeof(s_Query), "SELECT * FROM `%sitems`;", g_sDbPrefix);
+	h_db.Format(s_Query, sizeof(s_Query), "SELECT * FROM `%sitems`;", g_sDbPrefix);
 	DB_TQuery(DB_UgradeState_1, s_Query);
 }
 
@@ -629,7 +629,7 @@ public void DB_UgradeState_1(Database db, DBResultSet results, const char[] erro
 			if (!got_categories)
 			{
 				SQL_LockDatabase(h_db);
-				FormatEx(buffer, sizeof(buffer), "SELECT `item` FROM `%s`;", category);
+				h_db.Format(buffer, sizeof(buffer), "SELECT `item` FROM `%s`;", category);
 				DBResultSet hQuery = SQL_Query(h_db, buffer);
 				if (hQuery != null)
 				{
@@ -637,7 +637,7 @@ public void DB_UgradeState_1(Database db, DBResultSet results, const char[] erro
 					{
 						hQuery.FetchString(0, item, sizeof(item));
 						
-						FormatEx(buffer, sizeof(buffer), "INSERT INTO `%sitems` (`category`, `item`) VALUES ('%s', '%s');", g_sDbPrefix, category, item);
+						h_db.Format(buffer, sizeof(buffer), "INSERT INTO `%sitems` (`category`, `item`) VALUES ('%s', '%s');", g_sDbPrefix, category, item);
 						insert_dp.WriteString(buffer);
 					}
 					delete hQuery;
@@ -678,7 +678,7 @@ public void DB_UgradeState_1(Database db, DBResultSet results, const char[] erro
 			
 			for (int x = 0; x < num; x++)
 			{
-				FormatEx(buffer, sizeof(buffer), "INSERT INTO `%sboughts` (`player_id`, `item_id`, `count`, `duration`, `timeleft`, `buy_price`, `sell_price`, `buy_time`) VALUES \
+				h_db.Format(buffer, sizeof(buffer), "INSERT INTO `%sboughts` (`player_id`, `item_id`, `count`, `duration`, `timeleft`, `buy_price`, `sell_price`, `buy_time`) VALUES \
 												('%d', (SELECT `id` FROM `%sitems` WHERE `category` = '%s' AND `item` = (SELECT `item` FROM `%s` WHERE `id` = '%d')), '%d', '%d', '%d', '0', '-1', '%d');", 
 												g_sDbPrefix, id, g_sDbPrefix, category, category, itemId[x], count[itemId[x]], duration[itemId[x]], duration[itemId[x]], global_timer);
 				upgrade_dp.WriteString(buffer);
@@ -688,7 +688,7 @@ public void DB_UgradeState_1(Database db, DBResultSet results, const char[] erro
 		got_categories = true;
 	}
 	
-	FormatEx(buffer, sizeof(buffer), "DROP TABLE `%sitems`;", g_sDbPrefix);
+	h_db.Format(buffer, sizeof(buffer), "DROP TABLE `%sitems`;", g_sDbPrefix);
 	DB_TQueryEx(buffer, DBPrio_High);
 	
 	DB_CreateTables();

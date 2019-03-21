@@ -46,7 +46,7 @@ ConVar g_hHideCategoriesItemsCount;
 #include "shop/stats.sp"
 #endif
 
-#define SHOP_VERSION "3.0C5" // 03.12.2018
+#define SHOP_VERSION "3.0D1" // 17.03.2019
 
 public Plugin myinfo =
 {
