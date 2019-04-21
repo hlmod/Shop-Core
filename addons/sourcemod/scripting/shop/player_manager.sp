@@ -59,7 +59,7 @@ public int PlayerManager_IsAdmin(Handle plugin, int numParams)
 
 bool PlayerManager_IsAuthorizedIn(int client)
 {
-	return (client > 0 && client <= MaxClients && IsClientInGame(client) && !IsFakeClient(client) && i_Id[client] != 0);
+	return (client > 0 && client <= MaxClients && IsClientInGame(client) && !IsFakeClient(client) && i_Id[client] != 0 && g_bAuthorized[client]);
 }
 
 public int PlayerManager_GetClientId(Handle plugin, int numParams)
@@ -70,7 +70,7 @@ public int PlayerManager_GetClientId(Handle plugin, int numParams)
 	if (!CheckClient(client, error, sizeof(error)))
 		ThrowNativeError(SP_ERROR_NATIVE, error);
 	
-	return g_bAuthorized[client];
+	return i_Id[client];
 }
 
 public int PlayerManager_GetClientCredits(Handle plugin, int numParams)
@@ -1084,9 +1084,9 @@ void PlayerManager_OnClientPutInServer(int client)
 	
 	char s_Query[256];
 	if (db_type == DB_MySQL)
-		h_db.Format(s_Query, sizeof(s_Query), "SELECT `money`, `id` FROM `%splayers` WHERE `auth` REGEXP '^STEAM_[0-9]:%s$';", g_sDbPrefix, auth[8]);
+		h_db.Format(s_Query, sizeof(s_Query), "SELECT `money`, `id` FROM `%splayers` WHERE `auth` REGEXP '^STEAM_[0-9]:%s$' LIMIT 1;", g_sDbPrefix, auth[8]);
 	else
-		h_db.Format(s_Query, sizeof(s_Query), "SELECT `money`, `id` FROM `%splayers` WHERE `auth` = '%s';", g_sDbPrefix, auth);
+		h_db.Format(s_Query, sizeof(s_Query), "SELECT `money`, `id` FROM `%splayers` WHERE `auth` = '%s' LIMIT 1;", g_sDbPrefix, auth);
 	
 	DataPack dp = new DataPack();
 	dp.WriteCell(GetClientSerial(client));
@@ -1184,7 +1184,7 @@ void PlayerManager_DBToggleItemEx(int client, const char[] sItemId, bool bState)
 		dp.WriteCell(i_Id[client]);
 		dp.WriteCell(StringToInt(sItemId));
 		dp.WriteCell(bState);
-		h_db.Format(s_Query, sizeof(s_Query), "SELECT `state` FROM `%stoggles` WHERE `player_id` = '%d' AND `item_id` = '%s';", g_sDbPrefix, i_Id[client], sItemId);
+		h_db.Format(s_Query, sizeof(s_Query), "SELECT `state` FROM `%stoggles` WHERE `player_id` = '%d' AND `item_id` = '%s' LIMIT 1;", g_sDbPrefix, i_Id[client], sItemId);
 		TQuery(PlayerManager_CheckToggle, s_Query, dp);
 	}
 	else

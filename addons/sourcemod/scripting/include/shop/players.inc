@@ -3,7 +3,7 @@
  *	-
  *	@param client			Client index to get for
  *	-
- *	@return player id in the database
+ *	@return player id in the database or 0 if client doesn't in database
 */
 native int Shop_GetClientId(int client);
 

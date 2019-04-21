@@ -624,7 +624,7 @@ public int ItemManager_EndItem(Handle plugin, int numParams)
 	plugin_kv.Rewind();
 	
 	char s_Query[256];
-	h_db.Format(s_Query, sizeof(s_Query), "SELECT `id` FROM `%sitems` WHERE `category` = '%s' AND `item` = '%s';", g_sDbPrefix, plugin_category, plugin_item);
+	h_db.Format(s_Query, sizeof(s_Query), "SELECT `id` FROM `%sitems` WHERE `category` = '%s' AND `item` = '%s' LIMIT 1;", g_sDbPrefix, plugin_category, plugin_item);
 	
 	TQuery(ItemManager_OnItemRegistered, s_Query, dp);
 	
@@ -640,14 +640,14 @@ public int ItemManager_OnItemRegistered(Handle owner, Handle hndl, const char[] 
 	char category[SHOP_MAX_STRING_LENGTH], item[SHOP_MAX_STRING_LENGTH];
 	
 	dp.Reset();
-	int category_id = ReadPackCell(dp);
-	Handle plugin = view_as<Handle>(ReadPackCell(dp));
-	Function callback = ReadPackFunction(dp);
+	int category_id = dp.ReadCell();
+	Handle plugin = view_as<Handle>(dp.ReadCell());
+	Function callback = dp.ReadFunction();
 	dp.ReadString(category, sizeof(category));
 	dp.ReadString(item, sizeof(item));
-	KeyValues kv = view_as<KeyValues>(ReadPackCell(dp));
-	ArrayList array = view_as<ArrayList>(ReadPackCell(dp));
-	int iTry = ReadPackCell(dp);
+	KeyValues kv = view_as<KeyValues>(dp.ReadCell());
+	ArrayList array = view_as<ArrayList>(dp.ReadCell());
+	int iTry = dp.ReadCell();
 	
 	if (!iTry)
 	{
@@ -673,7 +673,7 @@ public int ItemManager_OnItemRegistered(Handle owner, Handle hndl, const char[] 
 	int id;
 	switch (iTry)
 	{
-		case 0 :
+		case 0:
 		{
 			if (!SQL_FetchRow(hndl))
 			{
@@ -697,7 +697,7 @@ public int ItemManager_OnItemRegistered(Handle owner, Handle hndl, const char[] 
 			
 			id = SQL_FetchInt(hndl, 0);
 		}
-		case 1 :
+		case 1:
 		{
 			id = SQL_GetInsertId(hndl);
 		}
