@@ -33,6 +33,7 @@ void PlayerManager_CreateNatives()
 	CreateNative("Shop_IsClientHasItem", PlayerManager_IsClientHasItem);
 	CreateNative("Shop_ToggleClientItem", PlayerManager_ToggleClientItem);
 	CreateNative("Shop_ToggleClientCategoryOff", PlayerManager_ToggleClientCategoryOff);
+	CreateNative("Shop_GetClientItems", PlayerManager_GetClientItems);
 }
 
 public int PlayerManager_IsAuthorized(Handle plugin, int numParams)
@@ -633,6 +634,32 @@ public int PlayerManager_ToggleClientCategoryOff(Handle plugin, int numParams)
 	while (h_KvClientItems[client].GotoNextKey());
 	
 	h_KvClientItems[client].Rewind();
+}
+
+public int PlayerManager_GetClientItems(Handle plugin, int numParams)
+{
+	int client = GetNativeCell(1);
+	
+	char error[64];
+	if (!CheckClient(client, error, sizeof(error)))
+		ThrowNativeError(SP_ERROR_NATIVE, error);
+
+	ArrayList hArrayItems = new ArrayList(ByteCountToCells(4));
+	KeyValues hKVItems = h_KvClientItems[client];
+
+	hKVItems.Rewind();
+	if (hKVItems.GotoFirstSubKey())
+	{
+		char sItemId[16];
+
+		do {
+			hKVItems.GetSectionName(sItemId, sizeof(sItemId));
+			hArrayItems.Push(StringToInt(sItemId));
+		}
+		while (hKVItems.GotoNextKey());
+	}
+
+	return view_as<int>(hArrayItems);
 }
 
 public Action PlayerManager_OnPlayerItemElapsed(Handle timer, DataPack dp)

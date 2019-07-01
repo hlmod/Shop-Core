@@ -251,3 +251,14 @@ native void Shop_SetClientItemCount(int client, ItemId item_id, int count = 0);
  *	@return true on success and false otherwise
 */
 native bool Shop_UseClientItem(int client, ItemId item_id);
+
+/**
+ * Returns the array with player item ids.
+ *
+ * @param	client		Client index
+ *
+ * @return	ArrayList handle with item ids.
+ * @error	Client is not connected/not loaded.
+ * @note	If player has not items - array returned too, but empty.
+ */
+native ArrayList Shop_GetClientItems(int client);
