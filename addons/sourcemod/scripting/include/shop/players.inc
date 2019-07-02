@@ -254,6 +254,7 @@ native bool Shop_UseClientItem(int client, ItemId item_id);
 
 /**
  * Returns the array with player item ids.
+ * Must be freed via CloseHandle() / delete / Handle.Close().
  *
  * @param	client		Client index
  *
