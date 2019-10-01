@@ -19,6 +19,11 @@ env:
   matrix:
     - SMVERSION=1.9
     - SMVERSION=1.10
+
+matrix:
+  allow_failures:
+    - env: SMVERSION=1.10
+
 install:
     # Sourcemod download
     - wget --input-file=http://sourcemod.net/smdrop/$SMVERSION/sourcemod-latest-linux

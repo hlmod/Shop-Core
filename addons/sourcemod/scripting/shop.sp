@@ -1730,8 +1730,6 @@ int GetCredits(int client)
 
 bool SetCredits(int client, int credits, int by_who)
 {
-	PlayerManager_SetCredits(client, credits);
-
 	if (credits < 1)
 	{
 		return false;
