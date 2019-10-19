@@ -5,9 +5,9 @@ int g_iTransCredits;
 /**
  * For SM 1.10
  */
-stock DataPackPos FUNCTIONS_DP_PLUGIN 		= INVALID_DP_POS;
-stock DataPackPos FUNCTIONS_DP_FUNCDISPLAY	= INVALID_DP_POS;
-stock DataPackPos FUNCTIONS_DP_FUNCSELECT		= INVALID_DP_POS;
+stock DataPackPos FUNCTIONS_DP_PLUGIN 		= view_as<DataPackPos>(0);
+stock DataPackPos FUNCTIONS_DP_FUNCDISPLAY	= view_as<DataPackPos>(1);
+stock DataPackPos FUNCTIONS_DP_FUNCSELECT		= view_as<DataPackPos>(2);
 
 bool g_bListenChat[MAXPLAYERS+1];
 int g_iCreditsTransferTarget[MAXPLAYERS+1],
@@ -92,18 +92,10 @@ void Functions_OnPluginStart()
 	g_hLuckCredits = CreateConVar("sm_shop_luck_credits", "500", "How many credits the luck cost", 0, true, 0.0);
 	g_hLuckChance = CreateConVar("sm_shop_luck_chance", "20", "How many chance the luck can be succeded", 0, true, 1.0, true, 100.0);
 
-	/**
-	 * For SM 1.10
-	 */
+
 	DataPack hPack = new DataPack();
-
-	FUNCTIONS_DP_PLUGIN = hPack.Position;
 	hPack.WriteCell(0);
-
-	FUNCTIONS_DP_FUNCDISPLAY = hPack.Position;
 	hPack.WriteCell(0);
-
-	FUNCTIONS_DP_FUNCSELECT = hPack.Position;
 	hPack.WriteCell(0);
 
 	delete hPack;

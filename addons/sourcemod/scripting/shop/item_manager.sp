@@ -7,26 +7,26 @@ KeyValues h_KvItems;
  * For SM 1.10
  * Items
  */
-stock DataPackPos ITEM_DATAPACKPOS_REGISTER			= INVALID_DP_POS;
-stock DataPackPos ITEM_DATAPACKPOS_USE 				= INVALID_DP_POS;
-stock DataPackPos ITEM_DATAPACKPOS_SHOULD_DISPLAY		= INVALID_DP_POS;
-stock DataPackPos ITEM_DATAPACKPOS_DISPLAY				= INVALID_DP_POS;
-stock DataPackPos ITEM_DATAPACKPOS_DESC				= INVALID_DP_POS;
-stock DataPackPos ITEM_DATAPACKPOS_COMMON				= INVALID_DP_POS;
-stock DataPackPos ITEM_DATAPACKPOS_BUY					= INVALID_DP_POS;
-stock DataPackPos ITEM_DATAPACKPOS_SELL				= INVALID_DP_POS;
-stock DataPackPos ITEM_DATAPACKPOS_ELAPSE				= INVALID_DP_POS;
+stock DataPackPos ITEM_DATAPACKPOS_REGISTER			= view_as<DataPackPos>(0);
+stock DataPackPos ITEM_DATAPACKPOS_USE 				= view_as<DataPackPos>(1);
+stock DataPackPos ITEM_DATAPACKPOS_SHOULD_DISPLAY		= view_as<DataPackPos>(2);
+stock DataPackPos ITEM_DATAPACKPOS_DISPLAY				= view_as<DataPackPos>(3);
+stock DataPackPos ITEM_DATAPACKPOS_DESC				= view_as<DataPackPos>(4);
+stock DataPackPos ITEM_DATAPACKPOS_COMMON				= view_as<DataPackPos>(5);
+stock DataPackPos ITEM_DATAPACKPOS_BUY					= view_as<DataPackPos>(6);
+stock DataPackPos ITEM_DATAPACKPOS_SELL				= view_as<DataPackPos>(7);
+stock DataPackPos ITEM_DATAPACKPOS_ELAPSE				= view_as<DataPackPos>(8);
 
 /**
  * For SM 1.10
  * Categories
  */
-stock DataPackPos CATEGORY_DATAPACKPOS_PLUGIN			= INVALID_DP_POS;
-stock DataPackPos CATEGORY_DATAPACKPOS_DISPLAY			= INVALID_DP_POS;
-stock DataPackPos CATEGORY_DATAPACKPOS_DESCRIPTION		= INVALID_DP_POS;
-stock DataPackPos CATEGORY_DATAPACKPOS_SHOULD_DISPLAY	= INVALID_DP_POS;
-stock DataPackPos CATEGORY_DATAPACKPOS_SELECT			= INVALID_DP_POS;
-stock DataPackPos CATEGORY_DATAPACKPOS_ITEMSCOUNT		= INVALID_DP_POS;
+stock DataPackPos CATEGORY_DATAPACKPOS_PLUGIN			= view_as<DataPackPos>(0);
+stock DataPackPos CATEGORY_DATAPACKPOS_DISPLAY			= view_as<DataPackPos>(1);
+stock DataPackPos CATEGORY_DATAPACKPOS_DESCRIPTION		= view_as<DataPackPos>(2);
+stock DataPackPos CATEGORY_DATAPACKPOS_SHOULD_DISPLAY	= view_as<DataPackPos>(3);
+stock DataPackPos CATEGORY_DATAPACKPOS_SELECT			= view_as<DataPackPos>(4);
+stock DataPackPos CATEGORY_DATAPACKPOS_ITEMSCOUNT		= view_as<DataPackPos>(5);
 
 void ItemManager_CreateNatives()
 {
@@ -101,32 +101,15 @@ void ItemManager_OnPluginStart()
 	 */
 	DataPack hPack = new DataPack();
 
-	ITEM_DATAPACKPOS_REGISTER = hPack.Position;
-	hPack.WriteCell(0);
-
-	ITEM_DATAPACKPOS_USE = hPack.Position;
-	hPack.WriteCell(0);
-
-	ITEM_DATAPACKPOS_SHOULD_DISPLAY = hPack.Position;
-	hPack.WriteCell(0);
-
-	ITEM_DATAPACKPOS_DISPLAY = hPack.Position;
-	hPack.WriteCell(0);
-
-	ITEM_DATAPACKPOS_DESC = hPack.Position;
-	hPack.WriteCell(0);
-
-	ITEM_DATAPACKPOS_COMMON = hPack.Position;
-	hPack.WriteCell(0);
-
-	ITEM_DATAPACKPOS_BUY = hPack.Position;
-	hPack.WriteCell(0);
-
-	ITEM_DATAPACKPOS_SELL = hPack.Position;
-	hPack.WriteCell(0);
-
-	ITEM_DATAPACKPOS_ELAPSE = hPack.Position;
-	hPack.WriteCell(0);
+	hPack.WriteCell(0); // register
+	hPack.WriteCell(0); // use
+	hPack.WriteCell(0); // should display
+	hPack.WriteCell(0); // display
+	hPack.WriteCell(0); // description
+	hPack.WriteCell(0); // common
+	hPack.WriteCell(0); // buy
+	hPack.WriteCell(0); // sell
+	hPack.WriteCell(0); // elapse
 
 	hPack.Reset(true);
 
@@ -134,23 +117,12 @@ void ItemManager_OnPluginStart()
 	 * For SM 1.10
 	 * Categories
 	 */
-	CATEGORY_DATAPACKPOS_PLUGIN = hPack.Position;
-	hPack.WriteCell(0);
-
-	CATEGORY_DATAPACKPOS_DISPLAY = hPack.Position;
-	hPack.WriteCell(0);
-
-	CATEGORY_DATAPACKPOS_DESCRIPTION = hPack.Position;
-	hPack.WriteCell(0);
-
-	CATEGORY_DATAPACKPOS_SHOULD_DISPLAY = hPack.Position;
-	hPack.WriteCell(0);
-
-	CATEGORY_DATAPACKPOS_SELECT = hPack.Position;
-	hPack.WriteCell(0);
-
-	CATEGORY_DATAPACKPOS_ITEMSCOUNT = hPack.Position;
-	hPack.WriteCell(0);
+	hPack.WriteCell(0); // plugin handle id
+	hPack.WriteCell(0); // category display
+	hPack.WriteCell(0); // category description
+	hPack.WriteCell(0); // category should display
+	hPack.WriteCell(0); // category select
+	hPack.WriteCell(0); // category items count
 
 	delete hPack;
 }
