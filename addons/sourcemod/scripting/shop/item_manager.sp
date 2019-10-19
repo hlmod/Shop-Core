@@ -94,37 +94,6 @@ void ItemManager_CreateNatives()
 void ItemManager_OnPluginStart()
 {
 	RegServerCmd("sm_items_dump", ItemManager_Dump);
-
-	/**
-	 * For SM 1.10
-	 * Items
-	 */
-	DataPack hPack = new DataPack();
-
-	hPack.WriteCell(0); // register
-	hPack.WriteCell(0); // use
-	hPack.WriteCell(0); // should display
-	hPack.WriteCell(0); // display
-	hPack.WriteCell(0); // description
-	hPack.WriteCell(0); // common
-	hPack.WriteCell(0); // buy
-	hPack.WriteCell(0); // sell
-	hPack.WriteCell(0); // elapse
-
-	hPack.Reset(true);
-
-	/**
-	 * For SM 1.10
-	 * Categories
-	 */
-	hPack.WriteCell(0); // plugin handle id
-	hPack.WriteCell(0); // category display
-	hPack.WriteCell(0); // category description
-	hPack.WriteCell(0); // category should display
-	hPack.WriteCell(0); // category select
-	hPack.WriteCell(0); // category items count
-
-	delete hPack;
 }
 
 public Action ItemManager_Dump(int argc)

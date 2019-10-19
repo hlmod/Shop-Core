@@ -33,15 +33,6 @@ void Admin_CreateNatives()
 	CreateNative("Shop_ShowAdminMenu", Admin_ShowAdminMenu);
 }
 
-void Admin_OnPluginStart() {
-	DataPack hPack = new DataPack();
-	hPack.WriteCell(0); // plugin handle
-	hPack.WriteCell(0); // admin module display func handle
-	hPack.WriteCell(0); // admin module select func handle
-
-	delete hPack;
-}
-
 public int Admin_AddToMenuNative(Handle plugin, int numParams)
 {
 	DataPack dp = new DataPack();

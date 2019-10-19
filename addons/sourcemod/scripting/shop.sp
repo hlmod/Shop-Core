@@ -181,7 +181,6 @@ public void OnPluginStart()
 	g_iMaxPageItems = GetMaxPageItems(GetMenuStyleHandle(MenuStyle_Default));
 
 	InitChat();
-	Admin_OnPluginStart();
 	DB_OnPluginStart();
 	Forward_OnPluginStart();
 	Functions_OnPluginStart();
