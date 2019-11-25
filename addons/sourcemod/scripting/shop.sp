@@ -10,7 +10,6 @@
 EngineVersion Engine_Version = Engine_Unknown;
 
 int g_iMaxPageItems = 10;
-#define INVALID_DP_POS	view_as<DataPackPos>(-1)
 
 int global_timer;
 Panel panel_info;
@@ -46,7 +45,7 @@ ConVar g_hHideCategoriesItemsCount;
 #include "shop/stats.sp"
 #endif
 
-#define SHOP_VERSION "3.0D3" // 10.05.2019
+#define SHOP_VERSION "3.0D4" // 19.10.2019
 
 public Plugin myinfo =
 {
@@ -182,7 +181,6 @@ public void OnPluginStart()
 	g_iMaxPageItems = GetMaxPageItems(GetMenuStyleHandle(MenuStyle_Default));
 
 	InitChat();
-	Admin_OnPluginStart();
 	DB_OnPluginStart();
 	Forward_OnPluginStart();
 	Functions_OnPluginStart();

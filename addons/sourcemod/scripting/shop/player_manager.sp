@@ -1187,6 +1187,7 @@ public int PlayerManager_AuthorizeClient(Database owner, DBResultSet hndl, const
 		{
 			iCredits[client] = dp.ReadCell();
 			i_Id[client] = hndl.InsertId;
+			g_bAuthorized[client] = true; // client doesn't have any item, so there are no reason to load them
 		}
 	}
 	delete dp;
