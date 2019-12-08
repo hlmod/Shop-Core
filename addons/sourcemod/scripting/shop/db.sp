@@ -262,12 +262,12 @@ public void DB_Connect(Database db, const char[] error, any data)
 	char s_Query[256];
 	if (db_type == DB_MySQL)
 	{
-		DB_TQueryEx("SET NAMES 'utf8'");
-		DB_TQueryEx("SET CHARSET 'utf8'");
+		DB_TQueryEx("SET NAMES 'utf8mb4'");
+		DB_TQueryEx("SET CHARSET 'utf8mb4'");
 
 		if (GetFeatureStatus(FeatureType_Native, "SQL_SetCharset") == FeatureStatus_Available)
 		{
-			h_db.SetCharset("utf8");
+			h_db.SetCharset("utf8mb4");
 		}
 
 		DB_TQuery(DB_GlobalTimer, "SELECT UNIX_TIMESTAMP()", _, DBPrio_High);
@@ -384,7 +384,7 @@ void DB_CreateTables()
 							  `buy_price` int NOT NULL,\
 							  `sell_price` int NOT NULL,\
 							  `buy_time` int\
-							) ENGINE=InnoDB DEFAULT CHARSET=utf8;", g_sDbPrefix);
+							) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;", g_sDbPrefix);
 		DB_TQuery(DB_OnPlayersTableLoad, s_Query, 1);
 		
 		h_db.Format(s_Query, sizeof(s_Query), "CREATE TABLE IF NOT EXISTS `%sitems` (\
@@ -392,7 +392,7 @@ void DB_CreateTables()
 							  `category` varchar(64) NOT NULL,\
 							  `item` varchar(64) NOT NULL,\
 							  PRIMARY KEY (`id`)\
-							) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;", g_sDbPrefix);
+							) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=1 ;", g_sDbPrefix);
 		DB_TQuery(DB_OnPlayersTableLoad, s_Query, 2);
 		
 		h_db.Format(s_Query, sizeof(s_Query), "CREATE TABLE IF NOT EXISTS `%splayers` (\
@@ -403,7 +403,7 @@ void DB_CreateTables()
 							  `lastconnect` int,\
 							  PRIMARY KEY (`id`), \
 								UNIQUE KEY `auth` (`auth`) \
-							) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;", g_sDbPrefix);
+							) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=1;", g_sDbPrefix);
 		DB_TQuery(DB_OnPlayersTableLoad, s_Query, 3);
 		
 		h_db.Format(s_Query, sizeof(s_Query), "CREATE TABLE IF NOT EXISTS `%stoggles` (\
@@ -412,7 +412,7 @@ void DB_CreateTables()
 							  `item_id` int NOT NULL,\
 							  `state` tinyint NOT NULL DEFAULT 0,\
 							  PRIMARY KEY (`id`) \
-							) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;", g_sDbPrefix);
+							) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=1;", g_sDbPrefix);
 		DB_TQuery(DB_OnPlayersTableLoad, s_Query, 4);
 	}
 	else
