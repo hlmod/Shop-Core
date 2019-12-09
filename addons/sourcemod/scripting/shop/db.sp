@@ -318,7 +318,7 @@ public void DB_CheckTable(Database db, DBResultSet results, const char[] error, 
 	{
 		if (!results.HasResults || !results.FetchRow() || results.FetchInt(0) < 1)
 		{
-			h_db.Format(s_Query, sizeof(s_Query), "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '%sitems';", g_sDbPrefix);
+			h_db.Format(s_Query, sizeof(s_Query), "SELECT LEFT(TABLE_COLLATION, 7) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '%sitems';", g_sDbPrefix);
 			DB_TQuery(DB_CheckTable2, s_Query);
 			
 			return;
@@ -350,21 +350,32 @@ public void DB_CheckTable2(Database db, DBResultSet results, const char[] error,
 		return;
 	}
 	
-	if (results.RowCount > 0)
+	if (db_type == DB_MySQL)
 	{
-		if (db_type == DB_MySQL)
-		{
-			if (results.FetchRow() && results.FetchInt(0) > 0)
-			{
-				DB_UpgradeToNewVersion();
-				return;
-			}
-		}
-		else
+		if (results.RowCount == 0)
 		{
 			DB_UpgradeToNewVersion();
 			return;
 		}
+
+		if (results.FetchRow())
+		{
+			char sCollationType[8];
+			results.FetchString(0, sCollationType, sizeof(sCollationType));
+			if (strcmp(sCollationType, "utf8mb4") == 0)
+			{
+				char sQuery[64];
+				h_db.Format(sQuery, sizeof(sQuery), "ALTER TABLE `%sitems` CONVERT TO CHARSET utf8mb4", g_sDbPrefix);
+				DB_TQueryEx(sQuery);
+			}
+		}
+
+		return;
+	}
+	else
+	{
+		DB_UpgradeToNewVersion();
+		return;
 	}
 	
 	DB_CreateTables();
