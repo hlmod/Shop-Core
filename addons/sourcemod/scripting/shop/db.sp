@@ -372,7 +372,7 @@ public void DB_CheckTable2(Database db, DBResultSet results, const char[] error,
 
 		return;
 	}
-	else
+	else if (results.RowCount == 0)
 	{
 		DB_UpgradeToNewVersion();
 		return;
