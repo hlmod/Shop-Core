@@ -362,7 +362,7 @@ public void DB_CheckTable2(Database db, DBResultSet results, const char[] error,
 		{
 			char sCollationType[8];
 			results.FetchString(0, sCollationType, sizeof(sCollationType));
-			if (strcmp(sCollationType, "utf8mb4") == 0)
+			if (strcmp(sCollationType, "utf8mb4") != 0)
 			{
 				char sQuery[64];
 				h_db.Format(sQuery, sizeof(sQuery), "ALTER TABLE `%sitems` CONVERT TO CHARSET utf8mb4", g_sDbPrefix);
