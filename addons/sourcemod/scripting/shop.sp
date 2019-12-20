@@ -6,14 +6,13 @@
 #tryinclude <SteamWorks>
 #define REQUIRE_EXTENSIONS
 
-#define SHOP_VERSION "3.0D2" // 21.04.2019
+#define SHOP_VERSION "3.0D4" // 19.10.2019
 #define SHOP_MYSQL_CHARSET "utf8mb4"
 
 #pragma newdecls required
 EngineVersion Engine_Version = Engine_Unknown;
 
 int g_iMaxPageItems = 10;
-#define INVALID_DP_POS	view_as<DataPackPos>(-1)
 
 int global_timer;
 Panel panel_info;
@@ -183,7 +182,6 @@ public void OnPluginStart()
 	g_iMaxPageItems = GetMaxPageItems(GetMenuStyleHandle(MenuStyle_Default));
 
 	InitChat();
-	Admin_OnPluginStart();
 	DB_OnPluginStart();
 	Forward_OnPluginStart();
 	Functions_OnPluginStart();
@@ -1731,8 +1729,6 @@ int GetCredits(int client)
 
 bool SetCredits(int client, int credits, int by_who)
 {
-	PlayerManager_SetCredits(client, credits);
-
 	if (credits < 1)
 	{
 		return false;
