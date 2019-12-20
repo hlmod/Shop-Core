@@ -318,7 +318,7 @@ public void DB_CheckTable(Database db, DBResultSet results, const char[] error, 
 	{
 		if (!results.HasResults || !results.FetchRow() || results.FetchInt(0) < 1)
 		{
-			h_db.Format(s_Query, sizeof(s_Query), "SELECT TABLE_COLLATION FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '%sitems';", g_sDbPrefix);
+			h_db.Format(s_Query, sizeof(s_Query), "SELECT LEFT(TABLE_COLLATION, %d) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '%sitems';", strlen(SHOP_MYSQL_CHARSET), g_sDbPrefix);
 			DB_TQuery(DB_CheckTable2, s_Query);
 			
 			return;
