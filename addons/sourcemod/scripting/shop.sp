@@ -6,6 +6,9 @@
 #tryinclude <SteamWorks>
 #define REQUIRE_EXTENSIONS
 
+#define SHOP_VERSION "3.0D4" // 19.10.2019
+#define SHOP_MYSQL_CHARSET "utf8mb4"
+
 #pragma newdecls required
 EngineVersion Engine_Version = Engine_Unknown;
 
@@ -44,8 +47,6 @@ ConVar g_hHideCategoriesItemsCount;
 #if defined _SteamWorks_Included
 #include "shop/stats.sp"
 #endif
-
-#define SHOP_VERSION "3.0D4" // 19.10.2019
 
 public Plugin myinfo =
 {
