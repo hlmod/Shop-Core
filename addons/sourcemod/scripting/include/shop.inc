@@ -373,6 +373,7 @@ public void __pl_shop_SetNTVOptional()
 	MarkNativeAsOptional("Shop_GetItemCategoryId");
 	MarkNativeAsOptional("Shop_GetCategoryId");
 	MarkNativeAsOptional("Shop_GetCategoryById");
+	MarkNativeAsOptional("Shop_GetCategoryNameById");
 	MarkNativeAsOptional("Shop_FillArrayByItems");
 	MarkNativeAsOptional("Shop_FormatItem");
 	
