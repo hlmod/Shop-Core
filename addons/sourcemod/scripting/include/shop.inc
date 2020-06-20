@@ -72,230 +72,230 @@ enum ShopMenu
 
 /**
  *	Called when the shop is ready to register items
- *	-
+ *	
  *	@noparams
- *	-
+ *	
  *	@noreturn
 */
 forward void Shop_Started();
 
 /**
  *	Called when the plugin has loaded the player's data
- *	-
+ *	
  *	@param client		Client index
- *	-
+ *	
  *	@noreturn
  */
 forward void Shop_OnAuthorized(int client);
 
 /**
  *	Called when a menu is being titled
- *	-
+ *	
  *	@param client			Client index to whom a menu is being titled
  *	@param menu_action		Menu that is being titled
  *	@param title			Current title is being set
  *	@param buffer			New title to set
  *	@param maxlength		Maxlength of the title
- *	-
+ *	
  *	@return true to apply new value and false to ignore
 */
 forward bool Shop_OnMenuTitle(int client, ShopMenu menu_action, const char[] title, char[] buffer, int maxlength);
 
 /**
  *	Called when credits are being sent to a player
- *	-
+ *	
  *	@param client				Client index who is sending credits
  *	@param target				Client index to whom credits being sent
  *	@param amount_give			Amount of credits being given to a target player. By reference
  *	@param amount_remove		Amount of credits being taken from performing player.
  *	@param amount_commission	Amount of credits the commission was set. By reference
  *	@param bPercent				Whether the commission was set by the percent By reference
- *	-
+ *	
  *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block
 */
 forward Action Shop_OnCreditsTransfer(int client, int target, int &amount_give, int &amount_remove, int &amount_commission, bool bPercent);
 
 /**
  *	Called when credits has been sent to a player
- *	-
+ *	
  *	@param client				Client index who sent credits
  *	@param target				Client index to whom credits were sent
  *	@param amount_give			Amount of credits has been given to a target player
  *	@param amount_remove		Amount of credits has been taken from a performing player
-  *	@param amount_commission	Amount of credits the commission was set
- *	-
+ *	@param amount_commission	Amount of credits the commission was set
+ *	
  *	@noreturn
 */
 forward void Shop_OnCreditsTransfered(int client, int target, int amount_give, int amount_remove, int amount_commission);
 
 /**
  *	Called when a player is being set credits to
- *	-
+ *	
  *	@param client			Client index who is being set to
  *	@param credits			Amount of credits a client is being set to. By reference
  *	@param by_who			See CREDITS_BY_* definitions for more info and any higher value is the admin index
- *	-
+ *	
  *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block
 */
 forward Action Shop_OnCreditsSet(int client, int &credits, int by_who);
 
 /**
  *	Called when a player is being given credits to
- *	-
+ *	
  *	@param client			Client index who is being given to
  *	@param credits			Amount of credits a client is being given to. By reference
  *	@param by_who			See CREDITS_BY_* definitions for more info and any higher values is the admin index
- *	-
+ *	
  *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block
 */
 forward Action Shop_OnCreditsGiven(int client, int &credits, int by_who);
 
 /**
  *	Called when a player is being taken credits from
- *	-
+ *	
  *	@param client			Client index who is being taken from
  *	@param credits			Amount of credits a client is being taken for. By reference
  *	@param by_who			See CREDITS_BY_* definitions for more info and any higher value is the admin index
- *	-
+ *	
  *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block
 */
 forward Action Shop_OnCreditsTaken(int client, int &credits, int by_who);
 
 /**
  *	Called when a player is being set gold to
- *	-
+ *	
  *	@param client			Client index who is being set to
  *	@param amount			Amount of gold a client is being set to. By reference
  *	@param by_who			See CREDITS_BY_* definitions for more info and any higher value is the admin index
- *	-
+ *	
  *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block
 */
 forward Action Shop_OnGoldSet(int client, int &amount, int by_who);
 
 /**
  *	Called when a player is being given gold to
- *	-
+ *	
  *	@param client			Client index who is being given to
  *	@param amount			Amount of gold a client is being given to. By reference
  *	@param by_who			See CREDITS_BY_* definitions for more info and any higher values is the admin index
- *	-
+ *	
  *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block
 */
 forward Action Shop_OnGoldGiven(int client, int &amount, int by_who);
 
 /**
  *	Called when a player is being taken gold from
- *	-
+ *	
  *	@param client			Client index who is being taken from
  *	@param amount			Amount of gold a client is being taken for. By reference
  *	@param by_who			See CREDITS_BY_* definitions for more info and any higher value is the admin index
- *	-
+ *	
  *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block
 */
 forward Action Shop_OnGoldTaken(int client, int &amount, int by_who);
 
 /**
  *	Called when a player is trying to try a luck
- *	-
+ *	
  *	@param client			Client index who is perfroming
- *	-
+ *	
  *	@return true to allow performing and false to block
 */
 forward bool Shop_OnClientLuckProcess(int client);
 
 /**
  *	Called when a player is nearly to win an item
- *	-
+ *	
  *	@param client			Client index who is nearly to win
  *	@param item_id			Item id of the item
- *	-
+ *	
  *	@return true to allow and false to block
 */
 forward bool Shop_OnClientShouldLuckItem(int client, ItemId item_id);
 
 /**
  *	Called when a player has won an item
- *	-
+ *	
  *	@param client			Client index who has won
  *	@param item_id			Item id of the item
- *	-
+ *	
  *	@noreturn
 */
 forward void Shop_OnClientItemLucked(int client, ItemId item_id);
 
 /**
  *	Checks whether the shop has been started
- *	-
+ *	
  *	@noparams
- *	-
+ *	
  *	@return	True if the shop is already started, false otherwise
 */
 native bool Shop_IsStarted();
 
 /**
  *	This must be called on PluginEnd. Fully unregisters the plugin. Unregisters items, categories and removes them from the shop and players' inventory
- *	-
+ *	
  *	@noparams
- *	-
+ *	
  *	@noreturn
 */
 native void Shop_UnregisterMe();
 
 /**
  *	Shows a player an item's panel
- *	-
+ *	
  *	@param client			Client index
  *	@param item_id			Item id of the item
- *	-
+ *	
  *	@return true if a panel has been shown, false otherwise
 */
 native bool Shop_ShowItemPanel(int client, ItemId item_id);
 
 /**
  *	Opens main menu for a player
- *	-
+ *	
  *	@param client			Client index
- *	-
+ *	
  *	@noreturn
 */
 native void Shop_OpenMainMenu(int client);
 
 /**
  *	Shows a player categories of the shop
- *	-
+ *	
  *	@param client			Client index
- *	-
+ *	
  *	@return true if categories has been shown, false otherwise
 */
 native bool Shop_ShowCategory(int client);
 
 /**
  *	Shows a player his inventory
- *	-
+ *	
  *	@param client			Client index
- *	-
+ *	
  *	@return true if the inventory has been shown, false otherwise
 */
 native bool Shop_ShowInventory(int client);
 
 /**
  *	Shows a player items of a category
- *	-
+ *	
  *	@param client			Client index
  *	@param category_id		Category id to show
  *	@param inventory		To show items of his inventory
- *	-
+ *	
  *	@return true if the items has been shown, false otherwise
 */
 native bool Shop_ShowItemsOfCategory(int client, CategoryId category_id, bool inventory = false);
 
 /**
  *	Get path to the main config folder of the Shop
- *	-
+ *	
  *	@param buffer			Buffer to store the path in
  *	@param size				Max buffer length
  *	@param file				File to retrieve the path for
- *	-
+ *	
  *	@noreturn
 */
 stock void Shop_GetCfgFile(char[] buffer, int size, const char[] file)
