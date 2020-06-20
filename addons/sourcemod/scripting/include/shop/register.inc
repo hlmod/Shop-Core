@@ -29,17 +29,17 @@ typeset Shop_ItemSellCallback
 /**
  *	Called when category registered at first time
  *  That means only once per unique name
- *	-
+ *	
  *	@param category_id		CategoryId of category
  *	@param name				Unique name of category
- *	-
+ *	
  *	@noreturn
 */
 forward void Shop_OnCategoryRegistered(CategoryId category_id, const char[] name);
 
 /**
  *	Registers new category id
- *	-
+ *	
  *	@param category				Category unique name
  *	@param name					Default category display name
  *	@param description			Default category description
@@ -47,7 +47,7 @@ forward void Shop_OnCategoryRegistered(CategoryId category_id, const char[] name
  *	@param cat_desc				Callback called on category's description being displayed
  *	@param cat_should			Callback called whether the category should be displayed to a player
  *	@param cat_select			Callback called when a player is trying to select the category
- *	-
+ *	
  *	@return Category id of the category
 */
 native CategoryId Shop_RegisterCategory(const char[] category, const char[] name, const char[] description, 
@@ -58,17 +58,17 @@ native CategoryId Shop_RegisterCategory(const char[] category, const char[] name
 
 /**
  *	Starts an item to register
- *	-
+ *	
  *	@param category_id			Category id to register an item for
  *	@param item					Item unique name
- *	-
+ *	
  *	@return true to success, false otherwise
 */
 native bool Shop_StartItem(CategoryId category_id, const char[] item);
 
 /**
  *	Sets the item information
- *	-
+ *	
  *	@param name					Default display name
  *	@param description			Default description
  *	@param price				Item price. Can not be lower than sell_price (on gold version can be lower and -1 for disable price by gold)
@@ -77,23 +77,23 @@ native bool Shop_StartItem(CategoryId category_id, const char[] item);
  *	@param value				Sets count if the item type is finite and sets duration if the item is togglable or non-togglable
  *	@param gold_price			Item price. Can be -1 to make in unbuyable by gold
  *	@param gold_sell_price		Item sell price. 0 to make item free by gold price and -1 to disable sell by gold. Can not be higher than price
- *	-
+ *	
  *	@noreturn
 */
 native void Shop_SetInfo(const char[] name, const char[] description, int price, int sell_price = -1, ItemType type, int value = 1, int gold_price = -1, int gold_sell_price = -1);
 
 /**
  *	Sets the item luck chance.
- *	-
+ *	
  *	@param luck_chance			Luck chance to set. From 0 to 100. 0 can not be lucked and 100 is always lucked by the general chance set in cvar. Default item chance is 100
- *	-
+ *	
  *	@noreturn
 */
 native void Shop_SetLuckChance(int luck_chance);
 
 /**
  *	Sets the item callbacks
- *	-
+ *	
  *	@param register				Callback called when the item is registered
  *	@param use_toggle			Callback called when the item is being used
  *	@param should				Callback called when the item is being displayed. Here you can stop displaying the item
@@ -103,7 +103,7 @@ native void Shop_SetLuckChance(int luck_chance);
  *	@param buy					Callback called when the item is being bought
  *	@param sell					Callback called when the item is being sold
  *	@param elapse				Callback called when the item is elapsed
- *	-
+ *	
  *	@noreturn
 */
 native void Shop_SetCallbacks(Shop_ItemRegister register=INVALID_FUNCTION,
@@ -118,58 +118,58 @@ native void Shop_SetCallbacks(Shop_ItemRegister register=INVALID_FUNCTION,
 
 /**
  *	Allows to hide item in buy panel, givable only by native or admin panel
- *	-
+ *	
  *	@param state			true - hide, false - show
- *	-
+ *	
  *	@noreturn
 */
 native void Shop_SetHide(bool state);
 
 /**
  *	Sets item custom info
- *	-
+ *	
  *	@param info			Name of the key
  *	@param value			Value to set
- *	-
+ *	
  *	@noreturn
 */
 native void Shop_SetCustomInfo(const char[] info, int value);
 
 /**
  *	Sets item custom info
- *	-
+ *	
  *	@param info			Name of the key
  *	@param value			Value to set
- *	-
+ *	
  *	@noreturn
 */
 native void Shop_SetCustomInfoFloat(const char[] info, float value);
 
 /**
  *	Sets item custom info
- *	-
+ *	
  *	@param info			Name of the key
  *	@param value			Value to set
- *	-
+ *	
  *	@noreturn
 */
 native void Shop_SetCustomInfoString(const char[] info, char[] value);
 
 /**
  *	Copies sub keys of the given kv structure to the item
- *	-
+ *	
  *	@param info			Name of the key
  *	@param value			Value to set
- *	-
+ *	
  *	@noreturn
 */
 native void Shop_KvCopySubKeysCustomInfo(KeyValues kv);
 
 /**
  *	Copletes the item info structure and start to register. Can not be used before an item has been started to register
- *	-
+ *	
  *	@noparams
- *	-
+ *	
  *	@noreturn
 */
 native void Shop_EndItem();
