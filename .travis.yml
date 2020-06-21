@@ -1,7 +1,4 @@
-﻿#Use the new container-based infrastructure
-sudo: false
-
-#Install some apt packages needed for spcomp
+﻿#Install some apt packages needed for spcomp
 addons:
     apt_packages:
         - lib32z1
@@ -11,7 +8,7 @@ language: c
 #Set the build environment
 env:
   global:
-    - STEAMWORKS_VERS=SteamWorks-git131
+    - STEAMWORKS_VERS=SteamWorks-git132
     - INCLUDE=addons/sourcemod/scripting/include
     - SCRIPTING=addons/sourcemod/scripting
     - PLUGINS=addons/sourcemod/plugins
@@ -54,12 +51,12 @@ before_deploy:
     - zip -rq shop shop
     - tar -czf shop.tar.gz shop
 deploy:
+    cleanup: true
     provider: releases
     api_key: ${GH_TOKEN}
     file:
       - shop.zip
       - shop.tar.gz
-    skip_cleanup: true
     on:
        tags: true
 #Notifications
