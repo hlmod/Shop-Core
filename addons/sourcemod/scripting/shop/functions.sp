@@ -608,14 +608,24 @@ void Functions_SetupLuck(int client)
 		return;
 	}
 	
-	int dummy;
+	int dummy, iLuckChance, iNewLuckValue;
 	ItemType type;
+	Action luckAction;
+	bool wasOverriden = false;
 	for (int i = 0; i < size; ++i)
 	{
 		dummy = hArray.Get(i);
 		type = GetItemType(dummy);
+		iLuckChance = GetItemLuckChance(dummy);
+		iNewLuckValue = iLuckChance;
+		luckAction = OnClientShouldLuckItem(client, dummy, iNewLuckValue);
+		if (luckAction == Plugin_Changed)
+		{
+			iLuckChance = iNewLuckValue;
+			wasOverriden = true;
+		}
 		
-		if (type != Item_Finite && type != Item_BuyOnly && ClientHasItem(client, dummy) || GetItemLuckChance(dummy) == 0 || !OnClientShouldLuckItem(client, dummy))
+		if (type != Item_Finite && type != Item_BuyOnly && ClientHasItem(client, dummy) || iLuckChance == 0 || luckAction == Plugin_Handled)
 		{
 			hArray.Erase(i--);
 			size--;
@@ -630,7 +640,7 @@ void Functions_SetupLuck(int client)
 		return;
 	}
 
-	if (GetRandomIntEx(1, 100) > g_hLuckChance.IntValue)
+	if (!wasOverriden && GetRandomIntEx(1, 100) > g_hLuckChance.IntValue)
 	{
 		delete hArray;
 		RemoveCredits(client, g_hLuckCredits.IntValue, CREDITS_BY_LUCK);
@@ -648,6 +658,12 @@ void Functions_SetupLuck(int client)
 		dummy = GetArrayCell(hArray, 0);
 		item_luck_chance = GetItemLuckChance(dummy);
 		
+		luckAction = OnClientShouldLuckItem(client, dummy, iNewLuckValue);
+		if (luckAction == Plugin_Changed)
+		{
+			item_luck_chance = iNewLuckValue;
+		}
+		
 		if (GetRandomIntEx(1, 100) > item_luck_chance)
 		{
 			if (size < 2)
@@ -664,6 +680,11 @@ void Functions_SetupLuck(int client)
 		item_id = dummy;
 		
 		break;
+	}
+	
+	if (hArray != null)
+	{
+		delete hArray;
 	}
 
 	RemoveCredits(client, g_hLuckCredits.IntValue, CREDITS_BY_LUCK);

@@ -103,13 +103,14 @@ bool Forward_OnClientLuckProcess(int client)
 	return result;
 }
 
-bool Forward_OnClientShouldLuckItem(int client, int item_id)
+Action Forward_OnClientShouldLuckItem(int client, int item_id, int &iLuckChance)
 {
-	bool result = true;
+	Action result = Plugin_Continue;
 	
 	Call_StartForward(h_fwdOnClientShouldLuckItem);
 	Call_PushCell(client);
 	Call_PushCell(item_id);
+	Call_PushCellRef(iLuckChance);
 	Call_Finish(result);
 	
 	return result;

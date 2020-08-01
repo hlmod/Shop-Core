@@ -205,13 +205,14 @@ forward bool Shop_OnClientLuckProcess(int client);
 
 /**
  *	Called when a player is nearly to win an item
- *	
- *	@param client			Client index who is nearly to win
- *	@param item_id			Item id of the item
- *	
- *	@return true to allow and false to block
+ *	-
+ *	@param client			client index
+ *	@param item_id			Item id
+ *	@param luck_chance		luck chance (by reference)
+ *	-
+ *	@return Plugin_Changed to apply custom changes. >= Plugin_Handled to block, Plugin_Continue - to proceed without changes.
 */
-forward bool Shop_OnClientShouldLuckItem(int client, ItemId item_id);
+forward Action Shop_OnClientShouldLuckItem(int client, ItemId item_id, int &luck_chance);
 
 /**
  *	Called when a player has won an item
