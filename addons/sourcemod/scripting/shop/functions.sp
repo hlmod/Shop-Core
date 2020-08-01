@@ -603,46 +603,53 @@ void Functions_SetupLuck(int client)
 	
 	if (!size)
 	{
-		CPrintToChat(client, "%t", "EmptyShop");
+		Helpers_ClearArrayWithChatReason(hArray, client, "EmptyShop");
+		return;
 	}
-	else
+	
+	bool wasOverriden = false;
+	// Remove from array items, that can't be in list on win, because of own luck chance or overriden by forward.
+	size = FilterItemsInLuckArray(hArray, client, wasOverriden);
+
+	if (!size)
 	{
-		bool wasOverriden = false;
-		// Remove from array items, that can't be in list on win, because of own luck chance or overriden by forward.
-		size = FilterItemsInLuckArray(hArray, client, wasOverriden);
-
-		if (!size)
-		{
-			// There are no items, that can be in Luck management
-			CPrintToChat(client, "%t", "NothingToLuck");
-		}
-		else if (!IsLoosedLuckWithCvarValue(client, wasOverriden)) // Play with cvar
-		{
-			// Get lucked item or INVALID_ITEM if no luck
-			int item_id = GetItemRollLuck(hArray, client);
-			if (view_as<ItemId>(item_id) == INVALID_ITEM)
-			{
-				// Looser
-				RemoveCredits(client, g_hLuckCredits.IntValue, CREDITS_BY_LUCK);
-				CPrintToChat(client, "%t", "Looser");
-			}
-			else
-			{
-				// Winner
-				RemoveCredits(client, g_hLuckCredits.IntValue, CREDITS_BY_LUCK);
-
-				GiveItem(client, item_id);
-
-				OnClientItemLucked(client, item_id);
-
-				char category[SHOP_MAX_STRING_LENGTH], item[SHOP_MAX_STRING_LENGTH];
-				GetCategoryDisplay(GetItemCategoryId(item_id), client, category, sizeof(category));
-				GetItemDisplay(item_id, client, item, sizeof(item));
-				
-				CPrintToChat(client, "%t", "Lucker", category, item);
-			}
-		}
+		// There are no items, that can be in Luck management
+		Helpers_ClearArrayWithChatReason(hArray, client, "NothingToLuck");
+		return;
 	}
+	
+	// Roll with a cvar
+	bool bIsWinner = IsLoosedLuckWithCvarValue(wasOverriden);
+	if (!bIsWinner)
+	{
+		RemoveCredits(client, g_hLuckCredits.IntValue, CREDITS_BY_LUCK);
+		Helpers_ClearArrayWithChatReason(hArray, client, "Looser");
+		return;
+	}
+	
+	// Get lucked item or INVALID_ITEM if no luck
+	int item_id = GetItemRollLuck(hArray, client);
+	bIsWinner = view_as<ItemId>(item_id) == INVALID_ITEM;
+	if (!bIsWinner)
+	{
+		// Looser
+		RemoveCredits(client, g_hLuckCredits.IntValue, CREDITS_BY_LUCK);
+		Helpers_ClearArrayWithChatReason(hArray, client, "Looser");
+		return;
+	}
+	
+	// Winner
+	RemoveCredits(client, g_hLuckCredits.IntValue, CREDITS_BY_LUCK);
+
+	GiveItem(client, item_id);
+
+	OnClientItemLucked(client, item_id);
+
+	char category[SHOP_MAX_STRING_LENGTH], item[SHOP_MAX_STRING_LENGTH];
+	GetCategoryDisplay(GetItemCategoryId(item_id), client, category, sizeof(category));
+	GetItemDisplay(item_id, client, item, sizeof(item));
+	
+	CPrintToChat(client, "%t", "Lucker", category, item);
 	
 	delete hArray;
 }
@@ -678,22 +685,17 @@ int FilterItemsInLuckArray(ArrayList hArray, int client, bool &wasOverriden)
 	return hArray.Length;
 }
 
-bool IsLoosedLuckWithCvarValue(int client, bool wasOverriden)
+bool IsLoosedLuckWithCvarValue(bool wasOverriden)
 {
-	bool looser = false;
+	bool winner = true;
 	if (!wasOverriden)
 	{
 		int rand = GetRandomIntEx(1, 100);
 		
-		looser = rand > g_hLuckChance.IntValue;
-		if (looser)
-		{
-			RemoveCredits(client, g_hLuckCredits.IntValue, CREDITS_BY_LUCK);
-			CPrintToChat(client, "%t", "Looser");
-		}
+		winner = rand > g_hLuckChance.IntValue;
 	}
 	
-	return looser;
+	return winner;
 }
 
 int GetItemRollLuck(ArrayList hArray, int client)
