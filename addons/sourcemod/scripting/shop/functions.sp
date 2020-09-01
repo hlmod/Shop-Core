@@ -90,7 +90,7 @@ void Functions_OnPluginStart()
 	g_hTransCredits.AddChangeHook(Functions_OnConVarChange);
 	
 	g_hLuckCredits = CreateConVar("sm_shop_luck_credits", "500", "How many credits the luck cost", 0, true, 0.0);
-	g_hLuckChance = CreateConVar("sm_shop_luck_chance", "20", "How many chance the luck can be succeded", 0, true, 1.0, true, 100.0);
+	g_hLuckChance = CreateConVar("sm_shop_luck_chance", "20", "How many chance the luck can be succeded", 0, true, 0.0, true, 100.0);
 }
 
 public void Functions_OnConVarChange(ConVar convar, const char[] oldValue, const char[] newValue)
@@ -619,7 +619,7 @@ void Functions_SetupLuck(int client)
 	}
 	
 	// Roll with a cvar
-	bool bIsWinner = IsLoosedLuckWithCvarValue(wasOverriden);
+	bool bIsWinner = IsWinLuckWithCvar(wasOverriden);
 	if (!bIsWinner)
 	{
 		RemoveCredits(client, g_hLuckCredits.IntValue, CREDITS_BY_LUCK);
@@ -685,14 +685,14 @@ int FilterItemsInLuckArray(ArrayList hArray, int client, bool &wasOverriden)
 	return hArray.Length;
 }
 
-bool IsLoosedLuckWithCvarValue(bool wasOverriden)
+bool IsWinLuckWithCvar(bool wasOverriden)
 {
 	bool winner = true;
 	if (!wasOverriden)
 	{
 		int rand = GetRandomIntEx(1, 100);
 		
-		winner = rand > g_hLuckChance.IntValue;
+		winner = rand <= g_hLuckChance.IntValue;
 	}
 	
 	return winner;
