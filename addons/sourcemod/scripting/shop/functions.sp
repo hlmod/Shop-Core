@@ -90,7 +90,7 @@ void Functions_OnPluginStart()
 	g_hTransCredits.AddChangeHook(Functions_OnConVarChange);
 	
 	g_hLuckCredits = CreateConVar("sm_shop_luck_credits", "500", "How many credits the luck cost", 0, true, 0.0);
-	g_hLuckChance = CreateConVar("sm_shop_luck_chance", "20", "How many chance the luck can be succeded", 0, true, 0.0, true, 100.0);
+	g_hLuckChance = CreateConVar("sm_shop_luck_chance", "20", "How many chance the luck can be succeded", 0, true, 1.0, true, 100.0);
 }
 
 public void Functions_OnConVarChange(ConVar convar, const char[] oldValue, const char[] newValue)
