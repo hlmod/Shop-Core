@@ -603,7 +603,7 @@ void Functions_SetupLuck(int client)
 	
 	if (!size)
 	{
-		Helpers_ClearArrayWithChatReason(hArray, client, "EmptyShop");
+		Helpers_CloseHandleWithChatReason(hArray, client, "EmptyShop");
 		return;
 	}
 	
@@ -614,7 +614,7 @@ void Functions_SetupLuck(int client)
 	if (!size)
 	{
 		// There are no items, that can be in Luck management
-		Helpers_ClearArrayWithChatReason(hArray, client, "NothingToLuck");
+		Helpers_CloseHandleWithChatReason(hArray, client, "NothingToLuck");
 		return;
 	}
 	
@@ -623,7 +623,7 @@ void Functions_SetupLuck(int client)
 	if (!bIsWinner)
 	{
 		RemoveCredits(client, g_hLuckCredits.IntValue, CREDITS_BY_LUCK);
-		Helpers_ClearArrayWithChatReason(hArray, client, "Looser");
+		Helpers_CloseHandleWithChatReason(hArray, client, "Looser");
 		return;
 	}
 	
@@ -634,7 +634,7 @@ void Functions_SetupLuck(int client)
 	{
 		// Looser
 		RemoveCredits(client, g_hLuckCredits.IntValue, CREDITS_BY_LUCK);
-		Helpers_ClearArrayWithChatReason(hArray, client, "Looser");
+		Helpers_CloseHandleWithChatReason(hArray, client, "Looser");
 		return;
 	}
 	
@@ -659,13 +659,15 @@ int FilterItemsInLuckArray(ArrayList hArray, int client, bool &wasOverriden)
 	int dummy, iLuckChance, iNewLuckValue;
 	ItemType type;
 	Action luckAction;
+	bool bShouldLuck;
 	for (int i = 0; i < hArray.Length; ++i)
 	{
 		dummy = hArray.Get(i);
 		type = GetItemType(dummy);
 		iLuckChance = GetItemLuckChance(dummy);
 		iNewLuckValue = iLuckChance;
-		luckAction = OnClientShouldLuckItem(client, dummy, iNewLuckValue);
+		luckAction = OnClientShouldLuckItemChance(client, dummy, iNewLuckValue);
+		bShouldLuck = OnClientShouldLuckItem(client, dummy);
 		
 		// To override luck for item
 		if (luckAction == Plugin_Changed)
@@ -676,7 +678,7 @@ int FilterItemsInLuckArray(ArrayList hArray, int client, bool &wasOverriden)
 			wasOverriden = true;
 		}
 		
-		if (type != Item_Finite && type != Item_BuyOnly && ClientHasItem(client, dummy) || iLuckChance == 0 || luckAction == Plugin_Handled)
+		if (type != Item_Finite && type != Item_BuyOnly && ClientHasItem(client, dummy) || iLuckChance == 0 || luckAction == Plugin_Handled || !bShouldLuck)
 		{
 			hArray.Erase(i--);
 		}
@@ -710,7 +712,7 @@ int GetItemRollLuck(ArrayList hArray, int client)
 		dummy = hArray.Get(0);
 		item_luck_chance = GetItemLuckChance(dummy);
 		
-		luckAction = OnClientShouldLuckItem(client, dummy, iNewLuckValue);
+		luckAction = OnClientShouldLuckItemChance(client, dummy, iNewLuckValue);
 		if (luckAction == Plugin_Changed)
 		{
 			item_luck_chance = iNewLuckValue;

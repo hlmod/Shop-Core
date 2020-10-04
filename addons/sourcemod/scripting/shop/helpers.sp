@@ -143,8 +143,8 @@ stock int Helpers_Math_Abs(int value)
 /**
  * 
  */
-void Helpers_ClearArrayWithChatReason(ArrayList hArray, int client, const char[] str)
+void Helpers_CloseHandleWithChatReason(Handle hArray, int client, const char[] chatReason)
 {
 	delete hArray;
-	CPrintToChat(client, "%t", str);
+	CPrintToChat(client, "%t", chatReason);
 }
