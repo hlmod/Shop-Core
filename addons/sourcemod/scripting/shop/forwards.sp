@@ -33,7 +33,7 @@ void Forward_OnPluginStart()
 	h_fwdOnItemElapsed = CreateGlobalForward("Shop_OnItemElapsed", ET_Ignore, Param_Cell, Param_Cell, Param_String, Param_Cell, Param_String);
 	h_fwdOnClientLuckProcess = CreateGlobalForward("Shop_OnClientLuckProcess", ET_Hook, Param_Cell);
 	h_fwdOnClientShouldLuckItem = CreateGlobalForward("Shop_OnClientShouldLuckItem", ET_Hook, Param_Cell, Param_Cell);
-	h_fwdOnClientShouldLuckItemChance = CreateGlobalForward("Shop_OnClientShouldLuckItem", ET_Hook, Param_Cell, Param_Cell, Param_Cell);
+	h_fwdOnClientShouldLuckItemChance = CreateGlobalForward("Shop_OnClientShouldLuckItemChance", ET_Hook, Param_Cell, Param_Cell, Param_CellByRef);
 	h_fwdOnClientItemLucked = CreateGlobalForward("Shop_OnClientItemLucked", ET_Ignore, Param_Cell, Param_Cell);
 	h_fwdOnItemTransfer = CreateGlobalForward("Shop_OnItemTransfer", ET_Hook, Param_Cell, Param_Cell, Param_Cell);
 	h_fwdOnItemTransfered = CreateGlobalForward("Shop_OnItemTransfered", ET_Ignore, Param_Cell, Param_Cell, Param_Cell);
