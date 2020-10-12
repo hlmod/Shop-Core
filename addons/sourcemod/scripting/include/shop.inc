@@ -204,14 +204,26 @@ forward Action Shop_OnGoldTaken(int client, int &amount, int by_who);
 forward bool Shop_OnClientLuckProcess(int client);
 
 /**
- *	Called when a player is nearly to win an item
- *	
- *	@param client			Client index who is nearly to win
- *	@param item_id			Item id of the item
- *	
+ *	Called when a player is nearly to win an item (deprecated)
+ *	-
+ *	@param client			client index
+ *	@param item_id			Item id
+ *	-
  *	@return true to allow and false to block
 */
+#pragma deprecated This forward will be removed in a future, use Shop_OnClientShouldLuckItemChance instead.
 forward bool Shop_OnClientShouldLuckItem(int client, ItemId item_id);
+
+/**
+ *	Called when a player is nearly to win an item
+ *	-
+ *	@param client			client index
+ *	@param item_id			Item id
+ *	@param luck_chance		luck chance (by reference)
+ *	-
+ *	@return Plugin_Changed to apply custom changes. >= Plugin_Handled to block, Plugin_Continue - to proceed without changes.
+*/
+forward Action Shop_OnClientShouldLuckItemChance(int client, ItemId item_id, int &luck_chance);
 
 /**
  *	Called when a player has won an item

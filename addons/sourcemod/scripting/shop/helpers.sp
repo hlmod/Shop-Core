@@ -139,3 +139,12 @@ stock int Helpers_Math_Abs(int value)
 {
 	return (value ^ (value >> 31)) - (value >> 31);
 }
+
+/**
+ * 
+ */
+void Helpers_CloseHandleWithChatReason(Handle hArray, int client, const char[] chatReason)
+{
+	delete hArray;
+	CPrintToChat(client, "%t", chatReason);
+}

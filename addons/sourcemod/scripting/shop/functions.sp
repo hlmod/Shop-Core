@@ -599,73 +599,46 @@ void Functions_SetupLuck(int client)
 	}
 	int size;
 	ArrayList hArray = Shop_CreateArrayOfItems(size);
-	SortADTArray(hArray, Sort_Random, Sort_Integer);
+	hArray.Sort(Sort_Random, Sort_Integer);
 	
 	if (!size)
 	{
-		delete hArray;
-		CPrintToChat(client, "%t", "EmptyShop");
+		Helpers_CloseHandleWithChatReason(hArray, client, "EmptyShop");
 		return;
 	}
 	
-	int dummy;
-	ItemType type;
-	for (int i = 0; i < size; ++i)
-	{
-		dummy = hArray.Get(i);
-		type = GetItemType(dummy);
-		
-		if (type != Item_Finite && type != Item_BuyOnly && ClientHasItem(client, dummy) || GetItemLuckChance(dummy) == 0 || !OnClientShouldLuckItem(client, dummy))
-		{
-			hArray.Erase(i--);
-			size--;
-		}
-	}
+	bool wasOverriden = false;
+	// Remove from array items, that can't be in list on win, because of own luck chance or overriden by forward.
+	size = FilterItemsInLuckArray(hArray, client, wasOverriden);
 
 	if (!size)
 	{
-		delete hArray;
-		CPrintToChat(client, "%t", "NothingToLuck");
-		
+		// There are no items, that can be in Luck management
+		Helpers_CloseHandleWithChatReason(hArray, client, "NothingToLuck");
 		return;
 	}
-
-	if (GetRandomIntEx(1, 100) > g_hLuckChance.IntValue)
+	
+	// Roll with a cvar
+	bool bIsWinner = IsWinLuckWithCvar(wasOverriden);
+	if (!bIsWinner)
 	{
-		delete hArray;
 		RemoveCredits(client, g_hLuckCredits.IntValue, CREDITS_BY_LUCK);
-		
-		CPrintToChat(client, "%t", "Looser");
-		
+		Helpers_CloseHandleWithChatReason(hArray, client, "Looser");
 		return;
 	}
 	
-	int item_id, item_luck_chance;
-	while (size > 0)
+	// Get lucked item or INVALID_ITEM if no luck
+	int item_id = GetItemRollLuck(hArray, client);
+	bIsWinner = view_as<ItemId>(item_id) == INVALID_ITEM;
+	if (!bIsWinner)
 	{
-		SortADTArray(hArray, Sort_Random, Sort_Integer);
-		
-		dummy = GetArrayCell(hArray, 0);
-		item_luck_chance = GetItemLuckChance(dummy);
-		
-		if (GetRandomIntEx(1, 100) > item_luck_chance)
-		{
-			if (size < 2)
-			{
-				delete hArray;
-				RemoveCredits(client, g_hLuckCredits.IntValue, CREDITS_BY_LUCK);
-				CPrintToChat(client, "%t", "Looser");
-				return;
-			}
-			hArray.Erase(0);
-			size--;
-		}
-		
-		item_id = dummy;
-		
-		break;
+		// Looser
+		RemoveCredits(client, g_hLuckCredits.IntValue, CREDITS_BY_LUCK);
+		Helpers_CloseHandleWithChatReason(hArray, client, "Looser");
+		return;
 	}
-
+	
+	// Winner
 	RemoveCredits(client, g_hLuckCredits.IntValue, CREDITS_BY_LUCK);
 
 	GiveItem(client, item_id);
@@ -677,6 +650,90 @@ void Functions_SetupLuck(int client)
 	GetItemDisplay(item_id, client, item, sizeof(item));
 	
 	CPrintToChat(client, "%t", "Lucker", category, item);
+	
+	delete hArray;
+}
+
+int FilterItemsInLuckArray(ArrayList hArray, int client, bool &wasOverriden)
+{
+	int dummy, iLuckChance, iNewLuckValue;
+	ItemType type;
+	Action luckAction;
+	bool bShouldLuck;
+	for (int i = 0; i < hArray.Length; ++i)
+	{
+		dummy = hArray.Get(i);
+		type = GetItemType(dummy);
+		iLuckChance = GetItemLuckChance(dummy);
+		iNewLuckValue = iLuckChance;
+		luckAction = OnClientShouldLuckItemChance(client, dummy, iNewLuckValue);
+		bShouldLuck = OnClientShouldLuckItem(client, dummy);
+		
+		// To override luck for item
+		if (luckAction == Plugin_Changed)
+		{
+			iLuckChance = iNewLuckValue;
+			
+			// If that block called at least once to forbid playing with g_hLuckChance cvar value
+			wasOverriden = true;
+		}
+		
+		if (type != Item_Finite && type != Item_BuyOnly && ClientHasItem(client, dummy) || iLuckChance == 0 || luckAction == Plugin_Handled || !bShouldLuck)
+		{
+			hArray.Erase(i--);
+		}
+	}
+	
+	return hArray.Length;
+}
+
+bool IsWinLuckWithCvar(bool wasOverriden)
+{
+	bool winner = true;
+	if (!wasOverriden)
+	{
+		int rand = GetRandomIntEx(1, 100);
+		
+		winner = rand <= g_hLuckChance.IntValue;
+	}
+	
+	return winner;
+}
+
+int GetItemRollLuck(ArrayList hArray, int client)
+{
+	Action luckAction;
+	int dummy, item_id, item_luck_chance, iNewLuckValue, size;
+	size = hArray.Length;
+	while (size > 0)
+	{
+		hArray.Sort(Sort_Random, Sort_Integer);
+		
+		dummy = hArray.Get(0);
+		item_luck_chance = GetItemLuckChance(dummy);
+		
+		luckAction = OnClientShouldLuckItemChance(client, dummy, iNewLuckValue);
+		if (luckAction == Plugin_Changed)
+		{
+			item_luck_chance = iNewLuckValue;
+		}
+		
+		if (GetRandomIntEx(1, 100) > item_luck_chance)
+		{
+			if (size < 2)
+			{
+				return view_as<int>(INVALID_ITEM);
+			}
+			hArray.Erase(0);
+			size--;
+		}
+		
+		item_id = dummy;
+		
+		break;
+	}
+	
+	return item_id;
 }
 
 stock bool Functions_AddTargetsToMenu(Menu menu, int filter_client)

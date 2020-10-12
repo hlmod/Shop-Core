@@ -1990,6 +1990,11 @@ bool OnClientShouldLuckItem(int client, int item_id)
 	return Forward_OnClientShouldLuckItem(client, item_id);
 }
 
+Action OnClientShouldLuckItemChance(int client, int item_id, int &iLuckChance)
+{
+	return Forward_OnClientShouldLuckItemChance(client, item_id, iLuckChance);
+}
+
 void OnClientItemLucked(int client, int item_id)
 {
 	Forward_OnClientItemLucked(client, item_id);
