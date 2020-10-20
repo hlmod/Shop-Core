@@ -1063,7 +1063,7 @@ public int ItemManager_GetItemId(Handle plugin, int numParams)
 	int category_id = GetNativeCell(1);
 	GetNativeString(2, item, sizeof(item));
 	
-	int item_id = -1;
+	int item_id = view_as<int>(INVALID_ITEM);
 	
 	h_KvItems.Rewind();
 	if (h_KvItems.GotoFirstSubKey())
