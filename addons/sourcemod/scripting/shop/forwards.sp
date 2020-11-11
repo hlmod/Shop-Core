@@ -217,7 +217,7 @@ Action Forward_OnCreditsTaken(int client, int &credits, int by_who)
 	return result;
 }
 
-void Forward_OnCreditsTaken_Post(int client, int &credits, int by_who)
+void Forward_OnCreditsTaken_Post(int client, int credits, int by_who)
 {
 	Call_StartForward(h_fwdOnCreditsTakenPost);
 	Call_PushCell(client);
@@ -239,7 +239,7 @@ Action Forward_OnCreditsSet(int client, int &credits, int by_who)
 	return result;
 }
 
-Action Forward_OnCreditsSet_Post(int client, int &credits, int by_who)
+void Forward_OnCreditsSet_Post(int client, int credits, int by_who)
 {
 	Call_StartForward(h_fwdOnCreditsSetPost);
 	Call_PushCell(client);
