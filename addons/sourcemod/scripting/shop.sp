@@ -680,7 +680,10 @@ public int OnItemSelect(Menu menu, MenuAction action, int param1, int param2)
 			char info[16];
 			menu.GetItem(param2, info, sizeof(info));
 			iPos[param1] = GetMenuSelectionPosition();
-			if (!ShowItemInfo(param1, StringToInt(info)))
+
+			Action result = Forward_OnItemSelect(param1, bInv[param1] ? Menu_Inventory : Menu_Buy, iClCategoryId[param1], StringToInt(info));
+			
+			if (result == Plugin_Handled || (result == Plugin_Changed || result == Plugin_Continue && !ShowItemInfo(param1, StringToInt(info))))
 			{
 				ShowItemsOfCategory(param1, iClCategoryId[param1], bInv[param1], iPos[param1]);
 			}
