@@ -1299,6 +1299,7 @@ bool ItemManager_FillCategories(Menu menu, int source_client, bool inventory = f
 	ArrayList array, hCategoriesArray;
 	char sCatId[16];
 	int iSize, x, i, index;
+	ShopMenu shop_menu = (showAll ? Menu_Inventory : Menu_Buy);
 	
 	bool result = false;
 	
@@ -1386,7 +1387,7 @@ bool ItemManager_FillCategories(Menu menu, int source_client, bool inventory = f
 					Call_PushCell(source_client);
 					Call_PushCell(i);
 					Call_PushString(category);
-					Call_PushCell(showAll ? Menu_Buy : Menu_Inventory);
+					Call_PushCell(shop_menu);
 					Call_Finish(should_display);
 					if (!should_display)
 					{
@@ -1417,11 +1418,11 @@ bool ItemManager_FillCategories(Menu menu, int source_client, bool inventory = f
 		}
 		
 		trie.GetString("name", buffer, sizeof(buffer));
-		ItemManager_OnCategoryDisplay(on_display_hndl, on_display_func, source_client, index, category, buffer, display, sizeof(display), showAll ? Menu_Buy : Menu_Inventory);
+		ItemManager_OnCategoryDisplay(on_display_hndl, on_display_func, source_client, index, category, buffer, display, sizeof(display), shop_menu);
 		
 		description[0] = '\0';
 		trie.GetString("description", buffer, sizeof(buffer));
-		ItemManager_OnCategoryDescription(on_desc_hndl, on_desc_func, source_client, index, category, buffer, description, sizeof(description), showAll ? Menu_Buy : Menu_Inventory);
+		ItemManager_OnCategoryDescription(on_desc_hndl, on_desc_func, source_client, index, category, buffer, description, sizeof(description), shop_menu);
 		
 		if (showAll || g_hHideCategoriesItemsCount.BoolValue)
 		{
