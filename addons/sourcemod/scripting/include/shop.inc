@@ -140,6 +140,17 @@ forward void Shop_OnCreditsTransfered(int client, int target, int amount_give, i
 forward Action Shop_OnCreditsSet(int client, int &credits, int by_who);
 
 /**
+ *	Called when a player has been set credits
+ *	
+ *	@param client			Client index who is been set
+ *	@param credits			Amount of credits a client is been set
+ *	@param by_who			See CREDITS_BY_* definitions for more info and any higher value is the admin index
+ *	
+ *	@noreturn
+*/
+forward void Shop_OnCreditsSeted(int client, int credits, int by_who);
+
+/**
  *	Called when a player is being given credits to
  *	
  *	@param client			Client index who is being given to
@@ -151,6 +162,17 @@ forward Action Shop_OnCreditsSet(int client, int &credits, int by_who);
 forward Action Shop_OnCreditsGiven(int client, int &credits, int by_who);
 
 /**
+ *	Called when a player has been given credits
+ *	
+ *	@param client			Client index who is been given
+ *	@param credits			Amount of credits a client is been given
+ *	@param by_who			See CREDITS_BY_* definitions for more info and any higher values is the admin index
+ *	
+ *	@return noreturn
+*/
+forward void Shop_OnCreditsGivened(int client, int credits, int by_who);
+
+/**
  *	Called when a player is being taken credits from
  *	
  *	@param client			Client index who is being taken from
@@ -160,6 +182,17 @@ forward Action Shop_OnCreditsGiven(int client, int &credits, int by_who);
  *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block
 */
 forward Action Shop_OnCreditsTaken(int client, int &credits, int by_who);
+
+/**
+ *	Called when a player has been taken credits
+ *	
+ *	@param client			Client index who is been taken
+ *	@param credits			Amount of credits a client is been taken
+ *	@param by_who			See CREDITS_BY_* definitions for more info and any higher value is the admin index
+ *	
+ *	@return noreturn
+*/
+forward void Shop_OnCreditsTakened(int client, int credits, int by_who);
 
 /**
  *	Called when a player is being set gold to

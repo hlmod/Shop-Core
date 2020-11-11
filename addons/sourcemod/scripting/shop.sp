@@ -1750,8 +1750,10 @@ bool SetCredits(int client, int credits, int by_who)
 			}
 		}
 	}
-	
+
 	PlayerManager_SetCredits(client, credits);
+
+	Forward_OnCreditsSeted(client, credits, by_who);
 	
 	if (by_who > 0)
 	{
@@ -1791,6 +1793,8 @@ int RemoveCredits(int client, int credits, int by_who)
 	
 	PlayerManager_RemoveCredits(client, credits);
 	
+	Forward_OnCreditsTakened(client, credits, by_who);
+	
 	if (by_who > 0)
 	{
 		CPrintToChat(client, "%t", "take_you_credits", credits);
@@ -1828,6 +1832,8 @@ int GiveCredits(int client, int credits, int by_who)
 	}
 	
 	PlayerManager_GiveCredits(client, credits);
+
+	Forward_OnCreditsGivened(client, credits, by_who);
 	
 	if (by_who > 0)
 	{
