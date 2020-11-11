@@ -16,11 +16,11 @@ Handle h_fwdOnAuthorized,
 	h_fwdOnCreditsTransfer,
 	h_fwdOnCreditsTransfered,
 	h_fwdOnCreditsSet,
-	h_fwdOnCreditsSeted,
+	h_fwdOnCreditsSetPost,
 	h_fwdOnCreditsGiven,
-	h_fwdOnCreditsGivened,
+	h_fwdOnCreditsGivenPost,
 	h_fwdOnCreditsTaken,
-	h_fwdOnCreditsTakened,
+	h_fwdOnCreditsTakenPost,
 	h_fwdOnCategoryRegistered;
 
 void Forward_OnPluginStart()
@@ -43,11 +43,11 @@ void Forward_OnPluginStart()
 	h_fwdOnCreditsTransfer = CreateGlobalForward("Shop_OnCreditsTransfer", ET_Hook, Param_Cell, Param_Cell, Param_CellByRef, Param_CellByRef, Param_CellByRef, Param_Cell);
 	h_fwdOnCreditsTransfered = CreateGlobalForward("Shop_OnCreditsTransfered", ET_Ignore, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
 	h_fwdOnCreditsSet = CreateGlobalForward("Shop_OnCreditsSet", ET_Hook, Param_Cell, Param_CellByRef, Param_Cell);
-	h_fwdOnCreditsSeted = CreateGlobalForward("Shop_OnCreditsSeted", ET_Hook, Param_Cell, Param_Cell, Param_Cell);
+	h_fwdOnCreditsSetPost = CreateGlobalForward("Shop_OnCreditsSet_Post", ET_Hook, Param_Cell, Param_Cell, Param_Cell);
 	h_fwdOnCreditsGiven = CreateGlobalForward("Shop_OnCreditsGiven", ET_Hook, Param_Cell, Param_CellByRef, Param_Cell);
-	h_fwdOnCreditsGivened = CreateGlobalForward("Shop_OnCreditsGivened", ET_Hook, Param_Cell, Param_Cell, Param_Cell);
+	h_fwdOnCreditsGivenPost = CreateGlobalForward("Shop_OnCreditsGiven_Post", ET_Hook, Param_Cell, Param_Cell, Param_Cell);
 	h_fwdOnCreditsTaken = CreateGlobalForward("Shop_OnCreditsTaken", ET_Hook, Param_Cell, Param_CellByRef, Param_Cell);
-	h_fwdOnCreditsTakened = CreateGlobalForward("Shop_OnCreditsTakened", ET_Hook, Param_Cell, Param_Cell, Param_Cell);
+	h_fwdOnCreditsTakenPost = CreateGlobalForward("Shop_OnCreditsTaken_Post", ET_Hook, Param_Cell, Param_Cell, Param_Cell);
 	h_fwdOnCategoryRegistered = CreateGlobalForward("Shop_OnCategoryRegistered", ET_Ignore, Param_Cell, Param_String);
 }
 
@@ -217,9 +217,9 @@ Action Forward_OnCreditsTaken(int client, int &credits, int by_who)
 	return result;
 }
 
-void Forward_OnCreditsTakened(int client, int &credits, int by_who)
+void Forward_OnCreditsTaken_Post(int client, int &credits, int by_who)
 {
-	Call_StartForward(h_fwdOnCreditsTakened);
+	Call_StartForward(h_fwdOnCreditsTakenPost);
 	Call_PushCell(client);
 	Call_PushCell(credits);
 	Call_PushCell(by_who);
@@ -239,9 +239,9 @@ Action Forward_OnCreditsSet(int client, int &credits, int by_who)
 	return result;
 }
 
-Action Forward_OnCreditsSeted(int client, int &credits, int by_who)
+Action Forward_OnCreditsSet_Post(int client, int &credits, int by_who)
 {
-	Call_StartForward(h_fwdOnCreditsSeted);
+	Call_StartForward(h_fwdOnCreditsSetPost);
 	Call_PushCell(client);
 	Call_PushCell(credits);
 	Call_PushCell(by_who);
@@ -261,9 +261,9 @@ Action Forward_OnCreditsGiven(int client, int &credits, int by_who)
 	return result;
 }
 
-void Forward_OnCreditsGivened(int client, int credits, int by_who)
+void Forward_OnCreditsGiven_Post(int client, int credits, int by_who)
 {
-	Call_StartForward(h_fwdOnCreditsGivened);
+	Call_StartForward(h_fwdOnCreditsGivenPost);
 	Call_PushCell(client);
 	Call_PushCell(credits);
 	Call_PushCell(by_who);

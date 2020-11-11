@@ -148,7 +148,7 @@ forward Action Shop_OnCreditsSet(int client, int &credits, int by_who);
  *	
  *	@noreturn
 */
-forward void Shop_OnCreditsSeted(int client, int credits, int by_who);
+forward void Shop_OnCreditsSet_Post(int client, int credits, int by_who);
 
 /**
  *	Called when a player is being given credits to
@@ -170,7 +170,7 @@ forward Action Shop_OnCreditsGiven(int client, int &credits, int by_who);
  *	
  *	@return noreturn
 */
-forward void Shop_OnCreditsGivened(int client, int credits, int by_who);
+forward void Shop_OnCreditsGiven_Post(int client, int credits, int by_who);
 
 /**
  *	Called when a player is being taken credits from
@@ -192,7 +192,7 @@ forward Action Shop_OnCreditsTaken(int client, int &credits, int by_who);
  *	
  *	@return noreturn
 */
-forward void Shop_OnCreditsTakened(int client, int credits, int by_who);
+forward void Shop_OnCreditsTaken_Post(int client, int credits, int by_who);
 
 /**
  *	Called when a player is being set gold to
