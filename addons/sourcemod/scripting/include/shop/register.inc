@@ -1,6 +1,6 @@
-typedef Shop_CategoryDisplayCallback = function bool (int client, CategoryId category_id, const char[] category, const char[] name, char[] buffer, int maxlen);
-typedef Shop_CategoryDescriptionCallback = function bool (int client, CategoryId category_id, const char[] category, const char[] description, char[] buffer, int maxlen);
-typedef Shop_CategoryShouldDisplayCallback = function bool (int client, CategoryId category_id, const char[] category);
+typedef Shop_CategoryDisplayCallback = function bool (int client, CategoryId category_id, const char[] category, const char[] name, char[] buffer, int maxlen, ShopMenu menu);
+typedef Shop_CategoryDescriptionCallback = function bool (int client, CategoryId category_id, const char[] category, const char[] description, char[] buffer, int maxlen, ShopMenu menu);
+typedef Shop_CategoryShouldDisplayCallback = function bool (int client, CategoryId category_id, const char[] category, ShopMenu menu);
 typedef Shop_CategorySelectCallback = function bool (int client, CategoryId category_id, const char[] category, ShopMenu menu);
 
 typeset Shop_ItemUseToggleCallback
