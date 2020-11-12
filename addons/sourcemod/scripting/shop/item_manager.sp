@@ -1552,8 +1552,9 @@ bool ItemManager_FillItemsOfCategory(Menu menu, int client, int source_client, i
 			
 			h_KvItems.Rewind();
 			
-			bool bShouldDisplay = ItemManager_OnItemShouldDisplay(plugin, callback_should, source_client, category_id, category, item_id, item, inventory ? Menu_Inventory : Menu_Buy);
-			
+			if(!ItemManager_OnItemShouldDisplay(plugin, callback_should, source_client, category_id, category, item_id, item, inventory ? Menu_Inventory : Menu_Buy)
+				continue;
+
 			bool disabled = false;
 			if (!ItemManager_OnItemDisplay(plugin, callback_display, source_client, category_id, category, item_id, item, inventory ? Menu_Inventory : Menu_Buy, disabled, display, display, sizeof(display)))
 			{
@@ -1562,8 +1563,7 @@ bool ItemManager_FillItemsOfCategory(Menu menu, int client, int source_client, i
 			
 			h_KvItems.JumpToKey(sItemId);
 			
-			if (bShouldDisplay)
-				menu.AddItem(sItemId, display, disabled ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
+			menu.AddItem(sItemId, display, disabled ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
 			
 			result = true;
 		}
