@@ -69,6 +69,7 @@ enum ShopMenu
 #include <shop/items>
 #include <shop/players>
 #include <shop/register>
+#include <shop/methodmaps>
 
 /**
  *	Called when the shop is ready to register items
@@ -413,5 +414,36 @@ public void __pl_shop_SetNTVOptional()
 	MarkNativeAsOptional("Shop_RemoveClientItem");
 	MarkNativeAsOptional("Shop_GetClientItemCount");
 	MarkNativeAsOptional("Shop_UseClientItem");
+
+	MarkNativeAsOptional("CategoryId.CategoryId");
+	MarkNativeAsOptional("CategoryId.GetCategoryd");
+	MarkNativeAsOptional("CategoryId.GetItemId");
+	MarkNativeAsOptional("CategoryId.GetUniqueName");
+	MarkNativeAsOptional("CategoryId.GetName");
+	MarkNativeAsOptional("CategoryId.Exist.get");
+
+	MarkNativeAsOptional("ItemId.GetCustomInfo");
+	MarkNativeAsOptional("ItemId.SetCustomInfo");
+	MarkNativeAsOptional("ItemId.GetCustomInfoFloat");
+	MarkNativeAsOptional("ItemId.SetCustomInfoFloat");
+	MarkNativeAsOptional("ItemId.GetCustomInfoString");
+	MarkNativeAsOptional("ItemId.SetCustomInfoString");
+	MarkNativeAsOptional("ItemId.KvCopyCustomInfo");
+	MarkNativeAsOptional("ItemId.GetUniqueName");
+	MarkNativeAsOptional("ItemId.GetName");
+	MarkNativeAsOptional("ItemId.GetCategoryId");
+	MarkNativeAsOptional("ItemId.Format");
+	MarkNativeAsOptional("ItemId.Price.get");
+	MarkNativeAsOptional("ItemId.Price.set");
+	MarkNativeAsOptional("ItemId.SellPrice.get");
+	MarkNativeAsOptional("ItemId.SellPrice.set");
+	MarkNativeAsOptional("ItemId.Value.get");
+	MarkNativeAsOptional("ItemId.Value.set");
+	MarkNativeAsOptional("ItemId.LuckChange.get");
+	MarkNativeAsOptional("ItemId.LuckChange.set");
+	MarkNativeAsOptional("ItemId.Hide.get");
+	MarkNativeAsOptional("ItemId.Hide.set");
+	MarkNativeAsOptional("ItemId.ItemType.get");
+	MarkNativeAsOptional("ItemId.Exist.get");
 }
 #endif
