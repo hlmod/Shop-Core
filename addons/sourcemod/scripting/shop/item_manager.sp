@@ -1477,7 +1477,7 @@ bool ItemManager_GetCategoryDisplay(int category_id, int source_client, char[] b
 	}
 	
 	trie.GetString("name", buffer, maxlength);
-	ItemManager_OnCategoryDisplay(on_display_hndl, on_display_func, source_client, category_id, category, buffer, buffer, maxlength, iClItemId[source_client]);
+	ItemManager_OnCategoryDisplay(on_display_hndl, on_display_func, source_client, category_id, category, buffer, buffer, maxlength, iClMenuId[source_client]);
 	
 	return true;
 }
