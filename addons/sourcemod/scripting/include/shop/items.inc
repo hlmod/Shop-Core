@@ -446,7 +446,7 @@ native bool Shop_GetCategoryById(CategoryId category_id, char[] buffer, int maxl
  *	Gets the category name by its id
  *	
  *	@param category_id			Category id to get for
- *	@param buffer				Buffer to store the unique name
+ *	@param buffer				Buffer to store the name
  *	@param maxlength			Max length of the buffer
  *	
  *	@return True on success, false otherwise
