@@ -1527,6 +1527,9 @@ bool ItemManager_FillItemsOfCategory(Menu menu = null, int client, int source_cl
 		h_arCategories.GetString(category_id, category, sizeof(category));
 		do
 		{
+			if(shouldTest && result)
+				break;
+
 			bool isHidden = view_as<bool>(h_KvItems.GetNum("hide", 0));
 			if (h_KvItems.GetNum("category_id", -1) != category_id || !h_KvItems.GetSectionName(sItemId, sizeof(sItemId)) || (inventory && !ClientHasItemEx(client, sItemId)))
 			{
