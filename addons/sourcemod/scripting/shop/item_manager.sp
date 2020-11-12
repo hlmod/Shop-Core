@@ -7,15 +7,16 @@ KeyValues h_KvItems;
  * For SM 1.10
  * Items
  */
-stock DataPackPos ITEM_DATAPACKPOS_REGISTER			= view_as<DataPackPos>(0);
-stock DataPackPos ITEM_DATAPACKPOS_USE 				= view_as<DataPackPos>(1);
+stock DataPackPos ITEM_DATAPACKPOS_REGISTER				= view_as<DataPackPos>(0);
+stock DataPackPos ITEM_DATAPACKPOS_USE 					= view_as<DataPackPos>(1);
 stock DataPackPos ITEM_DATAPACKPOS_SHOULD_DISPLAY		= view_as<DataPackPos>(2);
 stock DataPackPos ITEM_DATAPACKPOS_DISPLAY				= view_as<DataPackPos>(3);
-stock DataPackPos ITEM_DATAPACKPOS_DESC				= view_as<DataPackPos>(4);
+stock DataPackPos ITEM_DATAPACKPOS_DESC					= view_as<DataPackPos>(4);
 stock DataPackPos ITEM_DATAPACKPOS_COMMON				= view_as<DataPackPos>(5);
 stock DataPackPos ITEM_DATAPACKPOS_BUY					= view_as<DataPackPos>(6);
-stock DataPackPos ITEM_DATAPACKPOS_SELL				= view_as<DataPackPos>(7);
+stock DataPackPos ITEM_DATAPACKPOS_SELL					= view_as<DataPackPos>(7);
 stock DataPackPos ITEM_DATAPACKPOS_ELAPSE				= view_as<DataPackPos>(8);
+stock DataPackPos ITEM_DATAPACKPOS_SELECT				= view_as<DataPackPos>(9);
 
 /**
  * For SM 1.10
@@ -499,7 +500,11 @@ public int ItemManager_SetCallbacks(Handle plugin, int numParams)
 	hPack.WriteFunction(GetNativeFunction(7));
 	hPack.WriteFunction(GetNativeFunction(8));
 	hPack.WriteFunction(GetNativeFunction(9));
-	
+	if(numParams > 9)
+		hPack.WriteFunction(GetNativeFunction(10));
+	else 
+		hPack.WriteFunction(INVALID_FUNCTION);
+
 	plugin_kv.SetNum("callbacks", view_as<int>(hPack));
 }
 
@@ -1601,8 +1606,16 @@ Panel ItemManager_CreateItemPanelInfo(int source_client, int item_id, ShopMenu m
 	if (dpCallback == null)
 		ThrowNativeError(SP_ERROR_NATIVE, "Callbacks for this item not found");
 	
-	dpCallback.Position = ITEM_DATAPACKPOS_DISPLAY;
+	dpCallback.Position = ITEM_DATAPACKPOS_SELECT;
 	Function callback = dpCallback.ReadFunction();
+	
+	if(!ItemManager_OnItemSelect(plugin, callback, source_client, category_id, category, item_id, item, menu_act))
+	{
+		return panel;
+	}
+
+	dpCallback.Position = ITEM_DATAPACKPOS_DISPLAY;
+	callback = dpCallback.ReadFunction();
 	
 	h_KvItems.Rewind();
 	
@@ -2243,6 +2256,25 @@ bool ItemManager_OnItemDisplay(Handle plugin, Function callback, int client, int
 	if (!result)
 	{
 		strcopy(buffer, maxlen, name);
+	}
+	
+	return result;
+}
+
+bool ItemManager_OnItemSelect(Handle plugin, Function callback, int client, int category_id, const char[] category, int item_id, const char[] item, ShopMenu menu)
+{
+	bool result = true;
+	
+	if (IsCallValid(plugin, callback))
+	{
+		Call_StartFunction(plugin, callback);
+		Call_PushCell(client);
+		Call_PushCell(category_id);
+		Call_PushString(category);
+		Call_PushCell(item_id);
+		Call_PushString(item);
+		Call_PushCell(menu);
+		Call_Finish(result);
 	}
 	
 	return result;
