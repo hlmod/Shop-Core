@@ -1852,9 +1852,9 @@ bool FillCategories(Menu menu, int source_client, bool inventory = false, bool s
 	return ItemManager_FillCategories(menu, source_client, inventory, showAll);
 }
 
-bool FillItemsOfCategory(Menu menu, int client, int source_client, int category_id, bool showAll = false)
+bool FillItemsOfCategory(Menu menu = null, int client, int source_client, int category_id, bool showAll = false, bool shouldTest = false)
 {
-	return ItemManager_FillItemsOfCategory(menu, client, source_client, category_id, _, showAll);
+	return ItemManager_FillItemsOfCategory(menu, client, source_client, category_id, _, showAll, shouldTest);
 }
 
 int GetItemCategoryId(int item_id)
