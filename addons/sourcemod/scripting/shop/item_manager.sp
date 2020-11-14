@@ -1299,6 +1299,7 @@ bool ItemManager_FillCategories(Menu menu, int source_client, bool inventory = f
 	ArrayList array, hCategoriesArray;
 	char sCatId[16];
 	int iSize, x, i, index;
+	ShopMenu shop_menu = (showAll ? Menu_Inventory : Menu_Buy);
 	
 	bool result = false;
 	
@@ -1386,6 +1387,7 @@ bool ItemManager_FillCategories(Menu menu, int source_client, bool inventory = f
 					Call_PushCell(source_client);
 					Call_PushCell(i);
 					Call_PushString(category);
+					Call_PushCell(shop_menu);
 					Call_Finish(should_display);
 					if (!should_display)
 					{
@@ -1419,11 +1421,11 @@ bool ItemManager_FillCategories(Menu menu, int source_client, bool inventory = f
 			continue;
 			
 		trie.GetString("name", buffer, sizeof(buffer));
-		ItemManager_OnCategoryDisplay(on_display_hndl, on_display_func, source_client, index, category, buffer, display, sizeof(display));
+		ItemManager_OnCategoryDisplay(on_display_hndl, on_display_func, source_client, index, category, buffer, display, sizeof(display), shop_menu);
 		
 		description[0] = '\0';
 		trie.GetString("description", buffer, sizeof(buffer));
-		ItemManager_OnCategoryDescription(on_desc_hndl, on_desc_func, source_client, index, category, buffer, description, sizeof(description));
+		ItemManager_OnCategoryDescription(on_desc_hndl, on_desc_func, source_client, index, category, buffer, description, sizeof(description), shop_menu);
 		
 		if (showAll || g_hHideCategoriesItemsCount.BoolValue)
 		{
@@ -1478,7 +1480,7 @@ bool ItemManager_GetCategoryDisplay(int category_id, int source_client, char[] b
 	}
 	
 	trie.GetString("name", buffer, maxlength);
-	ItemManager_OnCategoryDisplay(on_display_hndl, on_display_func, source_client, category_id, category, buffer, buffer, maxlength);
+	ItemManager_OnCategoryDisplay(on_display_hndl, on_display_func, source_client, category_id, category, buffer, buffer, maxlength, iClMenuId[source_client]);
 	
 	return true;
 }
@@ -2286,7 +2288,7 @@ bool ItemManager_OnItemDescription(Handle plugin, Function callback, int client,
 	return result;
 }
 
-bool ItemManager_OnCategoryDisplay(Handle plugin, Function callback, int client, int category_id, const char[] category, const char[] name, char[] category_buffer, int category_maxlen)
+bool ItemManager_OnCategoryDisplay(Handle plugin, Function callback, int client, int category_id, const char[] category, const char[] name, char[] category_buffer, int category_maxlen, ShopMenu menu)
 {
 	bool result = false;
 	
@@ -2299,6 +2301,7 @@ bool ItemManager_OnCategoryDisplay(Handle plugin, Function callback, int client,
 		Call_PushString(name);
 		Call_PushStringEx(category_buffer, category_maxlen, SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
 		Call_PushCell(category_maxlen);
+		Call_PushCell(menu);
 		Call_Finish(result);
 	}
 	
@@ -2310,7 +2313,7 @@ bool ItemManager_OnCategoryDisplay(Handle plugin, Function callback, int client,
 	return result;
 }
 
-bool ItemManager_OnCategoryDescription(Handle plugin, Function callback, int client, int category_id, const char[] category, const char[] desc, char[] desc_buffer, int desc_maxlen)
+bool ItemManager_OnCategoryDescription(Handle plugin, Function callback, int client, int category_id, const char[] category, const char[] desc, char[] desc_buffer, int desc_maxlen, ShopMenu menu)
 {
 	bool result = false;
 	
@@ -2323,6 +2326,7 @@ bool ItemManager_OnCategoryDescription(Handle plugin, Function callback, int cli
 		Call_PushString(desc);
 		Call_PushStringEx(desc_buffer, desc_maxlen, SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
 		Call_PushCell(desc_maxlen);
+		Call_PushCell(menu);
 		Call_Finish(result);
 	}
 	
