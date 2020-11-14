@@ -24,6 +24,18 @@ forward Action Shop_OnItemDraw(int client, ShopMenu menu_action, CategoryId cate
 forward Action Shop_OnItemSelect(int client, ShopMenu menu_action, CategoryId category_id, ItemId item_id);
 
 /**
+ *	Called when an item is being select
+ *	
+ *	@param client			Client index an item is being select to
+ *	@param menu_action		Menu performing this action
+ *	@param category_id		Category id of an item
+ *	@param item_id			Item id of an item
+ *	
+ *	@noreturn
+*/
+forward Action Shop_OnItemSelected(int client, ShopMenu menu_action, CategoryId category_id, ItemId item_id);
+
+/**
  *	Called when an item is being displayd
  *	
  *	@param client			Client index an item is being displayed to
