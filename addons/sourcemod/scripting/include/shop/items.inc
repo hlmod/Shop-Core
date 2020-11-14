@@ -389,10 +389,10 @@ native int Shop_GetItemById(ItemId item_id, char[] buffer, int maxlength);
 native ItemType Shop_GetItemType(ItemId item_id);
 
 /**
- *	Get unique name of item
+ *	Get name of item
  *	
  *	@param item_id				Item id to get for
- *	@param buffer				Buffer to store the unique name
+ *	@param buffer				Buffer to store the name
  *	@param maxlength			Max length of the buffer
  *	
  *	@return Number of bytes written
@@ -467,10 +467,10 @@ native CategoryId Shop_GetCategoryId(const char[] category);
 native bool Shop_GetCategoryById(CategoryId category_id, char[] buffer, int maxlength);
 
 /**
- *	Получает имя категории
+ *	Gets the category name by its id
  *	
  *	@param category_id			Category id to get for
- *	@param buffer				Buffer to store the unique name
+ *	@param buffer				Buffer to store the name
  *	@param maxlength			Max length of the buffer
  *	
  *	@return True on success, false otherwise
