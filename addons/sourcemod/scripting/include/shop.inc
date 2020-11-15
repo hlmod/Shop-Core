@@ -416,7 +416,7 @@ public void __pl_shop_SetNTVOptional()
 	MarkNativeAsOptional("Shop_UseClientItem");
 
 	MarkNativeAsOptional("CategoryId.CategoryId");
-	MarkNativeAsOptional("CategoryId.GetCategoryd");
+	MarkNativeAsOptional("CategoryId.GetCategoryId");
 	MarkNativeAsOptional("CategoryId.GetItemId");
 	MarkNativeAsOptional("CategoryId.GetUniqueName");
 	MarkNativeAsOptional("CategoryId.GetName");
