@@ -37,12 +37,3 @@ native void Shop_AddToFunctionsMenu(Shop_FuncDisplay callback_display, Shop_Func
  *	@return true on success, false otherwise
 */
 native bool Shop_RemoveFromFunctionsMenu(Shop_FuncDisplay callback_display, Shop_FuncSelect callback_select);
-
-/**
- *	Shows functions menu to a player
- *	
- *	@param client			Client index to show to
- *	
- *	@noreturn
-*/
-native void Shop_ShowFunctionsMenu(int client);
