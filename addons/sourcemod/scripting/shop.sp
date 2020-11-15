@@ -682,17 +682,15 @@ public int OnItemSelect(Menu menu, MenuAction action, int param1, int param2)
 			iPos[param1] = GetMenuSelectionPosition();
 
 			ShopMenu shop_menu = (bInv[param1] ? Menu_Inventory : Menu_Buy);
+			int value = StringToInt(info);
 			
-			Action result = Forward_OnItemSelect(param1, shop_menu, iClCategoryId[param1], StringToInt(info));
+			Action result = Forward_OnItemSelect(param1, shop_menu, iClCategoryId[param1], value);
 			
 			if (result == Plugin_Handled || 
-			((result == Plugin_Changed || result == Plugin_Continue) && !ShowItemInfo(param1, StringToInt(info))))
+			((result == Plugin_Changed || result == Plugin_Continue) && !ShowItemInfo(param1, value)))
 			{
 				ShowItemsOfCategory(param1, iClCategoryId[param1], bInv[param1], iPos[param1]);
-			}
-			else
-			{
-				Forward_OnItemSelected(param1, shop_menu, iClCategoryId[param1], StringToInt(info));
+				Forward_OnItemSelected(param1, shop_menu, iClCategoryId[param1], value);
 			}
 		}
 		case MenuAction_Cancel :
