@@ -132,12 +132,11 @@ methodmap ItemId < Handle
 	// Formats item display name to use in menu
 	//
 	// @param client					Client index to get format for
-	// @param item_id					Item id to format
 	// @param menu						Menu to get formatted for
 	// @param buffer					Buffer to store the result in
 	// @param maxlength					Max length of the buffer
 	// @return					  		True if item formatted, false if param menu is Menu_Inventory and the player has not this item and the item is not formatted
-	public bool Format(int client, ItemId item_id, ShopMenu menu, char[] buffer, int maxlength) {
+	public bool Format(int client, ShopMenu menu, char[] buffer, int maxlength) {
 		return Shop_FormatItem(client, this, menu, buffer, maxlength);
 	}
 
