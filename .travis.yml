@@ -51,7 +51,7 @@ before_deploy:
     - zip -rq shop shop
     - tar -czf shop.tar.gz shop
 deploy:
-    cleanup: true
+    cleanup: false
     provider: releases
     api_key: ${GH_TOKEN}
     file:
