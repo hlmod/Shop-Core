@@ -1,4 +1,4 @@
-﻿#Install some apt packages needed for spcomp
+#Install some apt packages needed for spcomp
 addons:
     apt_packages:
         - lib32z1
@@ -51,7 +51,7 @@ before_deploy:
     - zip -rq shop shop
     - tar -czf shop.tar.gz shop
 deploy:
-    cleanup: false
+    skip_cleanup: true
     provider: releases
     api_key: ${GH_TOKEN}
     file:
