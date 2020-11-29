@@ -257,7 +257,7 @@
 	"try_luck"
 	{
 		"ua"		"Випробувати вдачу"
-  }
+	}
 
 	"luck_credits_chance"
 	{
@@ -402,7 +402,7 @@
 	"functions"
 	{
 		"ua"		"Функції"
-  }
+	}
 
 	"info"
 	{
