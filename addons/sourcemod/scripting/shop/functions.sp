@@ -629,7 +629,8 @@ void Functions_SetupLuck(int client)
 	
 	// Get lucked item or INVALID_ITEM if no luck
 	int item_id = GetItemRollLuck(hArray, client);
-	bIsWinner = view_as<ItemId>(item_id) == INVALID_ITEM;
+	bIsWinner = view_as<ItemId>(item_id) != INVALID_ITEM;
+	
 	if (!bIsWinner)
 	{
 		// Looser
@@ -680,6 +681,7 @@ int FilterItemsInLuckArray(ArrayList hArray, int client, bool &wasOverriden)
 		
 		if (type != Item_Finite && type != Item_BuyOnly && ClientHasItem(client, dummy) || iLuckChance == 0 || luckAction == Plugin_Handled || !bShouldLuck)
 		{
+			//PrintToChatAll("Item %d removed from luck. Type = %d, Client = %N, ClientHasItem = %d, iLuckChance = %d, luckAction = %d, bShouldLuck = %d, gold_price = %d", dummy, type, client, ClientHasItem(client, dummy), iLuckChance, luckAction, bShouldLuck, gold_price);
 			hArray.Erase(i--);
 		}
 	}
@@ -695,6 +697,7 @@ bool IsWinLuckWithCvar(bool wasOverriden)
 		int rand = GetRandomIntEx(1, 100);
 		
 		winner = rand <= g_hLuckChance.IntValue;
+		//PrintToChatAll("IsWinLuckWithCvar randomization: %d <= %d", rand, g_hLuckChance.IntValue);
 	}
 	
 	return winner;
@@ -703,7 +706,7 @@ bool IsWinLuckWithCvar(bool wasOverriden)
 int GetItemRollLuck(ArrayList hArray, int client)
 {
 	Action luckAction;
-	int dummy, item_id, item_luck_chance, iNewLuckValue, size;
+	int dummy, item_luck_chance, iNewLuckValue, size;
 	size = hArray.Length;
 	while (size > 0)
 	{
@@ -713,12 +716,18 @@ int GetItemRollLuck(ArrayList hArray, int client)
 		item_luck_chance = GetItemLuckChance(dummy);
 		
 		luckAction = OnClientShouldLuckItemChance(client, dummy, iNewLuckValue);
+		
+		//PrintToChatAll("Item %d luck chance = %d, luckAction = %d, iNewLuckValue = %d", dummy, item_luck_chance, luckAction, iNewLuckValue);
 		if (luckAction == Plugin_Changed)
 		{
 			item_luck_chance = iNewLuckValue;
 		}
 		
-		if (GetRandomIntEx(1, 100) > item_luck_chance)
+		if (GetRandomIntEx(1, 100) <= item_luck_chance)
+		{
+			return dummy;
+		}
+		else
 		{
 			if (size < 2)
 			{
@@ -727,13 +736,9 @@ int GetItemRollLuck(ArrayList hArray, int client)
 			hArray.Erase(0);
 			size--;
 		}
-		
-		item_id = dummy;
-		
-		break;
 	}
 	
-	return item_id;
+	return view_as<int>(INVALID_ITEM);
 }
 
 stock bool Functions_AddTargetsToMenu(Menu menu, int filter_client)
