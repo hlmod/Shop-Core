@@ -6,7 +6,7 @@
 #tryinclude <SteamWorks>
 #define REQUIRE_EXTENSIONS
 
-#define SHOP_VERSION "3.0E2" // 12.01.2021
+#define SHOP_VERSION "3.1E1" // 14.02.2021
 #define SHOP_MYSQL_CHARSET "utf8mb4"
 
 #pragma newdecls required
@@ -1099,14 +1099,16 @@ public int ItemPanel_Handler(Menu menu, MenuAction action, int param1, int param
 			{
 				case BUTTON_BUY :
 				{
-					BuyItem(param1, iClItemId[param1], false);
-					ShowItemInfo(param1, iClItemId[param1]);
+					ConfirmBuy(param1, iClItemId[param1]);
+					//BuyItem(param1, iClItemId[param1], false);
+					//ShowItemInfo(param1, iClItemId[param1]);
 				}
 				case BUTTON_SELL :
 				{
 					if (has)
 					{
-						SellItem(param1, iClItemId[param1]);
+						ConfirmSell(param1, iClItemId[param1]);
+						//SellItem(param1, iClItemId[param1]);
 					}
 					if (bInv[param1] && PlayerManager_GetItemCount(param1, iClItemId[param1]) < 1)
 					{
@@ -1185,6 +1187,76 @@ public int ItemPanel_Handler(Menu menu, MenuAction action, int param1, int param
 						}
 					}
 				}
+			}
+		}
+	}
+}
+
+public Action ConfirmBuy(int client, int item_id)
+{
+	Menu menu = new Menu(Menu_ConfirmBuy);
+	
+	menu.SetTitle("Are you sure that you going to purchase this item?");
+	menu.AddItem("YES", "Yes");
+	menu.AddItem("NO", "No");	
+
+	menu.ExitBackButton = true;
+	menu.Display(client, MENU_TIME_FOREVER);
+
+	return Plugin_Handled;
+}
+
+public int Menu_ConfirmBuy(Menu menu, MenuAction action, int param1, int param2)
+{
+	switch (action)
+	{
+		case MenuAction_Select:
+		{
+			char info[32];
+			menu.GetItem(param2, info, sizeof(info));
+			if (StrEqual(info, "YES"))
+			{
+				BuyItem(param1, iClItemId[param1], false);
+				ShowItemInfo(param1, iClItemId[param1]);
+			}
+			else
+			{
+				ShowItemInfo(param1, iClItemId[param1]);
+			}
+		}
+	}
+}
+
+public Action ConfirmSell(int client, int item_id)
+{
+	Menu menu = new Menu(Menu_ConfirmSell);
+	
+	menu.SetTitle("Are you sure that you going to sell this item?");
+	menu.AddItem("YES", "Yes");
+	menu.AddItem("NO", "No");	
+
+	menu.ExitBackButton = true;
+	menu.Display(client, MENU_TIME_FOREVER);
+
+	return Plugin_Handled;
+}
+
+public int Menu_ConfirmSell(Menu menu, MenuAction action, int param1, int param2)
+{
+	switch (action)
+	{
+		case MenuAction_Select:
+		{
+			char info[32];
+			menu.GetItem(param2, info, sizeof(info));
+			if (StrEqual(info, "YES"))
+			{
+				SellItem(param1, iClItemId[param1]);
+				ShowItemInfo(param1, iClItemId[param1]);
+			}
+			else
+			{
+				ShowItemInfo(param1, iClItemId[param1]);
 			}
 		}
 	}
