@@ -6,7 +6,7 @@
 #tryinclude <SteamWorks>
 #define REQUIRE_EXTENSIONS
 
-#define SHOP_VERSION "3.1E1" // 14.02.2021
+#define SHOP_VERSION "3.1E2" // 15.02.2021
 #define SHOP_MYSQL_CHARSET "utf8mb4"
 
 #pragma newdecls required
@@ -1110,6 +1110,11 @@ public int ItemPanel_Handler(Menu menu, MenuAction action, int param1, int param
 						ConfirmSell(param1, iClItemId[param1]);
 						//SellItem(param1, iClItemId[param1]);
 					}
+					else if (!has)
+					{
+						PrintToChat(param1, " \x04[Shop] x\01here is come the error.");
+						ShowItemInfo(param1, iClItemId[param1]);
+					}
 					if (bInv[param1] && PlayerManager_GetItemCount(param1, iClItemId[param1]) < 1)
 					{
 						if (!ShowItemsOfCategory(param1, iClCategoryId[param1], true, iPos[param1]) && !ShowInventory(param1))
@@ -1118,10 +1123,12 @@ public int ItemPanel_Handler(Menu menu, MenuAction action, int param1, int param
 							CPrintToChat(param1, "%t", "EmptyInventory");
 						}
 					}
+					/*
 					else
 					{
 						ShowItemInfo(param1, iClItemId[param1]);
 					}
+					*/
 				}
 				case BUTTON_PREVIEW :
 				{
@@ -1232,8 +1239,8 @@ public Action ConfirmSell(int client, int item_id)
 	Menu menu = new Menu(Menu_ConfirmSell);
 	
 	menu.SetTitle("Are you sure that you going to sell this item?");
-	menu.AddItem("YES", "Yes");
-	menu.AddItem("NO", "No");	
+	menu.AddItem("Confirm_YES", "Yes");
+	menu.AddItem("Confirm_NO", "No");	
 
 	menu.ExitBackButton = true;
 	menu.Display(client, MENU_TIME_FOREVER);
@@ -1249,7 +1256,7 @@ public int Menu_ConfirmSell(Menu menu, MenuAction action, int param1, int param2
 		{
 			char info[32];
 			menu.GetItem(param2, info, sizeof(info));
-			if (StrEqual(info, "YES"))
+			if (StrEqual(info, "Confirm_YES"))
 			{
 				SellItem(param1, iClItemId[param1]);
 				ShowItemInfo(param1, iClItemId[param1]);
