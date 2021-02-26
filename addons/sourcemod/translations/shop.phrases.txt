@@ -477,6 +477,22 @@
 		"en"		"{green}[Shop] {default}Your data is being loaded!"
 	}
 
+	"confirm_luck"
+	{
+		"#format"	"{1:i}"
+		"en"		"Are you sure to spend {1} credits \nfor Try Luck"
+	}
+
+	"yes"
+	{
+		"en"		"Yes"
+	}
+
+	"no"
+	{
+		"en"		"No"
+	}
+
 	"y."
 	{
 		"en"		"y."

@@ -246,7 +246,7 @@ public int Functions_Menu_Handler(Menu menu, MenuAction action, int param1, int 
 				}
 				case 'b' :
 				{
-					Functions_SetupLuck(param1);
+					Confirm_FunctionLuck(param1);
 					Functions_ShowMenu(param1, GetMenuSelectionPosition());
 				}
 				default :
@@ -281,6 +281,47 @@ public int Functions_Menu_Handler(Menu menu, MenuAction action, int param1, int 
 			}
 		}
 		case MenuAction_End : delete menu;
+	}
+}
+
+public void Confirm_FunctionLuck(int client)
+{
+	char buffer[256];
+	Menu menu = new Menu(Menu_ConfirmTryLuck);
+
+	FormatEx(buffer, sizeof(buffer), "%t\n", "confirm_luck", g_hLuckCredits.IntValue);
+	menu.SetTitle(buffer);
+
+	FormatEx(buffer, sizeof(buffer), "%t", "Yes");
+	menu.AddItem("a", buffer);
+
+	FormatEx(buffer, sizeof(buffer), "%t", "No");
+	menu.AddItem("b", buffer);
+
+}
+
+public int Menu_ConfirmTryLuck(Menu menu, MenuAction action, int param1, int param2)
+{
+	switch (action)
+	{
+		case MenuAction_Select:
+		{
+			char info[16];
+			menu.GetItem(param2, info, sizeof(info));
+		
+			switch (info[0])
+			{
+				case 'a' :
+				{
+					Functions_SetupLuck(param1);
+					Functions_ShowMenu(param1, GetMenuSelectionPosition());
+				}
+				case 'b' :
+				{
+					Functions_ShowMenu(param1, GetMenuSelectionPosition());
+				}
+			} 
+		}
 	}
 }
 
