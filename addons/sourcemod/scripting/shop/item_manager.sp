@@ -1318,9 +1318,8 @@ bool ItemManager_FillCategories(Menu menu, int source_client, bool inventory = f
 				if(index != -1 && index != x)
 				{
 					hCategoriesArray.SwapAt(index, x);
-
-					++x;
 				}
+				++x;
 			}
 		}
 	}
