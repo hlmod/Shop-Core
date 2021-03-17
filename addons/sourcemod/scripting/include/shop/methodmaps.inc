@@ -21,7 +21,7 @@ methodmap CategoryId < Handle
 	// 
 	// @param item						Category unique name to get id for
 	// @return					  		Category id of the category
-	public static CategoryId GetCategoryId(const char[] category) {
+	public static CategoryId GetIdByName(const char[] category) {
 		return Shop_GetCategoryId(category);
 	}
 
