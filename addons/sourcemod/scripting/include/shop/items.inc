@@ -208,7 +208,7 @@ native bool Shop_KvCopySubKeysItemCustomInfo(ItemId item_id, KeyValues kv);
  *	
  *	@param item_id				Item id
  *	
- *	@return true on success, false otherwise
+ *	@noreturn
 */
 native void Shop_UnregisterItemId(ItemId item_id);
 
