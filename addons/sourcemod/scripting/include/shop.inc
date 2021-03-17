@@ -210,9 +210,10 @@ public void __pl_shop_SetNTVOptional()
 	MarkNativeAsOptional("Shop_RemoveClientItem");
 	MarkNativeAsOptional("Shop_GetClientItemCount");
 	MarkNativeAsOptional("Shop_UseClientItem");
+	MarkNativeAsOptional("Shop_SetHide");
 
 	MarkNativeAsOptional("CategoryId.CategoryId");
-	MarkNativeAsOptional("CategoryId.GetCategoryId");
+	MarkNativeAsOptional("CategoryId.GetIdByName");
 	MarkNativeAsOptional("CategoryId.GetItemId");
 	MarkNativeAsOptional("CategoryId.GetUniqueName");
 	MarkNativeAsOptional("CategoryId.GetName");
