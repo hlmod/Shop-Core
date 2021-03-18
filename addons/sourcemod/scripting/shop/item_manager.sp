@@ -46,7 +46,7 @@ void ItemManager_CreateNatives()
 	CreateNative("Shop_SetHide", ItemManager_SetHide);
 	CreateNative("Shop_EndItem", ItemManager_EndItem);
 
-	CreateNative("Shop_UnregisterItemId", ItemManager_UnregisterItem);
+	CreateNative("Shop_UnregisterItem", ItemManager_UnregisterItem);
 	
 	CreateNative("Shop_GetItemCustomInfo", ItemManager_GetItemCustomInfo);
 	CreateNative("Shop_SetItemCustomInfo", ItemManager_SetItemCustomInfo);
