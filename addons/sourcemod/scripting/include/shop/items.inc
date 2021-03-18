@@ -210,7 +210,7 @@ native bool Shop_KvCopySubKeysItemCustomInfo(ItemId item_id, KeyValues kv);
  *	
  *	@noreturn
 */
-native void Shop_UnregisterItemId(ItemId item_id);
+native void Shop_UnregisterItem(ItemId item_id);
 
 /**
  *	Gets an item credits price
