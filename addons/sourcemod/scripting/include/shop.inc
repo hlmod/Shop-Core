@@ -128,6 +128,7 @@ public void __pl_shop_SetNTVOptional()
 	MarkNativeAsOptional("Shop_IsStarted");
 	MarkNativeAsOptional("Shop_UnregisterMe");
 	MarkNativeAsOptional("Shop_UnregisterItem");
+	MarkNativeAsOptional("Shop_ShowItemPanel");
 	MarkNativeAsOptional("Shop_OpenMainMenu");
 	MarkNativeAsOptional("Shop_ShowCategory");
 	MarkNativeAsOptional("Shop_ShowInventory");
