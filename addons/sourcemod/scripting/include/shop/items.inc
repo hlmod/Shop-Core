@@ -204,6 +204,15 @@ native bool Shop_SetItemCustomInfoString(ItemId item_id, const char[] info, cons
 native bool Shop_KvCopySubKeysItemCustomInfo(ItemId item_id, KeyValues kv);
 
 /**
+ *	Unregisters item, categories and removes them from the shop and players' inventory by ItemId
+ *	
+ *	@param item_id				Item id
+ *	
+ *	@noreturn
+*/
+native void Shop_UnregisterItem(ItemId item_id);
+
+/**
  *	Gets an item credits price
  *	
  *	@param item_id				Item id
