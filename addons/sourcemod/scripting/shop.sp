@@ -1348,6 +1348,8 @@ public int ItemTransPanel_Handler(Menu menu, MenuAction action, int param1, int 
 						return;
 					}
 					
+					ItemManager_OnUseToggleItem(param1, iClItemId[param1], false, Toggle_Off);
+					
 					PlayerManager_TransferItem(param1, target, iClItemId[param1]);
 					
 					RemoveCredits(param1, g_iItemTransfer, CREDITS_BY_BUY_OR_SELL);
