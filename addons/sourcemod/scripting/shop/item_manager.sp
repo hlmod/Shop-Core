@@ -46,6 +46,8 @@ void ItemManager_CreateNatives()
 	CreateNative("Shop_SetCallbacks", ItemManager_SetCallbacks);
 	CreateNative("Shop_SetHide", ItemManager_SetHide);
 	CreateNative("Shop_EndItem", ItemManager_EndItem);
+
+	CreateNative("Shop_UnregisterItem", ItemManager_UnregisterItem);
 	
 	CreateNative("Shop_GetItemCustomInfo", ItemManager_GetItemCustomInfo);
 	CreateNative("Shop_SetItemCustomInfo", ItemManager_SetItemCustomInfo);
@@ -579,6 +581,27 @@ public int ItemManager_EndItem(Handle plugin, int numParams)
 	plugin_array = null;
 	plugin_category[0] = '\0';
 	plugin_item[0] = '\0';
+}
+
+public int ItemManager_UnregisterItem(Handle plugin, int numParams)
+{
+	char item[SHOP_MAX_STRING_LENGTH];
+	int item_id = GetNativeCell(1);
+
+	Format(item, sizeof(item), "%i", item_id);
+
+	h_KvItems.Rewind();
+	if(!h_KvItems.JumpToKey(item))
+		ThrowNativeError(SP_ERROR_NATIVE, "Item id %s is invalid", item);
+
+	DataPack dpCallback = view_as<DataPack>(h_KvItems.GetNum("callbacks", 0));
+	if(dpCallback != null)
+		delete dpCallback;
+	
+	OnItemUnregistered(item_id);
+	
+	h_KvItems.DeleteThis();
+	h_KvItems.Rewind();
 }
 
 public int ItemManager_OnItemRegistered(Handle owner, Handle hndl, const char[] error, DataPack dp)
