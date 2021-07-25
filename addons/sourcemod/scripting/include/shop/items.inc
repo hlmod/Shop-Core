@@ -51,6 +51,20 @@ forward Action Shop_OnItemSelected(int client, ShopMenu menu_action, CategoryId 
 forward bool Shop_OnItemDisplay(int client, ShopMenu menu_action, CategoryId category_id, ItemId item_id, const char[] display, char[] buffer, int maxlength);
 
 /**
+ *	Called when an item's price and sell price is being displayed
+ *	
+ *	@param client			Client index an item's description is being displayed to
+ *	@param menu_action		Menu performing this action
+ *	@param category_id		Category id of an item
+ *	@param item_id			Item id of an item
+ *	@param price			Price
+ *	@param sell_price		Sell price
+ *	
+ *	@return true to apply new values, false otherwise
+*/
+forward bool Shop_OnItemPricesDisplay(int client, ShopMenu menu_action, CategoryId category_id, ItemId item_id, int &price, int &sell_price);
+
+/**
  *	Called when an item's description is being displayd
  *	
  *	@param client			Client index an item's description is being displayed to

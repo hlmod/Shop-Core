@@ -1657,6 +1657,8 @@ Panel ItemManager_CreateItemPanelInfo(int source_client, int item_id, ShopMenu m
 	
 	int price = h_KvItems.GetNum("price");
 	int sell_price = h_KvItems.GetNum("sell_price");
+
+	OnItemPricesDisplay(source_client, menu_act, category_id, item_id, price, sell_price);
 	
 	if (price < 1)
 		FormatEx(buffer, sizeof(buffer), "%t: %t", "Price", "Free");
