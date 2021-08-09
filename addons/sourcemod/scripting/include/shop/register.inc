@@ -13,6 +13,7 @@ typedef Shop_ItemCommon = function void(int client, CategoryId category_id, cons
 typedef Shop_ItemShouldDisplayCallback = function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ShopMenu menu);
 typedef Shop_ItemDisplayCallback = function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ShopMenu menu, bool &disabled, const char[] name, char[] buffer, int maxlen);
 typedef Shop_ItemDescriptionCallback = function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ShopMenu menu, const char[] description, char[] buffer, int maxlen);
+typedef Shop_ItemSelectCallBack = function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ShopMenu menu);
 
 typeset Shop_ItemBuyCallback
 {
@@ -103,6 +104,7 @@ native void Shop_SetLuckChance(int luck_chance);
  *	@param buy					Callback called when the item is being bought
  *	@param sell					Callback called when the item is being sold
  *	@param elapse				Callback called when the item is elapsed
+ *	@param select				Callback called when the item is selected in menu
  *	
  *	@noreturn
 */
@@ -114,7 +116,8 @@ native void Shop_SetCallbacks(Shop_ItemRegister register=INVALID_FUNCTION,
 							Shop_ItemCommon preview=INVALID_FUNCTION,
 							Shop_ItemBuyCallback buy=INVALID_FUNCTION,
 							Shop_ItemSellCallback sell=INVALID_FUNCTION,
-							Shop_ItemCommon elapse=INVALID_FUNCTION);
+							Shop_ItemCommon elapse=INVALID_FUNCTION,
+							Shop_ItemSelectCallBack select=INVALID_FUNCTION);
 
 /**
  *	Allows to hide item in buy panel, givable only by native or admin panel
