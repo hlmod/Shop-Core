@@ -647,7 +647,7 @@ public void DB_UgradeState_1(Database db, DBResultSet results, const char[] erro
 			results.FetchString(i, buffer, sizeof(buffer));
 			
 			int num, item_id;
-			char itemId[256], count[256], duration[256];
+			int itemId[256], count[256], duration[256];
 			
 			int reloc_idx = 0, var2 = 0;
 			while ((var2 = SplitString(buffer[reloc_idx], ",", part, sizeof(part))) != -1)
