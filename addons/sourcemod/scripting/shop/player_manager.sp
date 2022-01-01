@@ -567,10 +567,12 @@ public int PlayerManager_ToggleClientCategoryOff(Handle plugin, int numParams)
 	if (!h_KvClientItems[client].GotoFirstSubKey())
 		return;
 
+	int category_id = GetNativeCell(2);
+
 	char sItemId[16];
 	do
 	{
-		if (h_KvClientItems[client].GetNum("category_id", -1) != GetNativeCell(2) || !KvGetSectionName(h_KvClientItems[client], sItemId, sizeof(sItemId)))
+		if (h_KvClientItems[client].GetNum("category_id", -1) != category_id || !KvGetSectionName(h_KvClientItems[client], sItemId, sizeof(sItemId)))
 			continue;
 		
 		int duration = h_KvClientItems[client].GetNum("duration");
