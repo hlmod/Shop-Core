@@ -6,7 +6,7 @@
 #tryinclude <SteamWorks>
 #define REQUIRE_EXTENSIONS
 
-#define SHOP_VERSION "3.0E2" // 12.01.2021
+#define SHOP_VERSION "3.0F1" // 01.01.2021
 #define SHOP_MYSQL_CHARSET "utf8mb4"
 
 #pragma newdecls required
@@ -45,7 +45,7 @@ ConVar g_hHideCategoriesItemsCount;
 #include "shop/item_manager.sp"
 #include "shop/player_manager.sp"
 #if defined _SteamWorks_Included
-#include "shop/stats.sp"
+	#include "shop/stats.sp"
 #endif
 
 public Plugin myinfo =
