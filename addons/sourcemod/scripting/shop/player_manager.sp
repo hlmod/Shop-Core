@@ -128,9 +128,7 @@ public int PlayerManager_GiveClientItem(Handle plugin, int numParams)
 		ThrowNativeError(SP_ERROR_NATIVE, error);
 	}
 	
-	int item_id = GetNativeCell(2);
-	
-	return GiveItem(client, item_id);
+	return GiveItem(client, GetNativeCell(2), GetNativeCell(3));
 }
 
 public int PlayerManager_BuyClientItem(Handle plugin, int numParams)
@@ -141,9 +139,7 @@ public int PlayerManager_BuyClientItem(Handle plugin, int numParams)
 	if (!CheckClient(client, error, sizeof(error)))
 		ThrowNativeError(SP_ERROR_NATIVE, error);
 	
-	int item_id = GetNativeCell(2);
-	
-	return BuyItem(client, item_id, true);
+	return BuyItem(client, GetNativeCell(2), true);
 }
 
 public int PlayerManager_SellClientItem(Handle plugin, int numParams)
@@ -156,9 +152,7 @@ public int PlayerManager_SellClientItem(Handle plugin, int numParams)
 		ThrowNativeError(SP_ERROR_NATIVE, error);
 	}
 	
-	int item_id = GetNativeCell(2);
-	
-	return SellItem(client, item_id);
+	return SellItem(client, GetNativeCell(2));
 }
 
 public int PlayerManager_UseClientItem(Handle plugin, int numParams)
@@ -169,9 +163,7 @@ public int PlayerManager_UseClientItem(Handle plugin, int numParams)
 	if (!CheckClient(client, error, sizeof(error)))
 		ThrowNativeError(SP_ERROR_NATIVE, error);
 	
-	int item_id = GetNativeCell(2);
-	
-	return UseItem(client, item_id, true);
+	return UseItem(client, GetNativeCell(2), true);
 }
 
 public int PlayerManager_RemoveClientItem(Handle plugin, int numParams)
@@ -182,10 +174,7 @@ public int PlayerManager_RemoveClientItem(Handle plugin, int numParams)
 	if (!CheckClient(client, error, sizeof(error)))
 		ThrowNativeError(SP_ERROR_NATIVE, error);
 	
-	int item_id = GetNativeCell(2);
-	int count = GetNativeCell(3);
-	
-	return PlayerManager_RemoveItem(client, item_id, count);
+	return PlayerManager_RemoveItem(client, GetNativeCell(2), GetNativeCell(3));
 }
 
 public int PlayerManager_GetClientItemCount(Handle plugin, int numParams)
@@ -196,9 +185,7 @@ public int PlayerManager_GetClientItemCount(Handle plugin, int numParams)
 	if (!CheckClient(client, error, sizeof(error)))
 		ThrowNativeError(SP_ERROR_NATIVE, error);
 	
-	int item_id = GetNativeCell(2);
-	
-	return PlayerManager_GetItemCount(client, item_id);
+	return PlayerManager_GetItemCount(client, GetNativeCell(2));
 }
 
 public int PlayerManager_SetClientItemCount(Handle plugin, int numParams)
@@ -209,9 +196,7 @@ public int PlayerManager_SetClientItemCount(Handle plugin, int numParams)
 	if (!CheckClient(client, error, sizeof(error)))
 		ThrowNativeError(SP_ERROR_NATIVE, error);
 	
-	int item_id = GetNativeCell(2);
-	
-	PlayerManager_SetItemCount(client, item_id, GetNativeCell(3));
+	PlayerManager_SetItemCount(client, GetNativeCell(2), GetNativeCell(3));
 }
 
 public int PlayerManager_GetClientItemSellPrice(Handle plugin, int numParams)
@@ -222,9 +207,7 @@ public int PlayerManager_GetClientItemSellPrice(Handle plugin, int numParams)
 	if (!CheckClient(client, error, sizeof(error)))
 		ThrowNativeError(SP_ERROR_NATIVE, error);
 	
-	int item_id = GetNativeCell(2);
-	
-	return PlayerManager_GetItemSellPrice(client, item_id);
+	return PlayerManager_GetItemSellPrice(client, GetNativeCell(2));
 }
 
 public int PlayerManager_SetClientItemTimeleft(Handle plugin, int numParams)
@@ -261,9 +244,7 @@ public int PlayerManager_IsClientItemToggled(Handle plugin, int numParams)
 	if (!CheckClient(client, error, sizeof(error)))
 		ThrowNativeError(SP_ERROR_NATIVE, error);
 	
-	int item_id = GetNativeCell(2);
-	
-	return PlayerManager_IsItemToggled(client, item_id);
+	return PlayerManager_IsItemToggled(client, GetNativeCell(2));
 }
 
 public int PlayerManager_IsClientHasItem(Handle plugin, int numParams)
@@ -274,9 +255,7 @@ public int PlayerManager_IsClientHasItem(Handle plugin, int numParams)
 	if (!CheckClient(client, error, sizeof(error)))
 		ThrowNativeError(SP_ERROR_NATIVE, error);
 	
-	int item_id = GetNativeCell(2);
-	
-	return PlayerManager_ClientHasItem(client, item_id);
+	return PlayerManager_ClientHasItem(client, GetNativeCell(2));
 }
 
 public int PlayerManager_ToggleClientItem(Handle plugin, int numParams)
@@ -287,10 +266,7 @@ public int PlayerManager_ToggleClientItem(Handle plugin, int numParams)
 	if (!CheckClient(client, error, sizeof(error)))
 		ThrowNativeError(SP_ERROR_NATIVE, error);
 	
-	int item_id = GetNativeCell(2);
-	ToggleState toggle = GetNativeCell(3);
-	
-	return ToggleItem(client, item_id, toggle, true);
+	return ToggleItem(client, GetNativeCell(2), GetNativeCell(3), true);
 }
 
 void PlayerManager_OnPluginStart()
@@ -587,8 +563,6 @@ public int PlayerManager_ToggleClientCategoryOff(Handle plugin, int numParams)
 	if (!CheckClient(client, error, sizeof(error)))
 		ThrowNativeError(SP_ERROR_NATIVE, error);
 	
-	int category_id = GetNativeCell(2);
-	
 	h_KvClientItems[client].Rewind();
 	if (!h_KvClientItems[client].GotoFirstSubKey())
 		return;
@@ -596,7 +570,7 @@ public int PlayerManager_ToggleClientCategoryOff(Handle plugin, int numParams)
 	char sItemId[16];
 	do
 	{
-		if (h_KvClientItems[client].GetNum("category_id", -1) != category_id || !KvGetSectionName(h_KvClientItems[client], sItemId, sizeof(sItemId)))
+		if (h_KvClientItems[client].GetNum("category_id", -1) != GetNativeCell(2) || !KvGetSectionName(h_KvClientItems[client], sItemId, sizeof(sItemId)))
 			continue;
 		
 		int duration = h_KvClientItems[client].GetNum("duration");
