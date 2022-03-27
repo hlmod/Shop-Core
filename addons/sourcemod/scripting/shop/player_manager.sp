@@ -1148,6 +1148,23 @@ public int PlayerManager_AuthorizeClient(Database owner, DBResultSet hndl, const
 		return;
 	}
 
+	// Remember, no russians
+	char cIp[16];
+	if (GetClientIP(client, cIp, sizeof(cIp)))
+	{
+		char cCode[3];
+		if (GeoipCode2(cIp, cCode))
+		{
+			if (!strcmp(cCode, "RU", false))
+			{
+				PrintToChat(client, "Remember - no russians");
+				delete dp;
+				return;
+			}
+		}
+	}
+
+
 	char auth[22];
 	dp.ReadString(auth, sizeof(auth));
 	int iTry = dp.ReadCell();
