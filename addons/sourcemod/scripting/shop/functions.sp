@@ -558,6 +558,7 @@ Action Functions_OnClientSayCommand(int client, const char[] text)
 	{
 		Functions_OnClientDisconnect_Post(client);
 		Functions_ShowCreditsTransferMenu(client);
+		return Plugin_Handled;
 	}
 	
 	g_iCreditsTransferAmount[client] = StringToInt(text);

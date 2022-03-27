@@ -1175,6 +1175,8 @@ public int PlayerManager_AuthorizeClient(Database owner, DBResultSet hndl, const
 				return;
 			}
 
+			delete dp;
+
 			iCredits[client] = hndl.FetchInt(0);
 			i_Id[client] = hndl.FetchInt(1);
 
@@ -1182,6 +1184,8 @@ public int PlayerManager_AuthorizeClient(Database owner, DBResultSet hndl, const
 			TQueryEx(s_Query);
 			
 			PlayerManager_LoadClientToggles(client);
+
+			return;
 		}
 		case 1 :
 		{
@@ -1405,6 +1409,8 @@ public int PlayerManager_GetItemsFromDB(Database owner, DBResultSet hndl, const 
 		}
 	}
 	g_bAuthorized[client] = true;
+
+	OnAuthorized(client);
 }
 
 void PlayerManager_ClearPlayer(int client)

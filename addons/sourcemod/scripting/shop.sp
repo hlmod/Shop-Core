@@ -680,9 +680,17 @@ public int OnItemSelect(Menu menu, MenuAction action, int param1, int param2)
 			char info[16];
 			menu.GetItem(param2, info, sizeof(info));
 			iPos[param1] = GetMenuSelectionPosition();
-			if (!ShowItemInfo(param1, StringToInt(info)))
+
+			ShopMenu shop_menu = (bInv[param1] ? Menu_Inventory : Menu_Buy);
+			int value = StringToInt(info);
+			
+			Action result = Forward_OnItemSelect(param1, shop_menu, iClCategoryId[param1], value);
+			
+			if (result == Plugin_Handled || 
+			((result == Plugin_Changed || result == Plugin_Continue) && !ShowItemInfo(param1, value)))
 			{
 				ShowItemsOfCategory(param1, iClCategoryId[param1], bInv[param1], iPos[param1]);
+				Forward_OnItemSelected(param1, shop_menu, iClCategoryId[param1], value);
 			}
 		}
 		case MenuAction_Cancel :
