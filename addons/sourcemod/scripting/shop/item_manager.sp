@@ -1774,13 +1774,10 @@ Panel ItemManager_ConfirmItemPanelInfo(int source_client, int item_id, ShopMenu 
 		panel.DrawText(buffer);
 	}
 	
-	else
+	else if(sell_price > 0)
 	{
-		if(sell_price > 0)
-		{
-			FormatEx(buffer, sizeof(buffer), "%t: %d", "Sell Price", sell_price);
-			panel.DrawText(buffer);
-		}
+		FormatEx(buffer, sizeof(buffer), "%t: %d", "Sell Price", sell_price);
+		panel.DrawText(buffer);
 	}
 	
 	switch (view_as<ItemType>(h_KvItems.GetNum("type", 0))) // by default it will be ItemType_None
