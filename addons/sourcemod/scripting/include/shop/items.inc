@@ -52,6 +52,7 @@ forward bool Shop_OnItemDisplay(int client, ShopMenu menu_action, CategoryId cat
 
 /**
  *	Called when an item's price and sell price is being displayed
+ *	Prices when buying / selling do not change, only changes in the menu
  *	
  *	@param client			Client index an item's description is being displayed to
  *	@param menu_action		Menu performing this action
