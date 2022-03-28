@@ -211,5 +211,6 @@ public void __pl_shop_SetNTVOptional()
 	MarkNativeAsOptional("Shop_GetClientItemCount");
 	MarkNativeAsOptional("Shop_UseClientItem");
 	MarkNativeAsOptional("Shop_SetHide");
+	MarkNativeAsOptional("Shop_GetClientItems");
 }
 #endif
