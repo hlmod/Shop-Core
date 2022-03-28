@@ -288,11 +288,11 @@ public void Function_ConfirmLuckMenu(int client)
 	char buffer[256];
 	Menu menu = new Menu(Menu_ConfirmTryLuck);
 
-	FormatEx(buffer, sizeof(buffer), "%t \n", "confirm_luck", g_hLuckCredits.IntValue);
+	FormatEx(buffer, sizeof(buffer), "%T \n", "confirm_luck", client, g_hLuckCredits.IntValue);
 	menu.SetTitle(buffer);
-	FormatEx(buffer, sizeof(buffer), "%t", "Yes");
+	FormatEx(buffer, sizeof(buffer), "%T", "Yes", client);
 	menu.AddItem("yes", buffer);
-	FormatEx(buffer, sizeof(buffer), "%t", "No");
+	FormatEx(buffer, sizeof(buffer), "%T", "No", client);
 	menu.AddItem("no", buffer);
 
 	menu.ExitBackButton = false;
