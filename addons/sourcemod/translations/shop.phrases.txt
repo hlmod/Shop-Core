@@ -493,16 +493,6 @@
 		"en"		"Are you sure to spend {1} credits for Try a Luck \n"
 	}
 
-	"Yes"
-	{
-		"en"		"Yes"
-	}
-
-	"No"
-	{
-		"en"		"No"
-	}
-
 	"y."
 	{
 		"en"		"y."
