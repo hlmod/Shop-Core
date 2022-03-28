@@ -826,8 +826,6 @@ int iButton[MAXPLAYERS+1][11];
 #define CONFIRM_BACK 8
 #define CONFIRM_EXIT 10
 
-int iConfirmButton[MAXPLAYERS+1][11];
-
 bool ShowItemInfo(int client, int item_id)
 {
 	Panel panel = ItemManager_CreateItemPanelInfo(client, item_id, bInv[client] ? Menu_Inventory : Menu_Buy);
@@ -1224,8 +1222,6 @@ void ConfirmBuy(int client, int item_id)
 		ItemType type = ItemManager_GetItemTypeEx(sItemId);
 	
 		panel.DrawItem(" ", ITEMDRAW_SPACER|ITEMDRAW_RAWLINE);
-
-		int button = 1;
 		
 		switch (type)
 		{
@@ -1238,11 +1234,9 @@ void ConfirmBuy(int client, int item_id)
 
 					FormatEx(sBuffer, sizeof(sBuffer), "%t", "Yes");
 					panel.DrawItem(sBuffer);
-					iConfirmButton[client][button++] = CONFIRM_YES;
 
 					FormatEx(sBuffer, sizeof(sBuffer), "%t", "No");
 					panel.DrawItem(sBuffer);
-					iConfirmButton[client][button++] = CONFIRM_NO;
 				}
 			}
 			case Item_Finite :
@@ -1260,11 +1254,9 @@ void ConfirmBuy(int client, int item_id)
 
 					FormatEx(sBuffer, sizeof(sBuffer), "%t", "Yes");
 					panel.DrawItem(sBuffer);
-					iConfirmButton[client][button++] = CONFIRM_YES;
 
 					FormatEx(sBuffer, sizeof(sBuffer), "%t", "No");
 					panel.DrawItem(sBuffer);
-					iConfirmButton[client][button++] = CONFIRM_NO;
 				}
 			}
 			case Item_Togglable :
@@ -1276,11 +1268,9 @@ void ConfirmBuy(int client, int item_id)
 
 					FormatEx(sBuffer, sizeof(sBuffer), "%t", "Yes");
 					panel.DrawItem(sBuffer);
-					iConfirmButton[client][button++] = CONFIRM_YES;
 
 					FormatEx(sBuffer, sizeof(sBuffer), "%t", "No");
 					panel.DrawItem(sBuffer);
-					iConfirmButton[client][button++] = CONFIRM_NO;
 				}
 			}
 			case Item_BuyOnly :
@@ -1292,35 +1282,18 @@ void ConfirmBuy(int client, int item_id)
 
 					FormatEx(sBuffer, sizeof(sBuffer), "%t", "Yes");
 					panel.DrawItem(sBuffer);
-					iConfirmButton[client][button++] = CONFIRM_YES;
 
 					FormatEx(sBuffer, sizeof(sBuffer), "%t", "No");
 					panel.DrawItem(sBuffer);
-					iConfirmButton[client][button++] = CONFIRM_NO;
 				}
 			}
 		}
-		
-		panel.DrawItem(" ", ITEMDRAW_SPACER|ITEMDRAW_RAWLINE);
-		
-		panel.CurrentKey = g_iMaxPageItems-2;
-		iConfirmButton[client][g_iMaxPageItems-2] = CONFIRM_BACK;
-		FormatEx(sBuffer, sizeof(sBuffer), "%t", "Back");
-		panel.DrawItem(sBuffer, ITEMDRAW_CONTROL);
-		
-		panel.DrawItem(" ", ITEMDRAW_SPACER|ITEMDRAW_RAWLINE);
-		
-		panel.CurrentKey = g_iMaxPageItems;
-		iConfirmButton[client][g_iMaxPageItems] = CONFIRM_EXIT;
-		FormatEx(sBuffer, sizeof(sBuffer), "%t", "Exit");
-		panel.DrawItem(sBuffer, ITEMDRAW_CONTROL);
 		
 		iClItemId[client] = item_id;
 		
 		panel.Send(client, BuyConfirmPanel_Handler, MENU_TIME_FOREVER);
 		delete panel;
 	}
-	return;
 }
 
 public int BuyConfirmPanel_Handler(Menu menu, MenuAction action, int param1, int param2)
@@ -1329,7 +1302,7 @@ public int BuyConfirmPanel_Handler(Menu menu, MenuAction action, int param1, int
 	{
 		case MenuAction_Select :
 		{
-			switch (iConfirmButton[param1][param2])
+			switch (param2)
 			{
 				case CONFIRM_YES :
 				{
@@ -1339,31 +1312,6 @@ public int BuyConfirmPanel_Handler(Menu menu, MenuAction action, int param1, int
 				case CONFIRM_NO :
 				{
 					ShowItemInfo(param1, iClItemId[param1]);
-				}
-				default:
-				{
-					if(param2 == g_iMaxPageItems-2)
-					{
-						switch (iClMenuId[param1])
-						{
-							case Menu_Buy :
-							{
-								if (!ShowItemsOfCategory(param1, iClCategoryId[param1], false, iPos[param1]) && !ShowCategories(param1))
-								{
-									ShowMainMenu(param1);
-									CPrintToChat(param1, "%t", "EmptyShop");
-								}
-							}
-							case Menu_Inventory :
-							{
-								if (!ShowItemsOfCategory(param1, iClCategoryId[param1], true, iPos[param1]) && !ShowInventory(param1))
-								{
-									ShowMainMenu(param1);
-									CPrintToChat(param1, "%t", "EmptyInventory");
-								}
-							}
-						}
-					}
 				}
 			}
 		}
@@ -1390,8 +1338,6 @@ void ConfirmSell(int client, int item_id)
 		ItemType type = ItemManager_GetItemTypeEx(sItemId);
 	
 		panel.DrawItem(" ", ITEMDRAW_SPACER|ITEMDRAW_RAWLINE);
-
-		int button = 1;
 		
 		switch (type)
 		{
@@ -1404,11 +1350,9 @@ void ConfirmSell(int client, int item_id)
 
 					FormatEx(sBuffer, sizeof(sBuffer), "%t", "Yes");
 					panel.DrawItem(sBuffer);
-					iConfirmButton[client][button++] = CONFIRM_YES;
 
 					FormatEx(sBuffer, sizeof(sBuffer), "%t", "No");
 					panel.DrawItem(sBuffer);
-					iConfirmButton[client][button++] = CONFIRM_NO;
 				}
 			}
 			case Item_Finite :
@@ -1426,11 +1370,9 @@ void ConfirmSell(int client, int item_id)
 
 					FormatEx(sBuffer, sizeof(sBuffer), "%t", "Yes");
 					panel.DrawItem(sBuffer);
-					iConfirmButton[client][button++] = CONFIRM_YES;
 
 					FormatEx(sBuffer, sizeof(sBuffer), "%t", "No");
 					panel.DrawItem(sBuffer);
-					iConfirmButton[client][button++] = CONFIRM_NO;
 				}
 			}
 			case Item_Togglable :
@@ -1442,11 +1384,9 @@ void ConfirmSell(int client, int item_id)
 
 					FormatEx(sBuffer, sizeof(sBuffer), "%t", "Yes");
 					panel.DrawItem(sBuffer);
-					iConfirmButton[client][button++] = CONFIRM_YES;
 
 					FormatEx(sBuffer, sizeof(sBuffer), "%t", "No");
 					panel.DrawItem(sBuffer);
-					iConfirmButton[client][button++] = CONFIRM_NO;
 				}
 			}
 			case Item_BuyOnly :
@@ -1458,35 +1398,18 @@ void ConfirmSell(int client, int item_id)
 
 					FormatEx(sBuffer, sizeof(sBuffer), "%t", "Yes");
 					panel.DrawItem(sBuffer);
-					iConfirmButton[client][button++] = CONFIRM_YES;
 
 					FormatEx(sBuffer, sizeof(sBuffer), "%t", "No");
 					panel.DrawItem(sBuffer);
-					iConfirmButton[client][button++] = CONFIRM_NO;
 				}
 			}
 		}
-		
-		panel.DrawItem(" ", ITEMDRAW_SPACER|ITEMDRAW_RAWLINE);
-		
-		panel.CurrentKey = g_iMaxPageItems-2;
-		iConfirmButton[client][g_iMaxPageItems-2] = CONFIRM_BACK;
-		FormatEx(sBuffer, sizeof(sBuffer), "%t", "Back");
-		panel.DrawItem(sBuffer, ITEMDRAW_CONTROL);
-		
-		panel.DrawItem(" ", ITEMDRAW_SPACER|ITEMDRAW_RAWLINE);
-		
-		panel.CurrentKey = g_iMaxPageItems;
-		iConfirmButton[client][g_iMaxPageItems] = CONFIRM_EXIT;
-		FormatEx(sBuffer, sizeof(sBuffer), "%t", "Exit");
-		panel.DrawItem(sBuffer, ITEMDRAW_CONTROL);
 		
 		iClItemId[client] = item_id;
 		
 		panel.Send(client, SellConfirmPanel_Handler, MENU_TIME_FOREVER);
 		delete panel;
 	}
-	return;
 }
 
 public int SellConfirmPanel_Handler(Menu menu, MenuAction action, int param1, int param2)
@@ -1495,7 +1418,7 @@ public int SellConfirmPanel_Handler(Menu menu, MenuAction action, int param1, in
 	{
 		case MenuAction_Select :
 		{
-			switch (iConfirmButton[param1][param2])
+			switch (param2)
 			{
 				case CONFIRM_YES :
 				{
@@ -1505,31 +1428,6 @@ public int SellConfirmPanel_Handler(Menu menu, MenuAction action, int param1, in
 				case CONFIRM_NO :
 				{
 					ShowItemInfo(param1, iClItemId[param1]);
-				}
-				default:
-				{
-					if(param2 == g_iMaxPageItems-2)
-					{
-						switch (iClMenuId[param1])
-						{
-							case Menu_Buy :
-							{
-								if (!ShowItemsOfCategory(param1, iClCategoryId[param1], false, iPos[param1]) && !ShowCategories(param1))
-								{
-									ShowMainMenu(param1);
-									CPrintToChat(param1, "%t", "EmptyShop");
-								}
-							}
-							case Menu_Inventory :
-							{
-								if (!ShowItemsOfCategory(param1, iClCategoryId[param1], true, iPos[param1]) && !ShowInventory(param1))
-								{
-									ShowMainMenu(param1);
-									CPrintToChat(param1, "%t", "EmptyInventory");
-								}
-							}
-						}
-					}
 				}
 			}
 		}
