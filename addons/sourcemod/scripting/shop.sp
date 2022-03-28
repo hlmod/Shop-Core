@@ -821,6 +821,13 @@ public int OnItemSelect(Menu menu, MenuAction action, int param1, int param2)
 
 int iButton[MAXPLAYERS+1][11];
 
+#define CONFIRM_YES 1
+#define CONFIRM_NO 2
+#define CONFIRM_BACK 8
+#define CONFIRM_EXIT 10
+
+int iConfirmButton[MAXPLAYERS+1][11];
+
 bool ShowItemInfo(int client, int item_id)
 {
 	Panel panel = ItemManager_CreateItemPanelInfo(client, item_id, bInv[client] ? Menu_Inventory : Menu_Buy);
@@ -1108,19 +1115,15 @@ public int ItemPanel_Handler(Menu menu, MenuAction action, int param1, int param
 				case BUTTON_BUY :
 				{
 					ConfirmBuy(param1, iClItemId[param1]);
-					//BuyItem(param1, iClItemId[param1], false);
-					//ShowItemInfo(param1, iClItemId[param1]);
 				}
 				case BUTTON_SELL :
 				{
 					if (has)
 					{
 						ConfirmSell(param1, iClItemId[param1]);
-						//SellItem(param1, iClItemId[param1]);
 					}
 					else if (!has)
 					{
-						PrintToChat(param1, " \x04[Shop] x\01here is come the error.");
 						ShowItemInfo(param1, iClItemId[param1]);
 					}
 					if (bInv[param1] && PlayerManager_GetItemCount(param1, iClItemId[param1]) < 1)
@@ -1131,12 +1134,6 @@ public int ItemPanel_Handler(Menu menu, MenuAction action, int param1, int param
 							CPrintToChat(param1, "%t", "EmptyInventory");
 						}
 					}
-					/*
-					else
-					{
-						ShowItemInfo(param1, iClItemId[param1]);
-					}
-					*/
 				}
 				case BUTTON_PREVIEW :
 				{
@@ -1207,71 +1204,333 @@ public int ItemPanel_Handler(Menu menu, MenuAction action, int param1, int param
 	}
 }
 
-public Action ConfirmBuy(int client, int item_id)
+void ConfirmBuy(int client, int item_id)
 {
-	Menu menu = new Menu(Menu_ConfirmBuy);
+	Panel panel = ItemManager_ConfirmItemPanelInfo(client, item_id, Menu_Buy, true);
+	if (panel != null)
+	{
+		char sBuffer[SHOP_MAX_STRING_LENGTH], sItemId[16];
+		IntToString(item_id, sItemId, sizeof(sItemId));
+		
+		bool isHidden = ItemManager_GetItemHideEx(sItemId);
+		
+		SetGlobalTransTarget(client);
+		
+		int credits = GetCredits(client);
+		
+		FormatEx(sBuffer, sizeof(sBuffer), "%t\n ", "credits", credits);
+		panel.SetTitle(sBuffer, false);
+		
+		ItemType type = ItemManager_GetItemTypeEx(sItemId);
 	
-	menu.SetTitle("Are you sure that you going to purchase this item?");
-	menu.AddItem("YES", "Yes");
-	menu.AddItem("NO", "No");	
+		panel.DrawItem(" ", ITEMDRAW_SPACER|ITEMDRAW_RAWLINE);
 
-	menu.ExitBackButton = true;
-	menu.Display(client, MENU_TIME_FOREVER);
+		int button = 1;
+		
+		switch (type)
+		{
+			case Item_None :
+			{
+				if (!isHidden)
+				{
+					FormatEx(sBuffer, sizeof(sBuffer), "%t", "You Buy Sure");
+					panel.DrawText(sBuffer);
 
-	return Plugin_Handled;
+					FormatEx(sBuffer, sizeof(sBuffer), "%t", "Yes");
+					panel.DrawItem(sBuffer);
+					iConfirmButton[client][button++] = CONFIRM_YES;
+
+					FormatEx(sBuffer, sizeof(sBuffer), "%t", "No");
+					panel.DrawItem(sBuffer);
+					iConfirmButton[client][button++] = CONFIRM_NO;
+				}
+			}
+			case Item_Finite :
+			{
+				int count = PlayerManager_GetItemCountEx(client, sItemId);
+				FormatEx(sBuffer, sizeof(sBuffer), "%t: %d", "You have", count);
+				panel.DrawText(sBuffer);
+				
+				panel.DrawItem(" ", ITEMDRAW_SPACER|ITEMDRAW_RAWLINE);
+				
+				if (!isHidden)
+				{
+					FormatEx(sBuffer, sizeof(sBuffer), "%t", "You Buy Sure");
+					panel.DrawText(sBuffer);
+
+					FormatEx(sBuffer, sizeof(sBuffer), "%t", "Yes");
+					panel.DrawItem(sBuffer);
+					iConfirmButton[client][button++] = CONFIRM_YES;
+
+					FormatEx(sBuffer, sizeof(sBuffer), "%t", "No");
+					panel.DrawItem(sBuffer);
+					iConfirmButton[client][button++] = CONFIRM_NO;
+				}
+			}
+			case Item_Togglable :
+			{
+				if (!isHidden)
+				{
+					FormatEx(sBuffer, sizeof(sBuffer), "%t", "You Buy Sure");
+					panel.DrawText(sBuffer);
+
+					FormatEx(sBuffer, sizeof(sBuffer), "%t", "Yes");
+					panel.DrawItem(sBuffer);
+					iConfirmButton[client][button++] = CONFIRM_YES;
+
+					FormatEx(sBuffer, sizeof(sBuffer), "%t", "No");
+					panel.DrawItem(sBuffer);
+					iConfirmButton[client][button++] = CONFIRM_NO;
+				}
+			}
+			case Item_BuyOnly :
+			{
+				if (!isHidden)
+				{
+					FormatEx(sBuffer, sizeof(sBuffer), "%t", "You Buy Sure");
+					panel.DrawText(sBuffer);
+
+					FormatEx(sBuffer, sizeof(sBuffer), "%t", "Yes");
+					panel.DrawItem(sBuffer);
+					iConfirmButton[client][button++] = CONFIRM_YES;
+
+					FormatEx(sBuffer, sizeof(sBuffer), "%t", "No");
+					panel.DrawItem(sBuffer);
+					iConfirmButton[client][button++] = CONFIRM_NO;
+				}
+			}
+		}
+		
+		panel.DrawItem(" ", ITEMDRAW_SPACER|ITEMDRAW_RAWLINE);
+		
+		panel.CurrentKey = g_iMaxPageItems-2;
+		iConfirmButton[client][g_iMaxPageItems-2] = CONFIRM_BACK;
+		FormatEx(sBuffer, sizeof(sBuffer), "%t", "Back");
+		panel.DrawItem(sBuffer, ITEMDRAW_CONTROL);
+		
+		panel.DrawItem(" ", ITEMDRAW_SPACER|ITEMDRAW_RAWLINE);
+		
+		panel.CurrentKey = g_iMaxPageItems;
+		iConfirmButton[client][g_iMaxPageItems] = CONFIRM_EXIT;
+		FormatEx(sBuffer, sizeof(sBuffer), "%t", "Exit");
+		panel.DrawItem(sBuffer, ITEMDRAW_CONTROL);
+		
+		iClItemId[client] = item_id;
+		
+		panel.Send(client, BuyConfirmPanel_Handler, MENU_TIME_FOREVER);
+		delete panel;
+	}
+	return;
 }
 
-public int Menu_ConfirmBuy(Menu menu, MenuAction action, int param1, int param2)
+public int BuyConfirmPanel_Handler(Menu menu, MenuAction action, int param1, int param2)
 {
 	switch (action)
 	{
-		case MenuAction_Select:
+		case MenuAction_Select :
 		{
-			char info[32];
-			menu.GetItem(param2, info, sizeof(info));
-			if (StrEqual(info, "YES"))
+			switch (iConfirmButton[param1][param2])
 			{
-				BuyItem(param1, iClItemId[param1], false);
-				ShowItemInfo(param1, iClItemId[param1]);
-			}
-			else
-			{
-				ShowItemInfo(param1, iClItemId[param1]);
+				case CONFIRM_YES :
+				{
+					BuyItem(param1, iClItemId[param1], false);
+					ShowItemInfo(param1, iClItemId[param1]);
+				}
+				case CONFIRM_NO :
+				{
+					ShowItemInfo(param1, iClItemId[param1]);
+				}
+				default:
+				{
+					if(param2 == g_iMaxPageItems-2)
+					{
+						switch (iClMenuId[param1])
+						{
+							case Menu_Buy :
+							{
+								if (!ShowItemsOfCategory(param1, iClCategoryId[param1], false, iPos[param1]) && !ShowCategories(param1))
+								{
+									ShowMainMenu(param1);
+									CPrintToChat(param1, "%t", "EmptyShop");
+								}
+							}
+							case Menu_Inventory :
+							{
+								if (!ShowItemsOfCategory(param1, iClCategoryId[param1], true, iPos[param1]) && !ShowInventory(param1))
+								{
+									ShowMainMenu(param1);
+									CPrintToChat(param1, "%t", "EmptyInventory");
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 	}
 }
 
-public Action ConfirmSell(int client, int item_id)
+void ConfirmSell(int client, int item_id)
 {
-	Menu menu = new Menu(Menu_ConfirmSell);
+	Panel panel = ItemManager_ConfirmItemPanelInfo(client, item_id, Menu_Buy, false);
+	if (panel != null)
+	{
+		char sBuffer[SHOP_MAX_STRING_LENGTH], sItemId[16];
+		IntToString(item_id, sItemId, sizeof(sItemId));
+		
+		bool isHidden = ItemManager_GetItemHideEx(sItemId);
+		
+		SetGlobalTransTarget(client);
+		
+		int credits = GetCredits(client);
+		
+		FormatEx(sBuffer, sizeof(sBuffer), "%t\n ", "credits", credits);
+		panel.SetTitle(sBuffer, false);
+		
+		ItemType type = ItemManager_GetItemTypeEx(sItemId);
 	
-	menu.SetTitle("Are you sure that you going to sell this item?");
-	menu.AddItem("Confirm_YES", "Yes");
-	menu.AddItem("Confirm_NO", "No");	
+		panel.DrawItem(" ", ITEMDRAW_SPACER|ITEMDRAW_RAWLINE);
 
-	menu.ExitBackButton = true;
-	menu.Display(client, MENU_TIME_FOREVER);
+		int button = 1;
+		
+		switch (type)
+		{
+			case Item_None :
+			{
+				if (!isHidden)
+				{
+					FormatEx(sBuffer, sizeof(sBuffer), "%t", "You Sell Sure");
+					panel.DrawText(sBuffer);
 
-	return Plugin_Handled;
+					FormatEx(sBuffer, sizeof(sBuffer), "%t", "Yes");
+					panel.DrawItem(sBuffer);
+					iConfirmButton[client][button++] = CONFIRM_YES;
+
+					FormatEx(sBuffer, sizeof(sBuffer), "%t", "No");
+					panel.DrawItem(sBuffer);
+					iConfirmButton[client][button++] = CONFIRM_NO;
+				}
+			}
+			case Item_Finite :
+			{
+				int count = PlayerManager_GetItemCountEx(client, sItemId);
+				FormatEx(sBuffer, sizeof(sBuffer), "%t: %d", "You have", count);
+				panel.DrawText(sBuffer);
+				
+				panel.DrawItem(" ", ITEMDRAW_SPACER|ITEMDRAW_RAWLINE);
+				
+				if (!isHidden)
+				{
+					FormatEx(sBuffer, sizeof(sBuffer), "%t", "You Sell Sure");
+					panel.DrawText(sBuffer);
+
+					FormatEx(sBuffer, sizeof(sBuffer), "%t", "Yes");
+					panel.DrawItem(sBuffer);
+					iConfirmButton[client][button++] = CONFIRM_YES;
+
+					FormatEx(sBuffer, sizeof(sBuffer), "%t", "No");
+					panel.DrawItem(sBuffer);
+					iConfirmButton[client][button++] = CONFIRM_NO;
+				}
+			}
+			case Item_Togglable :
+			{
+				if (!isHidden)
+				{
+					FormatEx(sBuffer, sizeof(sBuffer), "%t", "You Sell Sure");
+					panel.DrawText(sBuffer);
+
+					FormatEx(sBuffer, sizeof(sBuffer), "%t", "Yes");
+					panel.DrawItem(sBuffer);
+					iConfirmButton[client][button++] = CONFIRM_YES;
+
+					FormatEx(sBuffer, sizeof(sBuffer), "%t", "No");
+					panel.DrawItem(sBuffer);
+					iConfirmButton[client][button++] = CONFIRM_NO;
+				}
+			}
+			case Item_BuyOnly :
+			{
+				if (!isHidden)
+				{
+					FormatEx(sBuffer, sizeof(sBuffer), "%t", "You Sell Sure");
+					panel.DrawText(sBuffer);
+
+					FormatEx(sBuffer, sizeof(sBuffer), "%t", "Yes");
+					panel.DrawItem(sBuffer);
+					iConfirmButton[client][button++] = CONFIRM_YES;
+
+					FormatEx(sBuffer, sizeof(sBuffer), "%t", "No");
+					panel.DrawItem(sBuffer);
+					iConfirmButton[client][button++] = CONFIRM_NO;
+				}
+			}
+		}
+		
+		panel.DrawItem(" ", ITEMDRAW_SPACER|ITEMDRAW_RAWLINE);
+		
+		panel.CurrentKey = g_iMaxPageItems-2;
+		iConfirmButton[client][g_iMaxPageItems-2] = CONFIRM_BACK;
+		FormatEx(sBuffer, sizeof(sBuffer), "%t", "Back");
+		panel.DrawItem(sBuffer, ITEMDRAW_CONTROL);
+		
+		panel.DrawItem(" ", ITEMDRAW_SPACER|ITEMDRAW_RAWLINE);
+		
+		panel.CurrentKey = g_iMaxPageItems;
+		iConfirmButton[client][g_iMaxPageItems] = CONFIRM_EXIT;
+		FormatEx(sBuffer, sizeof(sBuffer), "%t", "Exit");
+		panel.DrawItem(sBuffer, ITEMDRAW_CONTROL);
+		
+		iClItemId[client] = item_id;
+		
+		panel.Send(client, SellConfirmPanel_Handler, MENU_TIME_FOREVER);
+		delete panel;
+	}
+	return;
 }
 
-public int Menu_ConfirmSell(Menu menu, MenuAction action, int param1, int param2)
+public int SellConfirmPanel_Handler(Menu menu, MenuAction action, int param1, int param2)
 {
 	switch (action)
 	{
-		case MenuAction_Select:
+		case MenuAction_Select :
 		{
-			char info[32];
-			menu.GetItem(param2, info, sizeof(info));
-			if (StrEqual(info, "Confirm_YES"))
+			switch (iConfirmButton[param1][param2])
 			{
-				SellItem(param1, iClItemId[param1]);
-				ShowItemInfo(param1, iClItemId[param1]);
-			}
-			else
-			{
-				ShowItemInfo(param1, iClItemId[param1]);
+				case CONFIRM_YES :
+				{
+					SellItem(param1, iClItemId[param1]);
+					ShowItemInfo(param1, iClItemId[param1]);
+				}
+				case CONFIRM_NO :
+				{
+					ShowItemInfo(param1, iClItemId[param1]);
+				}
+				default:
+				{
+					if(param2 == g_iMaxPageItems-2)
+					{
+						switch (iClMenuId[param1])
+						{
+							case Menu_Buy :
+							{
+								if (!ShowItemsOfCategory(param1, iClCategoryId[param1], false, iPos[param1]) && !ShowCategories(param1))
+								{
+									ShowMainMenu(param1);
+									CPrintToChat(param1, "%t", "EmptyShop");
+								}
+							}
+							case Menu_Inventory :
+							{
+								if (!ShowItemsOfCategory(param1, iClCategoryId[param1], true, iPos[param1]) && !ShowInventory(param1))
+								{
+									ShowMainMenu(param1);
+									CPrintToChat(param1, "%t", "EmptyInventory");
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 	}

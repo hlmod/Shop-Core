@@ -246,8 +246,7 @@ public int Functions_Menu_Handler(Menu menu, MenuAction action, int param1, int 
 				}
 				case 'b' :
 				{
-					Confirm_FunctionLuck(param1);
-					Functions_ShowMenu(param1, GetMenuSelectionPosition());
+					Function_ConfirmLuckMenu(param1);
 				}
 				default :
 				{
@@ -284,20 +283,21 @@ public int Functions_Menu_Handler(Menu menu, MenuAction action, int param1, int 
 	}
 }
 
-public void Confirm_FunctionLuck(int client)
+public void Function_ConfirmLuckMenu(int client)
 {
 	char buffer[256];
 	Menu menu = new Menu(Menu_ConfirmTryLuck);
 
-	FormatEx(buffer, sizeof(buffer), "%t\n", "confirm_luck", g_hLuckCredits.IntValue);
+	FormatEx(buffer, sizeof(buffer), "%t \n", "confirm_luck", g_hLuckCredits.IntValue);
 	menu.SetTitle(buffer);
-
 	FormatEx(buffer, sizeof(buffer), "%t", "Yes");
-	menu.AddItem("a", buffer);
-
+	menu.AddItem("yes", buffer);
 	FormatEx(buffer, sizeof(buffer), "%t", "No");
-	menu.AddItem("b", buffer);
+	menu.AddItem("no", buffer);
 
+	menu.ExitBackButton = false;
+	menu.ExitButton = false;
+	menu.Display(client, MENU_TIME_FOREVER);
 }
 
 public int Menu_ConfirmTryLuck(Menu menu, MenuAction action, int param1, int param2)
@@ -309,17 +309,14 @@ public int Menu_ConfirmTryLuck(Menu menu, MenuAction action, int param1, int par
 			char info[16];
 			menu.GetItem(param2, info, sizeof(info));
 		
-			switch (info[0])
+			if(StrEqual(info, "yes"))
 			{
-				case 'a' :
-				{
-					Functions_SetupLuck(param1);
-					Functions_ShowMenu(param1, GetMenuSelectionPosition());
-				}
-				case 'b' :
-				{
-					Functions_ShowMenu(param1, GetMenuSelectionPosition());
-				}
+				Functions_SetupLuck(param1);
+				Functions_ShowMenu(param1, GetMenuSelectionPosition());
+			}
+			else
+			{
+				Functions_ShowMenu(param1, GetMenuSelectionPosition());
 			} 
 		}
 	}
