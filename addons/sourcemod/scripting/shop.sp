@@ -1122,7 +1122,7 @@ public int ItemPanel_Handler(Menu menu, MenuAction action, int param1, int param
 					{
 						ConfirmSell(param1, iClItemId[param1]);
 					}
-					else if (!has)
+					else
 					{
 						ShowItemInfo(param1, iClItemId[param1]);
 					}
