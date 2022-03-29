@@ -185,6 +185,7 @@ public void __pl_shop_SetNTVOptional()
 	MarkNativeAsOptional("Shop_GetCategoryNameById");
 	MarkNativeAsOptional("Shop_FillArrayByItems");
 	MarkNativeAsOptional("Shop_FormatItem");
+	MarkNativeAsOptional("Shop_GetClientItems");
 	
 	MarkNativeAsOptional("Shop_GetClientId");
 	MarkNativeAsOptional("Shop_SetClientItemTimeleft");
