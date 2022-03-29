@@ -772,10 +772,11 @@ public int ItemManager_KvCopySubKeysItemCustomInfo(Handle plugin, int numParams)
 	if (!h_KvItems.JumpToKey(buffer))
 		ThrowNativeError(SP_ERROR_NATIVE, "Item id %s is invalid", buffer);
 	
-	bool result = false;
-	
 	KeyValues origin_kv = GetNativeCell(2);
-	origin_kv.GetNum("___SD__");
+	if(origin_kv == INVALID_HANDLE) 
+		ThrowNativeError(SP_ERROR_NATIVE, "Handle is invalid!");
+	
+	bool result = false;
 	
 	if (h_KvItems.JumpToKey("CustomInfo", true))
 	{
