@@ -304,6 +304,10 @@ public int Menu_ConfirmTryLuck(Menu menu, MenuAction action, int param1, int par
 {
 	switch (action)
 	{
+		case MenuAction_End:
+		{
+		    delete menu;
+		}
 		case MenuAction_Select:
 		{
 			char info[16];
