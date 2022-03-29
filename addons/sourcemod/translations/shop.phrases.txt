@@ -490,7 +490,7 @@
 	"confirm_luck"
 	{
 		"#format"	"{1:i}"
-		"en"		"Are you sure to spend {1} credits for Try a Luck \n"
+		"en"		"Are you sure to spend {1} credits for Try a Luck?"
 	}
 
 	"y."
