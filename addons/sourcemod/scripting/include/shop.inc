@@ -213,8 +213,9 @@ public void __pl_shop_SetNTVOptional()
 	MarkNativeAsOptional("Shop_SetHide");
 
 	MarkNativeAsOptional("CategoryId.CategoryId");
-	MarkNativeAsOptional("CategoryId.GetIdByName");
+	MarkNativeAsOptional("CategoryId.NewItem");
 	MarkNativeAsOptional("CategoryId.GetItemId");
+	MarkNativeAsOptional("CategoryId.GetByUnique");
 	MarkNativeAsOptional("CategoryId.GetUniqueName");
 	MarkNativeAsOptional("CategoryId.GetDisplayName");
 	MarkNativeAsOptional("CategoryId.ToggleOff");
@@ -228,8 +229,7 @@ public void __pl_shop_SetNTVOptional()
 	MarkNativeAsOptional("ItemId.SetCustomInfoString");
 	MarkNativeAsOptional("ItemId.KvCopyCustomInfo");
 	MarkNativeAsOptional("ItemId.GetUniqueName");
-	MarkNativeAsOptional("ItemId.GetName");
-	MarkNativeAsOptional("ItemId.GetCategoryId");
+	MarkNativeAsOptional("ItemId.GetDisplayName");
 	MarkNativeAsOptional("ItemId.Format");
 	MarkNativeAsOptional("ItemId.Give");
 	MarkNativeAsOptional("ItemId.Buy");

@@ -1,5 +1,5 @@
 
-methodmap CategoryId < Handle
+methodmap CategoryId __nullable__
 {
 	// Registers new category id
 	// 
@@ -17,19 +17,23 @@ methodmap CategoryId < Handle
 							 Shop_CategoryShouldDisplayCallback cat_should=INVALID_FUNCTION,
 							 Shop_CategorySelectCallback cat_select=INVALID_FUNCTION);
 
-	// Gets category id of the category unique name
+	// Starts an item to register
 	// 
-	// @param item						Category unique name to get id for
-	// @return					  		Category id of the category
-	public static CategoryId GetIdByName(const char[] category) {
-		return Shop_GetCategoryId(category);
-	}
+ 	// @param item						Item unique name
+ 	// @return true to success, false otherwise
+	public native bool NewItem(const char[] item);
 
 	// Gets item id of the item unique name from category_id
 	// 
 	// @param item						Item unique name to get for
 	// @return					  		Item id of the item
-	public static native ItemId GetItemId(const char[] item);
+	public native ItemId GetItemId(const char[] item);
+
+	// Gets the category unique name by its id
+	// 
+	// @param category					Category unique name
+	// @return					  		Category id of the category
+	public static native CategoryId GetByUnique(char[] category);
 
 	// Gets the category unique name by its id
 	// 
@@ -43,7 +47,7 @@ methodmap CategoryId < Handle
 	// @param buffer					Buffer to store the unique name
 	// @param maxlength					Max length of the buffer
 	// @return					  		True on success, false otherwise
-	public native bool GetName(char[] buffer, int maxlength);
+	public native bool GetDisplayName(char[] buffer, int maxlength);
 
 	// Toggles all items of category off
 	// 
@@ -59,11 +63,10 @@ methodmap CategoryId < Handle
 	}
 }
 
-methodmap ItemId < Handle
+methodmap ItemId __nullable__
 {
 	// Gets an item custom info
 	// 
-	// @param item_id					Item id
 	// @param info						Info key to get
 	// @param defaultvalue				Optional default value to use if the key is not found
 	// @return					 		Integer value of the key
@@ -71,15 +74,13 @@ methodmap ItemId < Handle
 
 	// Sets an item custom info
 	// 
-	// @param item_id					Item id
 	// @param info						Info key to get
 	// @param value						Value to set
-	// @return					  		true on success, false otherwise
-	public native bool SetCustomInfo(const char[] info, int value);
+	// @noreturn
+	public native void SetCustomInfo(const char[] info, int value);
 
 	// Gets an item custom info
 	// 
-	// @param item_id					Item id
 	// @param info						Info key to get
 	// @param defaultvalue				Optional default value to use if the key is not found
 	// @return					  		Float value of the key
@@ -87,15 +88,13 @@ methodmap ItemId < Handle
 
 	// Sets an item custom info
 	// 
-	// @param item_id					Item id
 	// @param info						Info key to get
 	// @param value						Value to set
-	// @return					  		true on success, false otherwise
-	public native bool SetCustomInfoFloat(const char[] info, float value);
+	// @noreturn
+	public native void SetCustomInfoFloat(const char[] info, float value);
 
 	// Gets an item custom info
 	// 
-	// @param item_id					Item id
 	// @param info						Info key to get
 	// @param buffer					Buffer to store the value in
 	// @param maxlength					Max length of the buffer
@@ -105,15 +104,13 @@ methodmap ItemId < Handle
 
 	// Sets an item custom info
 	// 
-	// @param item_id					Item id
 	// @param info						Info key to get
 	// @param value						Value to set
-	// @return					  		true on success, false otherwise
-	public native bool SetCustomInfoString(const char[] info, const char[] value);
+	// @noreturn
+	public native void SetCustomInfoString(const char[] info, const char[] value);
 
 	// Copies SubKeys of a KeyValue structure to the item info
 	// 
-	// @param item_id					Item id
 	// @param kv						KeyValue structure to copy
 	// @return					  		true on success, false otherwise
 	public native bool KvCopyCustomInfo(KeyValues kv);
@@ -130,12 +127,7 @@ methodmap ItemId < Handle
 	// @param buffer					Buffer to store the unique name
 	// @param maxlength					Max length of the buffer
 	// @return					  		Number of bytes written
-	public native int GetName(char[] buffer, int maxlength);
-
-	// Gets the item's category id
-	//
-	// @return					  		Category id or INVALID_CATEGORY if category is not set or item id is invalid
-	public native CategoryId GetCategoryId();
+	public native int GetDisplayName(char[] buffer, int maxlength);
 
 	// Formats item display name to use in menu
 	//
