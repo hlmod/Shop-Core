@@ -128,6 +128,7 @@ public void __pl_shop_SetNTVOptional()
 {
 	MarkNativeAsOptional("Shop_IsStarted");
 	MarkNativeAsOptional("Shop_UnregisterMe");
+	MarkNativeAsOptional("Shop_UnregisterItem");
 	MarkNativeAsOptional("Shop_ShowItemPanel");
 	MarkNativeAsOptional("Shop_OpenMainMenu");
 	MarkNativeAsOptional("Shop_ShowCategory");
@@ -212,6 +213,7 @@ public void __pl_shop_SetNTVOptional()
 	MarkNativeAsOptional("Shop_GetClientItemCount");
 	MarkNativeAsOptional("Shop_UseClientItem");
 	MarkNativeAsOptional("Shop_SetHide");
+	MarkNativeAsOptional("Shop_GetClientItems");
 
 	MarkNativeAsOptional("CategoryId.CategoryId");
 	MarkNativeAsOptional("CategoryId.NewItem");
@@ -258,5 +260,6 @@ public void __pl_shop_SetNTVOptional()
 	MarkNativeAsOptional("ItemId.Hide.set");
 	MarkNativeAsOptional("ItemId.ItemType.get");
 	MarkNativeAsOptional("ItemId.Exist.get");
+
 }
 #endif

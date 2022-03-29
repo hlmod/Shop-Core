@@ -12,6 +12,30 @@
 forward Action Shop_OnItemDraw(int client, ShopMenu menu_action, CategoryId category_id, ItemId item_id, bool &disable);
 
 /**
+ *	Called when an item is being select
+ *	
+ *	@param client			Client index an item is being select to
+ *	@param menu_action		Menu performing this action
+ *	@param category_id		Category id of an item
+ *	@param item_id			Item id of an item
+ *	
+ *	@return Plugin_Handled to block an item to select, and show items of category. Plugin_Stop to close menu. Plugin_Continue or Plugin_Changed otherwise
+*/
+forward Action Shop_OnItemSelect(int client, ShopMenu menu_action, CategoryId category_id, ItemId item_id);
+
+/**
+ *	Called when an item is being select
+ *	
+ *	@param client			Client index an item is being select to
+ *	@param menu_action		Menu performing this action
+ *	@param category_id		Category id of an item
+ *	@param item_id			Item id of an item
+ *	
+ *	@noreturn
+*/
+forward void Shop_OnItemSelected(int client, ShopMenu menu_action, CategoryId category_id, ItemId item_id);
+
+/**
  *	Called when an item is being displayd
  *	
  *	@param client			Client index an item is being displayed to
@@ -202,6 +226,15 @@ native bool Shop_SetItemCustomInfoString(ItemId item_id, const char[] info, cons
  *	@return true on success, false otherwise
 */
 native bool Shop_KvCopySubKeysItemCustomInfo(ItemId item_id, KeyValues kv);
+
+/**
+ *	Unregisters item, categories and removes them from the shop and players' inventory by ItemId
+ *	
+ *	@param item_id				Item id
+ *	
+ *	@noreturn
+*/
+native void Shop_UnregisterItem(ItemId item_id);
 
 /**
  *	Gets an item credits price
@@ -500,26 +533,4 @@ stock ArrayList Shop_CreateArrayOfItems(int &size = 0)
 stock ItemId Shop_GetArrayItem(ArrayList array, int index)
 {
 	return view_as<ItemId>(array.Get(index));
-}
-
-//________________________________
-//|		CODE	HERE			  |
-//|		!Not necessary!			  |
-//| will be removed in the future.|
-//|_______________________________|	
-// | || || || || |	| || || || || |	
-// \ /\ /\ /\ /\ /	\ /\ /\ /\ /\ /	
-//  V  V  V  V  V	 V  V  V  V  V	
-
-/**
- *	Gets array size
- *	
- *	@param array			Array handle
- *	
- *	@return Size of the array
-*/
-#pragma deprecated Do not use it
-stock int Shop_GetArrayItemSize(ArrayList array)
-{
-	return array.Length;
 }
