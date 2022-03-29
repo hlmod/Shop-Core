@@ -45,6 +45,14 @@ methodmap CategoryId < Handle
 	// @return					  		True on success, false otherwise
 	public native bool GetName(char[] buffer, int maxlength);
 
+	// Toggles all items of category off
+	// 
+	// @param client					Client index
+	// @noreturn
+	public void ToggleOff(int client) {
+		Shop_ToggleClientCategoryOff(client, this);
+	}
+
 	// Whether the category is valid (registered)
 	property bool Exist {
 		public native get();
@@ -138,6 +146,122 @@ methodmap ItemId < Handle
 	// @return					  		True if item formatted, false if param menu is Menu_Inventory and the player has not this item and the item is not formatted
 	public bool Format(int client, ShopMenu menu, char[] buffer, int maxlength) {
 		return Shop_FormatItem(client, this, menu, buffer, maxlength);
+	}
+
+	// Gives the item from the player's inventory
+	//
+	// @param client					Client index
+	// @param value						Count if the item is finite and duration if the item is togglable or non-togglable.
+	// @return							True on success, false otherwise
+	public bool Give(int client, int value = 1) {
+		return Shop_GiveClientItem(client, this, value);
+	}
+
+	// Forces the player to buy the item from the shop
+	// 
+	// @param client					Client index
+	// @return							True if the player successfuly bought, false otherwise
+	public bool Buy(int client) {
+		return Shop_BuyClientItem(client, this);
+	}
+
+	// Forces the player to sell the item from the inventory
+	// 
+	// @param client					Client index
+	// @return							True if the player successfuly sold, false otherwise
+	public bool Sell(int client) {
+		return Shop_SellClientItem(client, this);
+	}
+
+	// Forces a player to use an item
+	// 
+	// @param client					Client index to force to
+	// @return 							true on success and false otherwise
+	public bool Use(int client) {
+		return Shop_UseClientItem(client, this);
+	}
+
+	// Remove the item from the player's inventory
+	// 
+	// @param client					Client index
+	// @param count						Number of count to remove
+	// @return							True on success, false otherwise
+	public bool Remove(int client, int count = 0) {
+		return Shop_RemoveClientItem(client, this, count);
+	}
+
+	// Get's count of an item a player has
+	// 
+	// @param client					Client index
+	// @return							Amount of item that player has
+	public int GetCount(int client) {
+		return Shop_GetClientItemCount(client, this);
+	}
+
+	// Set count of an item a player has
+	// 
+	// @param client					Client index
+	// @noreturn
+	public void SetCount(int client, int count = 0) {
+		Shop_SetClientItemCount(client, this, count);
+	}
+	
+	// Sets timeleft for an item. 0 to set no timelimit
+	// 
+	// @param client					Client index to set to
+	// @param timeleft					Timeleft to set. 0 to make it forever
+	// @param reset_duration			Reset duration
+	// @return 							True on success and false it client has not this item
+	public bool SetTimeLeft(int client, int timeleft, bool reset_duration = true) {
+		return Shop_SetClientItemTimeleft(client, this, timeleft, reset_duration);
+	}
+
+	// Gets timeleft for an item
+	// 
+	// @param client					Client index to get from
+	// @return 							item timeleft in seconds. 0 if item has no timelimit
+	public int GetTimeLeft(int client) {
+		return Shop_GetClientItemTimeleft(client, this);
+	}
+
+	// Gets an absolute sell price for an item a player hold
+	// 
+	// @param client					Client index to get from
+	// @param isGold					True to retrieve gold value, false to get credits
+	// 		
+	// @return 							sell price of the item
+	public int GetSellPrice(int client, bool isGold = false) {
+		return Shop_GetClientItemSellPrice(client, this, isGold);
+	}
+
+	// Whether a player has toggled on an item
+	// 
+	// @param client					Client index to check to
+	// @return 							true if player has item toggled on and false otherwise
+	public bool IsToggled(int client) {
+		return Shop_IsClientItemToggled(client, this);
+	}
+	
+	// Whether a player has an item
+	// 
+	// @param client					Client index to check to
+	// @return 							true if player has item and false otherwise
+	public bool IsHas(int client) {
+		return Shop_IsClientHasItem(client, this);
+	}
+
+	// Toggles a client's item
+	// 
+	// @param client					Client index
+	// @param toggle					Toggle state. See ToggleState enum
+	// @return 							true on success and false otherwise
+	public bool Toggle(int client, ToggleState toggle = Toggle) {
+		return Shop_ToggleClientItem(client, this, toggle);
+	}
+
+	// Gets the item's category id
+	property CategoryId CategoryId {
+		public native get();
 	}
 
 	// Get or set an item credits price

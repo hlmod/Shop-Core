@@ -216,7 +216,8 @@ public void __pl_shop_SetNTVOptional()
 	MarkNativeAsOptional("CategoryId.GetIdByName");
 	MarkNativeAsOptional("CategoryId.GetItemId");
 	MarkNativeAsOptional("CategoryId.GetUniqueName");
-	MarkNativeAsOptional("CategoryId.GetName");
+	MarkNativeAsOptional("CategoryId.GetDisplayName");
+	MarkNativeAsOptional("CategoryId.ToggleOff");
 	MarkNativeAsOptional("CategoryId.Exist.get");
 
 	MarkNativeAsOptional("ItemId.GetCustomInfo");
@@ -230,6 +231,20 @@ public void __pl_shop_SetNTVOptional()
 	MarkNativeAsOptional("ItemId.GetName");
 	MarkNativeAsOptional("ItemId.GetCategoryId");
 	MarkNativeAsOptional("ItemId.Format");
+	MarkNativeAsOptional("ItemId.Give");
+	MarkNativeAsOptional("ItemId.Buy");
+	MarkNativeAsOptional("ItemId.Sell");
+	MarkNativeAsOptional("ItemId.Use");
+	MarkNativeAsOptional("ItemId.Remove");
+	MarkNativeAsOptional("ItemId.GetCount");
+	MarkNativeAsOptional("ItemId.SetCount");
+	MarkNativeAsOptional("ItemId.SetTimeLeft");
+	MarkNativeAsOptional("ItemId.GetTimeLeft");
+	MarkNativeAsOptional("ItemId.GetSellPrice");
+	MarkNativeAsOptional("ItemId.IsToggled");
+	MarkNativeAsOptional("ItemId.IsHas");
+	MarkNativeAsOptional("ItemId.Toggle");
+	MarkNativeAsOptional("ItemId.CategoryId.get");
 	MarkNativeAsOptional("ItemId.Price.get");
 	MarkNativeAsOptional("ItemId.Price.set");
 	MarkNativeAsOptional("ItemId.SellPrice.get");
