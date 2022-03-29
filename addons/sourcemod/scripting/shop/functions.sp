@@ -313,7 +313,7 @@ public int Menu_ConfirmTryLuck(Menu menu, MenuAction action, int param1, int par
 			char info[16];
 			menu.GetItem(param2, info, sizeof(info));
 		
-			if(StrEqual(info, "yes"))
+			if (info[0] == "y")
 			{
 				Functions_SetupLuck(param1);
 				Functions_ShowMenu(param1, GetMenuSelectionPosition());
