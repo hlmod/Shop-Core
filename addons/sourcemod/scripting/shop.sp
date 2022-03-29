@@ -6,7 +6,7 @@
 #tryinclude <SteamWorks>
 #define REQUIRE_EXTENSIONS
 
-#define SHOP_VERSION "3.0E3" // 27.03.2022
+#define SHOP_VERSION "3.0E4"
 #define SHOP_MYSQL_CHARSET "utf8mb4"
 
 #pragma newdecls required
@@ -1997,11 +1997,6 @@ int GetItemLuckChance(int item_id)
 bool OnClientLuckProcess(int client)
 {
 	return Forward_OnClientLuckProcess(client);
-}
-
-bool OnClientShouldLuckItem(int client, int item_id)
-{
-	return Forward_OnClientShouldLuckItem(client, item_id);
 }
 
 Action OnClientShouldLuckItemChance(int client, int item_id, int &iLuckChance)
