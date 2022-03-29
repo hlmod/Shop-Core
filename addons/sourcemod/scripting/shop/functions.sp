@@ -246,7 +246,15 @@ public int Functions_Menu_Handler(Menu menu, MenuAction action, int param1, int 
 				}
 				case 'b' :
 				{
-					Function_ConfirmLuckMenu(param1);
+					if (g_bConfirmTryLuck)
+					{
+						Function_ConfirmLuckMenu(param1);
+					}
+					else
+					{
+						Functions_SetupLuck(param1);
+						Functions_ShowMenu(param1, GetMenuSelectionPosition());
+					}
 				}
 				default :
 				{
