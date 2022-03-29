@@ -1316,6 +1316,10 @@ public int BuyConfirmPanel_Handler(Menu menu, MenuAction action, int param1, int
 				}
 			}
 		}
+		case MenuAction_End :
+		{
+			delete menu;
+		}
 	}
 }
 
@@ -1392,6 +1396,10 @@ public int SellConfirmPanel_Handler(Menu menu, MenuAction action, int param1, in
 					ShowItemInfo(param1, iClItemId[param1]);
 				}
 			}
+		}
+		case MenuAction_End :
+		{
+			delete menu;
 		}
 	}
 }
