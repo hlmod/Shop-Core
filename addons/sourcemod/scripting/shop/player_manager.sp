@@ -20,19 +20,33 @@ void PlayerManager_CreateNatives()
 	CreateNative("Shop_GiveClientCredits", PlayerManager_GiveClientCredits);
 	CreateNative("Shop_TakeClientCredits", PlayerManager_TakeClientCredits);
 	CreateNative("Shop_GiveClientItem", PlayerManager_GiveClientItem);
+	CreateNative("ItemId.Give", PlayerManager_GiveClientItem);
 	CreateNative("Shop_BuyClientItem", PlayerManager_BuyClientItem);
+	CreateNative("ItemId.Buy", PlayerManager_BuyClientItem);
 	CreateNative("Shop_SellClientItem", PlayerManager_SellClientItem);
+	CreateNative("ItemId.Sell", PlayerManager_SellClientItem);
 	CreateNative("Shop_UseClientItem", PlayerManager_UseClientItem);
+	CreateNative("ItemId.Use", PlayerManager_UseClientItem);
 	CreateNative("Shop_RemoveClientItem", PlayerManager_RemoveClientItem);
+	CreateNative("ItemId.Remove", PlayerManager_RemoveClientItem);
 	CreateNative("Shop_GetClientItemCount", PlayerManager_GetClientItemCount);
+	CreateNative("ItemId.GetCount", PlayerManager_GetClientItemCount);
 	CreateNative("Shop_SetClientItemCount", PlayerManager_SetClientItemCount);
+	CreateNative("ItemId.SetCount", PlayerManager_SetClientItemCount);
 	CreateNative("Shop_SetClientItemTimeleft", PlayerManager_SetClientItemTimeleft);
+	CreateNative("ItemId.SetTimeLeft", PlayerManager_SetClientItemTimeleft);
 	CreateNative("Shop_GetClientItemTimeleft", PlayerManager_GetClientItemTimeleft);
+	CreateNative("ItemId.GetTimeLeft", PlayerManager_GetClientItemTimeleft);
 	CreateNative("Shop_GetClientItemSellPrice", PlayerManager_GetClientItemSellPrice);
+	CreateNative("ItemId.GetSellPrice", PlayerManager_GetClientItemSellPrice);
 	CreateNative("Shop_IsClientItemToggled", PlayerManager_IsClientItemToggled);
+	CreateNative("ItemId.IsToggled", PlayerManager_IsClientItemToggled);
 	CreateNative("Shop_IsClientHasItem", PlayerManager_IsClientHasItem);
+	CreateNative("ItemId.IsHas", PlayerManager_IsClientHasItem);
 	CreateNative("Shop_ToggleClientItem", PlayerManager_ToggleClientItem);
+	CreateNative("ItemId.Toggle", PlayerManager_ToggleClientItem);
 	CreateNative("Shop_ToggleClientCategoryOff", PlayerManager_ToggleClientCategoryOff);
+	CreateNative("CategoryId.ToggleOff", PlayerManager_ToggleClientCategoryOff);
 	CreateNative("Shop_GetClientItems", PlayerManager_GetClientItems);
 }
 
@@ -1151,6 +1165,8 @@ public int PlayerManager_AuthorizeClient(Database owner, DBResultSet hndl, const
 				return;
 			}
 
+			delete dp;
+
 			iCredits[client] = hndl.FetchInt(0);
 			i_Id[client] = hndl.FetchInt(1);
 
@@ -1158,6 +1174,8 @@ public int PlayerManager_AuthorizeClient(Database owner, DBResultSet hndl, const
 			TQueryEx(s_Query);
 			
 			PlayerManager_LoadClientToggles(client);
+
+			return;
 		}
 		case 1 :
 		{
@@ -1381,6 +1399,8 @@ public int PlayerManager_GetItemsFromDB(Database owner, DBResultSet hndl, const 
 		}
 	}
 	g_bAuthorized[client] = true;
+
+	OnAuthorized(client);
 }
 
 void PlayerManager_ClearPlayer(int client)

@@ -69,6 +69,7 @@ enum ShopMenu
 #include <shop/items>
 #include <shop/players>
 #include <shop/register>
+#include <shop/methodmaps>
 
 /**
  *	Called when the shop is ready to register items
@@ -185,6 +186,7 @@ public void __pl_shop_SetNTVOptional()
 	MarkNativeAsOptional("Shop_GetCategoryNameById");
 	MarkNativeAsOptional("Shop_FillArrayByItems");
 	MarkNativeAsOptional("Shop_FormatItem");
+	MarkNativeAsOptional("Shop_GetClientItems");
 	
 	MarkNativeAsOptional("Shop_GetClientId");
 	MarkNativeAsOptional("Shop_SetClientItemTimeleft");
@@ -211,5 +213,53 @@ public void __pl_shop_SetNTVOptional()
 	MarkNativeAsOptional("Shop_GetClientItemCount");
 	MarkNativeAsOptional("Shop_UseClientItem");
 	MarkNativeAsOptional("Shop_SetHide");
+	MarkNativeAsOptional("Shop_GetClientItems");
+
+	MarkNativeAsOptional("CategoryId.CategoryId");
+	MarkNativeAsOptional("CategoryId.NewItem");
+	MarkNativeAsOptional("CategoryId.GetItemId");
+	MarkNativeAsOptional("CategoryId.GetByUnique");
+	MarkNativeAsOptional("CategoryId.GetUniqueName");
+	MarkNativeAsOptional("CategoryId.GetDisplayName");
+	MarkNativeAsOptional("CategoryId.ToggleOff");
+	MarkNativeAsOptional("CategoryId.Exist.get");
+
+	MarkNativeAsOptional("ItemId.GetCustomInfo");
+	MarkNativeAsOptional("ItemId.SetCustomInfo");
+	MarkNativeAsOptional("ItemId.GetCustomInfoFloat");
+	MarkNativeAsOptional("ItemId.SetCustomInfoFloat");
+	MarkNativeAsOptional("ItemId.GetCustomInfoString");
+	MarkNativeAsOptional("ItemId.SetCustomInfoString");
+	MarkNativeAsOptional("ItemId.KvCopyCustomInfo");
+	MarkNativeAsOptional("ItemId.GetUniqueName");
+	MarkNativeAsOptional("ItemId.GetDisplayName");
+	MarkNativeAsOptional("ItemId.Format");
+	MarkNativeAsOptional("ItemId.Give");
+	MarkNativeAsOptional("ItemId.Buy");
+	MarkNativeAsOptional("ItemId.Sell");
+	MarkNativeAsOptional("ItemId.Use");
+	MarkNativeAsOptional("ItemId.Remove");
+	MarkNativeAsOptional("ItemId.GetCount");
+	MarkNativeAsOptional("ItemId.SetCount");
+	MarkNativeAsOptional("ItemId.SetTimeLeft");
+	MarkNativeAsOptional("ItemId.GetTimeLeft");
+	MarkNativeAsOptional("ItemId.GetSellPrice");
+	MarkNativeAsOptional("ItemId.IsToggled");
+	MarkNativeAsOptional("ItemId.IsHas");
+	MarkNativeAsOptional("ItemId.Toggle");
+	MarkNativeAsOptional("ItemId.CategoryId.get");
+	MarkNativeAsOptional("ItemId.Price.get");
+	MarkNativeAsOptional("ItemId.Price.set");
+	MarkNativeAsOptional("ItemId.SellPrice.get");
+	MarkNativeAsOptional("ItemId.SellPrice.set");
+	MarkNativeAsOptional("ItemId.Value.get");
+	MarkNativeAsOptional("ItemId.Value.set");
+	MarkNativeAsOptional("ItemId.LuckChange.get");
+	MarkNativeAsOptional("ItemId.LuckChange.set");
+	MarkNativeAsOptional("ItemId.Hide.get");
+	MarkNativeAsOptional("ItemId.Hide.set");
+	MarkNativeAsOptional("ItemId.ItemType.get");
+	MarkNativeAsOptional("ItemId.Exist.get");
+
 }
 #endif

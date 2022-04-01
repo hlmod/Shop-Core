@@ -661,7 +661,6 @@ int FilterItemsInLuckArray(ArrayList hArray, int client, bool &wasOverriden)
 	int dummy, iLuckChance, iNewLuckValue;
 	ItemType type;
 	Action luckAction;
-	bool bShouldLuck;
 	for (int i = 0; i < hArray.Length; ++i)
 	{
 		dummy = hArray.Get(i);
@@ -669,7 +668,6 @@ int FilterItemsInLuckArray(ArrayList hArray, int client, bool &wasOverriden)
 		iLuckChance = GetItemLuckChance(dummy);
 		iNewLuckValue = iLuckChance;
 		luckAction = OnClientShouldLuckItemChance(client, dummy, iNewLuckValue);
-		bShouldLuck = OnClientShouldLuckItem(client, dummy);
 		
 		// To override luck for item
 		if (luckAction == Plugin_Changed)
@@ -680,7 +678,7 @@ int FilterItemsInLuckArray(ArrayList hArray, int client, bool &wasOverriden)
 			wasOverriden = true;
 		}
 		
-		if (type != Item_Finite && type != Item_BuyOnly && ClientHasItem(client, dummy) || iLuckChance == 0 || luckAction == Plugin_Handled || !bShouldLuck)
+		if (type != Item_Finite && type != Item_BuyOnly && ClientHasItem(client, dummy) || iLuckChance == 0 || luckAction == Plugin_Handled)
 		{
 			//PrintToChatAll("Item %d removed from luck. Type = %d, Client = %N, ClientHasItem = %d, iLuckChance = %d, luckAction = %d, bShouldLuck = %d, gold_price = %d", dummy, type, client, ClientHasItem(client, dummy), iLuckChance, luckAction, bShouldLuck, gold_price);
 			hArray.Erase(i--);

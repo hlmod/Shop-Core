@@ -10,7 +10,6 @@ Handle h_fwdOnAuthorized,
 	h_fwdOnItemBuy,
 	h_fwdOnItemSell,
 	h_fwdOnClientLuckProcess,
-	h_fwdOnClientShouldLuckItem,
 	h_fwdOnClientShouldLuckItemChance,
 	h_fwdOnClientItemLucked,
 	h_fwdOnItemTransfer,
@@ -23,7 +22,8 @@ Handle h_fwdOnAuthorized,
 	h_fwdOnCreditsGivenPost,
 	h_fwdOnCreditsTaken,
 	h_fwdOnCreditsTakenPost,
-	h_fwdOnCategoryRegistered;
+	h_fwdOnCategoryRegistered,
+	h_fwdOnItemRegistered;
 
 void Forward_OnPluginStart()
 {
@@ -32,14 +32,13 @@ void Forward_OnPluginStart()
 	h_fwdOnItemBuy = CreateGlobalForward("Shop_OnItemBuy", ET_Hook, Param_Cell, Param_Cell, Param_String, Param_Cell, Param_String, Param_Cell, Param_CellByRef, Param_CellByRef, Param_CellByRef);
 	h_fwdOnItemDraw = CreateGlobalForward("Shop_OnItemDraw", ET_Hook, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_CellByRef);
 	h_fwdOnItemSelect = CreateGlobalForward("Shop_OnItemSelect", ET_Hook, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
-	h_fwdOnItemSelected = CreateGlobalForward("Shop_OnItemSelected", ET_Hook, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
+	h_fwdOnItemSelected = CreateGlobalForward("Shop_OnItemSelected", ET_Ignore, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
 	h_fwdOnItemDisplay = CreateGlobalForward("Shop_OnItemDisplay", ET_Hook, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_String, Param_String, Param_Cell);
 	h_fwdOnItemDescription = CreateGlobalForward("Shop_OnItemDescription", ET_Hook, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_String, Param_String, Param_Cell);
 	h_fwdOnItemSell = CreateGlobalForward("Shop_OnItemSell", ET_Hook, Param_Cell, Param_Cell, Param_String, Param_Cell, Param_String, Param_Cell, Param_CellByRef);
 	h_fwdOnItemToggled = CreateGlobalForward("Shop_OnItemToggled", ET_Ignore, Param_Cell, Param_Cell, Param_String, Param_Cell, Param_String, Param_Cell);
 	h_fwdOnItemElapsed = CreateGlobalForward("Shop_OnItemElapsed", ET_Ignore, Param_Cell, Param_Cell, Param_String, Param_Cell, Param_String);
 	h_fwdOnClientLuckProcess = CreateGlobalForward("Shop_OnClientLuckProcess", ET_Hook, Param_Cell);
-	h_fwdOnClientShouldLuckItem = CreateGlobalForward("Shop_OnClientShouldLuckItem", ET_Hook, Param_Cell, Param_Cell);
 	h_fwdOnClientShouldLuckItemChance = CreateGlobalForward("Shop_OnClientShouldLuckItemChance", ET_Hook, Param_Cell, Param_Cell, Param_CellByRef);
 	h_fwdOnClientItemLucked = CreateGlobalForward("Shop_OnClientItemLucked", ET_Ignore, Param_Cell, Param_Cell);
 	h_fwdOnItemTransfer = CreateGlobalForward("Shop_OnItemTransfer", ET_Hook, Param_Cell, Param_Cell, Param_Cell);
@@ -47,12 +46,13 @@ void Forward_OnPluginStart()
 	h_fwdOnCreditsTransfer = CreateGlobalForward("Shop_OnCreditsTransfer", ET_Hook, Param_Cell, Param_Cell, Param_CellByRef, Param_CellByRef, Param_CellByRef, Param_Cell);
 	h_fwdOnCreditsTransfered = CreateGlobalForward("Shop_OnCreditsTransfered", ET_Ignore, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
 	h_fwdOnCreditsSet = CreateGlobalForward("Shop_OnCreditsSet", ET_Hook, Param_Cell, Param_CellByRef, Param_Cell);
-	h_fwdOnCreditsSetPost = CreateGlobalForward("Shop_OnCreditsSet_Post", ET_Hook, Param_Cell, Param_Cell, Param_Cell);
+	h_fwdOnCreditsSetPost = CreateGlobalForward("Shop_OnCreditsSet_Post", ET_Ignore, Param_Cell, Param_Cell, Param_Cell);
 	h_fwdOnCreditsGiven = CreateGlobalForward("Shop_OnCreditsGiven", ET_Hook, Param_Cell, Param_CellByRef, Param_Cell);
-	h_fwdOnCreditsGivenPost = CreateGlobalForward("Shop_OnCreditsGiven_Post", ET_Hook, Param_Cell, Param_Cell, Param_Cell);
+	h_fwdOnCreditsGivenPost = CreateGlobalForward("Shop_OnCreditsGiven_Post", ET_Ignore, Param_Cell, Param_Cell, Param_Cell);
 	h_fwdOnCreditsTaken = CreateGlobalForward("Shop_OnCreditsTaken", ET_Hook, Param_Cell, Param_CellByRef, Param_Cell);
-	h_fwdOnCreditsTakenPost = CreateGlobalForward("Shop_OnCreditsTaken_Post", ET_Hook, Param_Cell, Param_Cell, Param_Cell);
+	h_fwdOnCreditsTakenPost = CreateGlobalForward("Shop_OnCreditsTaken_Post", ET_Ignore, Param_Cell, Param_Cell, Param_Cell);
 	h_fwdOnCategoryRegistered = CreateGlobalForward("Shop_OnCategoryRegistered", ET_Ignore, Param_Cell, Param_String);
+	h_fwdOnItemRegistered = CreateGlobalForward("Shop_OnItemRegistered", ET_Ignore, Param_Cell, Param_String, Param_Cell, Param_String);
 }
 
 bool Forward_OnItemTransfer(int client, int target, int item_id)
@@ -110,18 +110,6 @@ bool Forward_OnClientLuckProcess(int client)
 	
 	Call_StartForward(h_fwdOnClientLuckProcess);
 	Call_PushCell(client);
-	Call_Finish(result);
-	
-	return result;
-}
-
-bool Forward_OnClientShouldLuckItem(int client, int item_id)
-{
-	bool result = true;
-	
-	Call_StartForward(h_fwdOnClientShouldLuckItem);
-	Call_PushCell(client);
-	Call_PushCell(item_id);
 	Call_Finish(result);
 	
 	return result;
@@ -415,5 +403,15 @@ void Forward_OnCategoryRegistered(int category_id, const char[] category)
 	Call_StartForward(h_fwdOnCategoryRegistered);
 	Call_PushCell(category_id);
 	Call_PushString(category);
+	Call_Finish();
+}
+
+void Forward_OnItemRegistered(int category_id, const char[] category, int item_id, const char[] item)
+{
+	Call_StartForward(h_fwdOnItemRegistered);
+	Call_PushCell(category_id);
+	Call_PushString(category);
+	Call_PushCell(item_id);
+	Call_PushString(item);
 	Call_Finish();
 }

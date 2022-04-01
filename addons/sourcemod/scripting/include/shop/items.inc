@@ -33,7 +33,7 @@ forward Action Shop_OnItemSelect(int client, ShopMenu menu_action, CategoryId ca
  *	
  *	@noreturn
 */
-forward Action Shop_OnItemSelected(int client, ShopMenu menu_action, CategoryId category_id, ItemId item_id);
+forward void Shop_OnItemSelected(int client, ShopMenu menu_action, CategoryId category_id, ItemId item_id);
 
 /**
  *	Called when an item is being displayd
@@ -533,26 +533,4 @@ stock ArrayList Shop_CreateArrayOfItems(int &size = 0)
 stock ItemId Shop_GetArrayItem(ArrayList array, int index)
 {
 	return view_as<ItemId>(array.Get(index));
-}
-
-//________________________________
-//|		CODE	HERE			  |
-//|		!Not necessary!			  |
-//| will be removed in the future.|
-//|_______________________________|	
-// | || || || || |	| || || || || |	
-// \ /\ /\ /\ /\ /	\ /\ /\ /\ /\ /	
-//  V  V  V  V  V	 V  V  V  V  V	
-
-/**
- *	Gets array size
- *	
- *	@param array			Array handle
- *	
- *	@return Size of the array
-*/
-#pragma deprecated Do not use it
-stock int Shop_GetArrayItemSize(ArrayList array)
-{
-	return array.Length;
 }
