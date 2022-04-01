@@ -36,7 +36,9 @@ void ItemManager_CreateNatives()
 	h_KvItems = new KeyValues("Items");
 	
 	CreateNative("Shop_RegisterCategory", ItemManager_RegisterCategory);
+	CreateNative("CategoryId.CategoryId", ItemManager_RegisterCategory);
 	CreateNative("Shop_StartItem", ItemManager_StartItem);
+	CreateNative("CategoryId.NewItem", ItemManager_StartItem);
 	CreateNative("Shop_SetInfo", ItemManager_SetInfo);
 	CreateNative("Shop_SetLuckChance", ItemManager_SetLuckChance);
 	CreateNative("Shop_SetCustomInfo", ItemManager_SetCustomInfo);
@@ -50,45 +52,73 @@ void ItemManager_CreateNatives()
 	CreateNative("Shop_UnregisterItem", ItemManager_UnregisterItem);
 	
 	CreateNative("Shop_GetItemCustomInfo", ItemManager_GetItemCustomInfo);
+	CreateNative("ItemId.GetCustomInfo", ItemManager_GetItemCustomInfo);
 	CreateNative("Shop_SetItemCustomInfo", ItemManager_SetItemCustomInfo);
+	CreateNative("ItemId.SetCustomInfo", ItemManager_SetItemCustomInfo);
 	
 	CreateNative("Shop_GetItemCustomInfoFloat", ItemManager_GetItemCustomInfoFloat);
+	CreateNative("ItemId.GetCustomInfoFloat", ItemManager_GetItemCustomInfoFloat);
 	CreateNative("Shop_SetItemCustomInfoFloat", ItemManager_SetItemCustomInfoFloat);
+	CreateNative("ItemId.SetCustomInfoFloat", ItemManager_SetItemCustomInfoFloat);
 	
 	CreateNative("Shop_GetItemCustomInfoString", ItemManager_GetItemCustomInfoString);
+	CreateNative("ItemId.GetCustomInfoString", ItemManager_GetItemCustomInfoString);
 	CreateNative("Shop_SetItemCustomInfoString", ItemManager_SetItemCustomInfoString);
+	CreateNative("ItemId.SetCustomInfoString", ItemManager_SetItemCustomInfoString);
+
 	CreateNative("Shop_KvCopySubKeysItemCustomInfo", ItemManager_KvCopySubKeysItemCustomInfo);
+	CreateNative("ItemId.KvCopyCustomInfo", ItemManager_KvCopySubKeysItemCustomInfo);
 	
 	CreateNative("Shop_GetItemPrice", ItemManager_GetItemPrice);
+	CreateNative("ItemId.Price.get", ItemManager_GetItemPrice);
 	CreateNative("Shop_SetItemPrice", ItemManager_SetItemPrice);
+	CreateNative("ItemId.Price.set", ItemManager_SetItemPrice);
 	
 	CreateNative("Shop_GetItemSellPrice", ItemManager_GetItemSellPrice);
+	CreateNative("ItemId.SellPrice.get", ItemManager_GetItemSellPrice);
 	CreateNative("Shop_SetItemSellPrice", ItemManager_SetItemSellPrice);
+	CreateNative("ItemId.SellPrice.set", ItemManager_SetItemSellPrice);
 	
 	CreateNative("Shop_GetItemValue", ItemManager_GetItemValue);
+	CreateNative("ItemId.Value.get", ItemManager_GetItemValue);
 	CreateNative("Shop_SetItemValue", ItemManager_SetItemValue);
+	CreateNative("ItemId.Value.set", ItemManager_SetItemValue);
 
 	CreateNative("Shop_GetItemLuckChance", ItemManager_GetItemLuckChance);
+	CreateNative("ItemId.LuckChange.get", ItemManager_GetItemLuckChance);
 	CreateNative("Shop_SetItemLuckChance", ItemManager_SetItemLuckChance);
+	CreateNative("ItemId.LuckChange.set", ItemManager_SetItemLuckChance);
 
 	CreateNative("Shop_GetItemId", ItemManager_GetItemId);
+	CreateNative("CategoryId.GetItemId", ItemManager_GetItemId);
 	CreateNative("Shop_GetItemById", ItemManager_GetItemById);
+	CreateNative("ItemId.GetUniqueName", ItemManager_GetItemById);
 	CreateNative("Shop_GetItemNameById", ItemManager_GetItemNameById);
+	CreateNative("ItemId.GetDisplayName", ItemManager_GetItemNameById);
 
 	CreateNative("Shop_GetItemHide", ItemManager_GetItemHide);
+	CreateNative("ItemId.Hide.get", ItemManager_GetItemHide);
 	CreateNative("Shop_SetItemHide", ItemManager_SetItemHide);
+	CreateNative("ItemId.Hide.set", ItemManager_SetItemHide);
 
 	CreateNative("Shop_GetItemType", ItemManager_GetItemTypeNative);
+	CreateNative("ItemId.Type.get", ItemManager_GetItemTypeNative);
 
 	CreateNative("Shop_GetItemCategoryId", ItemManager_GetItemCategoryIdNative);
+	CreateNative("ItemId.CategoryId.get", ItemManager_GetItemCategoryIdNative);
 	
 	CreateNative("Shop_IsItemExists", ItemManager_IsItemExistsNative);
+	CreateNative("ItemId.Exist.get", ItemManager_IsItemExistsNative);
 	
 	CreateNative("Shop_IsValidCategory", ItemManager_IsValidCategoryNative);
+	CreateNative("CategoryId.Exist.get", ItemManager_IsValidCategoryNative);
 	
 	CreateNative("Shop_GetCategoryId", ItemManager_GetCategoryIdNative);
+	CreateNative("CategoryId.GetByUnique", ItemManager_GetCategoryIdNative);
 	CreateNative("Shop_GetCategoryById", ItemManager_GetCategoryByIdNative);
+	CreateNative("CategoryId.GetUniqueName", ItemManager_GetCategoryByIdNative);
 	CreateNative("Shop_GetCategoryNameById", ItemManager_GetCategoryNameByIdNative);
+	CreateNative("CategoryId.GetDisplayName", ItemManager_GetCategoryNameByIdNative);
 	
 	CreateNative("Shop_FillArrayByItems", ItemManager_FillArrayByItemsNative);
 	CreateNative("Shop_FormatItem", ItemManager_FormatItemNative);
