@@ -745,6 +745,8 @@ public int ItemManager_OnItemRegistered(Handle owner, Handle hndl, const char[] 
 		Call_PushCell(id);
 		Call_Finish();
 	}
+
+	Forward_OnItemRegistered(category_id, category, id, item);
 }
 
 public int ItemManager_GetItemCustomInfo(Handle plugin, int numParams)

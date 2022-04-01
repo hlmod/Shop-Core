@@ -22,7 +22,8 @@ Handle h_fwdOnAuthorized,
 	h_fwdOnCreditsGivenPost,
 	h_fwdOnCreditsTaken,
 	h_fwdOnCreditsTakenPost,
-	h_fwdOnCategoryRegistered;
+	h_fwdOnCategoryRegistered,
+	h_fwdOnItemRegistered;
 
 void Forward_OnPluginStart()
 {
@@ -51,6 +52,7 @@ void Forward_OnPluginStart()
 	h_fwdOnCreditsTaken = CreateGlobalForward("Shop_OnCreditsTaken", ET_Hook, Param_Cell, Param_CellByRef, Param_Cell);
 	h_fwdOnCreditsTakenPost = CreateGlobalForward("Shop_OnCreditsTaken_Post", ET_Ignore, Param_Cell, Param_Cell, Param_Cell);
 	h_fwdOnCategoryRegistered = CreateGlobalForward("Shop_OnCategoryRegistered", ET_Ignore, Param_Cell, Param_String);
+	h_fwdOnItemRegistered = CreateGlobalForward("Shop_OnItemRegistered", ET_Ignore, Param_Cell, Param_String, Param_Cell, Param_String);
 }
 
 bool Forward_OnItemTransfer(int client, int target, int item_id)
@@ -401,5 +403,15 @@ void Forward_OnCategoryRegistered(int category_id, const char[] category)
 	Call_StartForward(h_fwdOnCategoryRegistered);
 	Call_PushCell(category_id);
 	Call_PushString(category);
+	Call_Finish();
+}
+
+void Forward_OnItemRegistered(int category_id, const char[] category, int item_id, const char[] item)
+{
+	Call_StartForward(h_fwdOnItemRegistered);
+	Call_PushCell(category_id);
+	Call_PushString(category);
+	Call_PushCell(item_id);
+	Call_PushString(item);
 	Call_Finish();
 }
