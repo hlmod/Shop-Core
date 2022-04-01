@@ -43,19 +43,17 @@ forward Action Shop_OnCreditsTransfer(int client, int target, int &amount_give, 
  *	@param amount_give			Amount of credits has been given to a target player
  *	@param amount_remove		Amount of credits has been taken from a performing player
  *	@param amount_commission	Amount of credits the commission was set
- *	
- *	@noreturn
 */
 forward void Shop_OnCreditsTransfered(int client, int target, int amount_give, int amount_remove, int amount_commission);
 
 /**
- *	Called when a player is being set credits to
- *	
- *	@param client			Client index who is being set to
- *	@param credits			Amount of credits a client is being set to. By reference
- *	@param by_who			See CREDITS_BY_* definitions for more info and any higher value is the admin index
- *	
- *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block
+ * 	Called when a player is being set credits to.
+ *
+ * 	@param client			Client index who is being set to.
+ * 	@param credits			Amount of credits a client is being set to. By reference.
+ * 	@param by_who			See CREDITS_BY_* definitions for more info and any higher value is the admin index.
+ *
+ * 	@return Plugin_Changed to apply new values. >= Plugin_Handled to block.
 */
 forward Action Shop_OnCreditsSet(int client, int &credits, int by_who);
 
@@ -104,13 +102,11 @@ forward void Shop_OnCreditsGiven_Post(int client, int credits, int by_who);
 forward Action Shop_OnCreditsTaken(int client, int &credits, int by_who);
 
 /**
- *	Called when a player has been taken credits
- *	
- *	@param client			Client index who is been taken
- *	@param credits			Amount of credits a client is been taken
- *	@param by_who			See CREDITS_BY_* definitions for more info and any higher value is the admin index
- *	
- *	@return noreturn
+ * 	Called when a player has been taken credits.
+ * 	
+ * 	@param client			Client index who is been taken.
+ * 	@param credits			Amount of credits a client is been taken.
+ * 	@param by_who			See CREDITS_BY_* definitions for more info and any higher value is the admin index.
 */
 forward void Shop_OnCreditsTaken_Post(int client, int credits, int by_who);
 
@@ -230,12 +226,14 @@ native int Shop_GetClientItemSellPrice(int client, ItemId item_id, bool isGold =
 native bool Shop_IsClientItemToggled(int client, ItemId item_id);
 
 /**
- *	Whether a player has an item
- *	
- *	@param client			Client index to check to
- *	@param item_id		Item id to check
- *	
- *	@return true if player has item and false otherwise
+ *	Whether a player has an item.
+ * 
+ * 	@param client			Client index to check to.
+ * 	@param item_id			Item id to check.
+ * 	@error					Inalid client.
+ * 	@error					Inalid ItemId.
+ *
+ * @return true if player has item and false otherwise.
 */
 native bool Shop_IsClientHasItem(int client, ItemId item_id);
 
@@ -432,14 +430,13 @@ native void Shop_SetClientItemCount(int client, ItemId item_id, int count = 0);
 native bool Shop_UseClientItem(int client, ItemId item_id);
 
 /**
- * Returns the array with player item ids.
- * Must be freed via CloseHandle() / delete / Handle.Close().
- *
- * @param	client		Client index
- *
- * @return	ArrayList handle with item ids.
- * @error	Client is not connected/not loaded.
- * @note	If player has not items - array returned too, but empty.
+ * 	Returns the array with player item ids.
+ * 	@note  Must be closed via CloseHandle()/delete/Handle.Close().
+ * 	
+ * 	@param client			Client index.
+ * 	@error					Client is not connected/not loaded.
+ *	
+ * 	@return ArrayList handle with item ids.
  */
 native ArrayList Shop_GetClientItems(int client);
 

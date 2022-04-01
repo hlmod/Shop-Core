@@ -1,21 +1,23 @@
 
 methodmap CategoryId __nullable__
 {
-	// Registers new category id
+	// Registers new category id.
 	// 
-	// @param category					Category unique name
-	// @param name						Default category display name
-	// @param description				Default category description
-	// @param cat_display				Callback called on category being displayed
-	// @param cat_desc					Callback called on category's description being displayed
-	// @param cat_should				Callback called whether the category should be displayed to a player
-	// @param cat_select				Callback called when a player is trying to select the category
-	// @return					  		Category id of the category
+	// @param category				Category unique name.
+	// @param name					Default category display name.
+	// @param description			Default category description.
+	// @param cat_display			Callback called on category being displayed.
+	// @param cat_desc				Callback called on category's description being displayed.
+	// @param cat_should			Callback called whether the category should be displayed to a player.
+	// @param cat_select			Callback called when a player is trying to select the category.
+	// @error						Empty unique identifier.
+	// 
+	// @return Category id of the category.
 	public native CategoryId(const char[] category, const char[] name, const char[] description, 
-							 Shop_CategoryDisplayCallback cat_display=INVALID_FUNCTION, 
-							 Shop_CategoryDescriptionCallback cat_desc=INVALID_FUNCTION,
-							 Shop_CategoryShouldDisplayCallback cat_should=INVALID_FUNCTION,
-							 Shop_CategorySelectCallback cat_select=INVALID_FUNCTION);
+				 Shop_CategoryDisplayCallback cat_display=INVALID_FUNCTION, 
+				 Shop_CategoryDescriptionCallback cat_desc=INVALID_FUNCTION,
+				 Shop_CategoryShouldDisplayCallback cat_should=INVALID_FUNCTION,
+				 Shop_CategorySelectCallback cat_select=INVALID_FUNCTION);
 
 	// Starts an item to register
 	// 
@@ -49,10 +51,10 @@ methodmap CategoryId __nullable__
 	// @return					  		True on success, false otherwise
 	public native bool GetDisplayName(char[] buffer, int maxlength);
 
-	// Toggles all items of category off
+	// Toggles all items of category off.
 	// 
-	// @param client					Client index
-	// @noreturn
+	// @param client				Client index.
+	// @error						Invalid client.
 	public void ToggleOff(int client) {
 		Shop_ToggleClientCategoryOff(client, this);
 	}
