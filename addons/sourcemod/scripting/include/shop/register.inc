@@ -39,6 +39,19 @@ typeset Shop_ItemSellCallback
 forward void Shop_OnCategoryRegistered(CategoryId category_id, const char[] name);
 
 /**
+ *	Called when item registered at first time
+ *  That means only once per unique name
+ *	
+ *	@param category_id		CategoryId of category
+ *	@param category			Unique name of category
+ *	@param item_id			ItemId of item
+ *	@param item				Unique name of item
+ *	
+ *	@noreturn
+*/
+forward void Shop_OnItemRegistered(CategoryId category_id, const char[] category, ItemId item_id, const char[] item);
+
+/**
  *	Registers new category id
  *	
  *	@param category				Category unique name
