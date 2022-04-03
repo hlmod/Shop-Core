@@ -1245,56 +1245,46 @@ public int ItemPanel_Handler(Menu menu, MenuAction action, int param1, int param
 void ConfirmBuy(int client, int item_id)
 {
 	Panel panel = ItemManager_ConfirmItemPanelInfo(client, item_id, Menu_Buy, true);
-	if (panel != null)
-	{
-		char sBuffer[SHOP_MAX_STRING_LENGTH], sItemId[16];
-		IntToString(item_id, sItemId, sizeof(sItemId));
-		
-		SetGlobalTransTarget(client);
-		
-		int credits = GetCredits(client);
-		
-		FormatEx(sBuffer, sizeof(sBuffer), "%t\n ", "credits", credits);
-		panel.SetTitle(sBuffer, false);
-		
-		ItemType type = ItemManager_GetItemTypeEx(sItemId);
+
+	if (panel == null)
+		return;
+
+	char sBuffer[SHOP_MAX_STRING_LENGTH], sItemId[16];
+	IntToString(item_id, sItemId, sizeof(sItemId));
 	
+	SetGlobalTransTarget(client);
+	
+	int credits = GetCredits(client);
+	
+	FormatEx(sBuffer, sizeof(sBuffer), "%t\n ", "credits", credits);
+	panel.SetTitle(sBuffer, false);
+	
+	ItemType type = ItemManager_GetItemTypeEx(sItemId);
+
+	panel.DrawItem(" ", ITEMDRAW_SPACER|ITEMDRAW_RAWLINE);
+
+	if(type == Item_Finite)
+	{
+		int count = PlayerManager_GetItemCountEx(client, sItemId);
+		FormatEx(sBuffer, sizeof(sBuffer), "%t: %d", "You have", count);
+		panel.DrawText(sBuffer);
+		
 		panel.DrawItem(" ", ITEMDRAW_SPACER|ITEMDRAW_RAWLINE);
-
-		if(type == Item_Finite)
-		{
-			int count = PlayerManager_GetItemCountEx(client, sItemId);
-			FormatEx(sBuffer, sizeof(sBuffer), "%t: %d", "You have", count);
-			panel.DrawText(sBuffer);
-			
-			panel.DrawItem(" ", ITEMDRAW_SPACER|ITEMDRAW_RAWLINE);
-			
-			FormatEx(sBuffer, sizeof(sBuffer), "%t", "You Buy Sure");
-			panel.DrawText(sBuffer);
-
-			FormatEx(sBuffer, sizeof(sBuffer), "%t", "Yes");
-			panel.DrawItem(sBuffer);
-
-			FormatEx(sBuffer, sizeof(sBuffer), "%t", "No");
-			panel.DrawItem(sBuffer);
-		}
-		else
-		{
-			FormatEx(sBuffer, sizeof(sBuffer), "%t", "You Buy Sure");
-			panel.DrawText(sBuffer);
-
-			FormatEx(sBuffer, sizeof(sBuffer), "%t", "Yes");
-			panel.DrawItem(sBuffer);
-
-			FormatEx(sBuffer, sizeof(sBuffer), "%t", "No");
-			panel.DrawItem(sBuffer);
-		}
-		
-		iClItemId[client] = item_id;
-		
-		panel.Send(client, BuyConfirmPanel_Handler, MENU_TIME_FOREVER);
-		delete panel;
 	}
+		
+	FormatEx(sBuffer, sizeof(sBuffer), "%t", "You Buy Sure");
+	panel.DrawText(sBuffer);
+
+	FormatEx(sBuffer, sizeof(sBuffer), "%t", "Yes");
+	panel.DrawItem(sBuffer);
+
+	FormatEx(sBuffer, sizeof(sBuffer), "%t", "No");
+	panel.DrawItem(sBuffer);
+
+	iClItemId[client] = item_id;
+	
+	panel.Send(client, BuyConfirmPanel_Handler, MENU_TIME_FOREVER);
+	delete panel;
 }
 
 public int BuyConfirmPanel_Handler(Menu menu, MenuAction action, int param1, int param2)
@@ -1316,66 +1306,52 @@ public int BuyConfirmPanel_Handler(Menu menu, MenuAction action, int param1, int
 				}
 			}
 		}
-		case MenuAction_End :
-		{
-			delete menu;
-		}
 	}
 }
 
 void ConfirmSell(int client, int item_id)
 {
 	Panel panel = ItemManager_ConfirmItemPanelInfo(client, item_id, Menu_Buy, false);
-	if (panel != null)
-	{
-		char sBuffer[SHOP_MAX_STRING_LENGTH], sItemId[16];
-		IntToString(item_id, sItemId, sizeof(sItemId));
-		
-		SetGlobalTransTarget(client);
-		
-		int credits = GetCredits(client);
-		
-		FormatEx(sBuffer, sizeof(sBuffer), "%t\n ", "credits", credits);
-		panel.SetTitle(sBuffer, false);
-		
-		ItemType type = ItemManager_GetItemTypeEx(sItemId);
 	
+	if (panel == null)
+		return;
+
+	char sBuffer[SHOP_MAX_STRING_LENGTH], sItemId[16];
+	IntToString(item_id, sItemId, sizeof(sItemId));
+	
+	SetGlobalTransTarget(client);
+	
+	int credits = GetCredits(client);
+	
+	FormatEx(sBuffer, sizeof(sBuffer), "%t\n ", "credits", credits);
+	panel.SetTitle(sBuffer, false);
+	
+	ItemType type = ItemManager_GetItemTypeEx(sItemId);
+
+	panel.DrawItem(" ", ITEMDRAW_SPACER|ITEMDRAW_RAWLINE);
+	
+	if(type == Item_Finite)
+	{
+		int count = PlayerManager_GetItemCountEx(client, sItemId);
+		FormatEx(sBuffer, sizeof(sBuffer), "%t: %d", "You have", count);
+		panel.DrawText(sBuffer);
+		
 		panel.DrawItem(" ", ITEMDRAW_SPACER|ITEMDRAW_RAWLINE);
-		
-		if(type == Item_Finite)
-		{
-			int count = PlayerManager_GetItemCountEx(client, sItemId);
-			FormatEx(sBuffer, sizeof(sBuffer), "%t: %d", "You have", count);
-			panel.DrawText(sBuffer);
-			
-			panel.DrawItem(" ", ITEMDRAW_SPACER|ITEMDRAW_RAWLINE);
-			
-			FormatEx(sBuffer, sizeof(sBuffer), "%t", "You Sell Sure");
-			panel.DrawText(sBuffer);
-
-			FormatEx(sBuffer, sizeof(sBuffer), "%t", "Yes");
-			panel.DrawItem(sBuffer);
-
-			FormatEx(sBuffer, sizeof(sBuffer), "%t", "No");
-			panel.DrawItem(sBuffer);
-		}
-		else
-		{
-			FormatEx(sBuffer, sizeof(sBuffer), "%t", "You Sell Sure");
-			panel.DrawText(sBuffer);
-
-			FormatEx(sBuffer, sizeof(sBuffer), "%t", "Yes");
-			panel.DrawItem(sBuffer);
-
-			FormatEx(sBuffer, sizeof(sBuffer), "%t", "No");
-			panel.DrawItem(sBuffer);
-		}
-		
-		iClItemId[client] = item_id;
-		
-		panel.Send(client, SellConfirmPanel_Handler, MENU_TIME_FOREVER);
-		delete panel;
 	}
+
+	FormatEx(sBuffer, sizeof(sBuffer), "%t", "You Sell Sure");
+	panel.DrawText(sBuffer);
+
+	FormatEx(sBuffer, sizeof(sBuffer), "%t", "Yes");
+	panel.DrawItem(sBuffer);
+
+	FormatEx(sBuffer, sizeof(sBuffer), "%t", "No");
+	panel.DrawItem(sBuffer);
+	
+	iClItemId[client] = item_id;
+	
+	panel.Send(client, SellConfirmPanel_Handler, MENU_TIME_FOREVER);
+	delete panel;
 }
 
 public int SellConfirmPanel_Handler(Menu menu, MenuAction action, int param1, int param2)
