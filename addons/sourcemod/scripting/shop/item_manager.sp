@@ -1745,6 +1745,97 @@ Panel ItemManager_CreateItemPanelInfo(int source_client, int item_id, ShopMenu m
 	return panel;
 }
 
+Panel ItemManager_ConfirmItemPanelInfo(int source_client, int item_id, ShopMenu menu_act, bool isBuy)
+{
+	Panel panel;
+	
+	char sItemId[16];
+	IntToString(item_id, sItemId, sizeof(sItemId));
+	
+	h_KvItems.Rewind();
+	if (!h_KvItems.JumpToKey(sItemId))
+	{
+		return panel;
+	}
+	
+	int category_id = h_KvItems.GetNum("category_id");
+	Handle plugin = view_as<Handle>(h_KvItems.GetNum("plugin"));
+	
+	char buffer[256], category[SHOP_MAX_STRING_LENGTH], item[SHOP_MAX_STRING_LENGTH];
+	
+	h_arCategories.GetString(category_id, category, sizeof(category));
+	h_KvItems.GetString("item", item, sizeof(item));
+	h_KvItems.GetString("name", buffer, sizeof(buffer));
+	
+	DataPack dpCallback = view_as<DataPack>(h_KvItems.GetNum("callbacks"));
+	if (dpCallback == null)
+		ThrowNativeError(SP_ERROR_NATIVE, "Callbacks for this item not found");
+	
+	dpCallback.Position = ITEM_DATAPACKPOS_SELECT;
+	Function callback = dpCallback.ReadFunction();
+	
+	if(!ItemManager_OnItemSelect(plugin, callback, source_client, category_id, category, item_id, item, menu_act))
+	{
+		return panel;
+	}
+
+	dpCallback.Position = ITEM_DATAPACKPOS_DISPLAY;
+	callback = dpCallback.ReadFunction();
+	
+	h_KvItems.Rewind();
+	
+	ItemManager_OnItemDisplay(plugin, callback, source_client, category_id, category, item_id, item, menu_act, _, buffer, buffer, sizeof(buffer));
+	
+	OnItemDisplay(source_client, menu_act, category_id, item_id, buffer, buffer, sizeof(buffer));
+	
+	h_KvItems.JumpToKey(sItemId);
+	
+	panel = new Panel();
+	panel.DrawText(buffer);
+	
+	SetGlobalTransTarget(source_client);
+	
+	int price = h_KvItems.GetNum("price");
+	int sell_price = h_KvItems.GetNum("sell_price");
+	
+	if(isBuy)
+	{
+		if (price < 1)
+			FormatEx(buffer, sizeof(buffer), "%t: %t", "Price", "Free");
+		else
+			FormatEx(buffer, sizeof(buffer), "%t: %d", "Price", price);
+		panel.DrawText(buffer);
+	}
+	
+	else if(sell_price > 0)
+	{
+		FormatEx(buffer, sizeof(buffer), "%t: %d", "Sell Price", sell_price);
+		panel.DrawText(buffer);
+	}
+	
+	switch (view_as<ItemType>(h_KvItems.GetNum("type", 0))) // by default it will be ItemType_None
+	{
+		case Item_Finite :
+		{
+			FormatEx(buffer, sizeof(buffer), "%t: %d", "Count", h_KvItems.GetNum("count", 1));
+			panel.DrawText(buffer);
+		}
+		case Item_None, Item_Togglable :
+		{
+			int duration = h_KvItems.GetNum("duration", 0);
+			if (duration < 1)
+				FormatEx(buffer, sizeof(buffer), "%t: %t", "duration", "forever");
+			else
+			{
+				GetTimeFromStamp(buffer, sizeof(buffer), duration, source_client);
+				Format(buffer, sizeof(buffer), "%t: %s", "duration", buffer);
+			}
+			panel.DrawText(buffer);
+		}
+	}	
+	return panel;
+}
+
 stock int ItemManager_GetCategoryId(const char[] category)
 {
 	return h_arCategories.FindString(category);
