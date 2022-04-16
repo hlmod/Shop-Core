@@ -601,7 +601,7 @@ void DB_UpgradeToNewVersion()
 	
 	if (db_type == DB_MySQL)
 	{
-		h_db.Format(s_Query, sizeof(s_Query), "ALTER IGNORE TABLE `%splayers` ADD `lastconnect` int(10) NOT NULL DEFAULT '0';", g_sDbPrefix);
+		h_db.Format(s_Query, sizeof(s_Query), "ALTER TABLE `%splayers` ADD `lastconnect` int(10) NOT NULL DEFAULT '0';", g_sDbPrefix);
 	}
 	else
 	{
