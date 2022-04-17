@@ -51,8 +51,8 @@ forward Action Shop_OnItemSelected(int client, ShopMenu menu_action, CategoryId 
 forward bool Shop_OnItemDisplay(int client, ShopMenu menu_action, CategoryId category_id, ItemId item_id, const char[] display, char[] buffer, int maxlength);
 
 /**
- *	Called when an item's price and sell price is being displayed
- *	Prices when buying / selling do not change, only changes in the menu
+ *	Called before the sell and buy prices are displayed in the item's management menu.
+ *	@note Prices change only in the menu! Does not affect prices when buying/selling.
  *	
  *	@param client			Client index an item's description is being displayed to
  *	@param menu_action		Menu performing this action
