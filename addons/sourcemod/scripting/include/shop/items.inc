@@ -63,7 +63,7 @@ forward bool Shop_OnItemDisplay(int client, ShopMenu menu_action, CategoryId cat
  *	
  *	@return true to apply new values, false otherwise
 */
-forward bool Shop_OnItemPricesDisplay(int client, ShopMenu menu_action, CategoryId category_id, ItemId item_id, int &price, int &sell_price);
+forward bool Shop_OnItemPricesDisplay(int client, ShopMenu menu_action, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, int &price, int &sell_price);
 
 /**
  *	Called when an item's description is being displayd

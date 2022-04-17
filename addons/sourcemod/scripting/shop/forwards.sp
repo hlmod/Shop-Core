@@ -35,7 +35,7 @@ void Forward_OnPluginStart()
 	h_fwdOnItemSelect = CreateGlobalForward("Shop_OnItemSelect", ET_Hook, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
 	h_fwdOnItemSelected = CreateGlobalForward("Shop_OnItemSelected", ET_Hook, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
 	h_fwdOnItemDisplay = CreateGlobalForward("Shop_OnItemDisplay", ET_Hook, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_String, Param_String, Param_Cell);
-	h_fwdOnItemPricesDisplay = CreateGlobalForward("Shop_OnItemPricesDisplay", ET_Hook, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_CellByRef, Param_CellByRef);
+	h_fwdOnItemPricesDisplay = CreateGlobalForward("Shop_OnItemPricesDisplay", ET_Hook, Param_Cell, Param_Cell, Param_Cell, Param_String, Param_Cell, Param_String, Param_CellByRef, Param_CellByRef);
 	h_fwdOnItemDescription = CreateGlobalForward("Shop_OnItemDescription", ET_Hook, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_String, Param_String, Param_Cell);
 	h_fwdOnItemSell = CreateGlobalForward("Shop_OnItemSell", ET_Hook, Param_Cell, Param_Cell, Param_String, Param_Cell, Param_String, Param_Cell, Param_CellByRef);
 	h_fwdOnItemToggled = CreateGlobalForward("Shop_OnItemToggled", ET_Ignore, Param_Cell, Param_Cell, Param_String, Param_Cell, Param_String, Param_Cell);
@@ -212,7 +212,7 @@ bool Forward_OnItemDisplay(int client, ShopMenu menu_action, int category_id, in
 	return result;
 }
 
-bool Forward_OnItemPricesDisplay(int client, ShopMenu menu_action, int category_id, int item_id, int &price, int &sell_price)
+bool Forward_OnItemPricesDisplay(int client, ShopMenu menu_action, int category_id, const char[] category, int item_id, const char[] item, int &price, int &sell_price)
 {
 	bool result;
 	int new_price = price;
@@ -222,7 +222,9 @@ bool Forward_OnItemPricesDisplay(int client, ShopMenu menu_action, int category_
 	Call_PushCell(client);
 	Call_PushCell(menu_action);
 	Call_PushCell(category_id);
+	Call_PushString(category);
 	Call_PushCell(item_id);
+	Call_PushString(item);
 	Call_PushCellRef(new_price);
 	Call_PushCellRef(new_sell_price);
 	Call_Finish(result);

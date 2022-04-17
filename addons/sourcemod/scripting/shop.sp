@@ -1930,9 +1930,9 @@ bool OnItemDisplay(int client, ShopMenu menu_action, int category_id, int item_i
 	return Forward_OnItemDisplay(client, menu_action, category_id, item_id, display, sBuffer, maxlength);
 }
 
-bool OnItemPricesDisplay(int client, ShopMenu menu_action, int category_id, int item_id, int &price, int &sell_price)
+bool OnItemPricesDisplay(int client, ShopMenu menu_action, int category_id, const char[] category, int item_id, const char[] item, int &price, int &sell_price)
 {
-	return Forward_OnItemPricesDisplay(client, menu_action, category_id, item_id, price, sell_price);
+	return Forward_OnItemPricesDisplay(client, menu_action, category_id, category, item_id, item, price, sell_price);
 }
 
 bool OnItemDescription(int client, ShopMenu menu_action, int category_id, int item_id, const char[] display, char[] sBuffer, int maxlength)

@@ -1651,7 +1651,7 @@ Panel ItemManager_CreateItemPanelInfo(int source_client, int item_id, ShopMenu m
 	
 	OnItemDisplay(source_client, menu_act, category_id, item_id, buffer, buffer, sizeof(buffer));
 
-	OnItemPricesDisplay(source_client, menu_act, category_id, item_id, price, sell_price);
+	OnItemPricesDisplay(source_client, menu_act, category_id, category, item_id, item, price, sell_price);
 	
 	h_KvItems.JumpToKey(sItemId);
 	
