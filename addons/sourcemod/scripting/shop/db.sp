@@ -228,6 +228,8 @@ public Action DB_ReconnectTimer(Handle timer)
 	{
 		DB_TryConnect();
 	}
+
+	return Plugin_Continue;
 }
 
 DataPack upgrade_dp;

@@ -226,6 +226,7 @@ public int PlayerManager_SetClientItemCount(Handle plugin, int numParams)
 	int item_id = GetNativeCell(2);
 	
 	PlayerManager_SetItemCount(client, item_id, GetNativeCell(3));
+	return 0;
 }
 
 public int PlayerManager_GetClientItemSellPrice(Handle plugin, int numParams)
@@ -605,7 +606,7 @@ public int PlayerManager_ToggleClientCategoryOff(Handle plugin, int numParams)
 	
 	h_KvClientItems[client].Rewind();
 	if (!h_KvClientItems[client].GotoFirstSubKey())
-		return;
+		return 0;
 
 	char sItemId[16];
 	do
@@ -648,6 +649,7 @@ public int PlayerManager_ToggleClientCategoryOff(Handle plugin, int numParams)
 	while (h_KvClientItems[client].GotoNextKey());
 	
 	h_KvClientItems[client].Rewind();
+	return 0;
 }
 
 public any PlayerManager_GetClientItems(Handle plugin, int numParams)
@@ -707,6 +709,7 @@ public Action PlayerManager_OnPlayerItemElapsed(Handle timer, DataPack dp)
 	}
 	
 	OnPlayerItemElapsed(client, item_id);
+	return Plugin_Continue;
 }
 
 stock bool PlayerManager_CanPreviewEx(int client, const char[] sItemId, int &sec)
@@ -1139,7 +1142,7 @@ void PlayerManager_OnClientPutInServer(int client)
 	TQuery(PlayerManager_AuthorizeClient, s_Query, dp);
 }
 
-public int PlayerManager_AuthorizeClient(Database owner, DBResultSet hndl, const char[] error, DataPack dp)
+public void PlayerManager_AuthorizeClient(Database owner, DBResultSet hndl, const char[] error, DataPack dp)
 {
 	if (owner == null)
 	{
@@ -1329,7 +1332,7 @@ void PlayerManager_LoadClientItems(int client)
 	TQuery(PlayerManager_GetItemsFromDB, s_Query, GetClientSerial(client));
 }
 
-public int PlayerManager_GetItemsFromDB(Database owner, DBResultSet hndl, const char[] error, any serial)
+public void PlayerManager_GetItemsFromDB(Database owner, DBResultSet hndl, const char[] error, any serial)
 {
 	if (owner == null)
 	{
