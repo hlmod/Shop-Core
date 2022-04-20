@@ -1249,7 +1249,7 @@ void ConfirmBuy(int client, int item_id)
 	if (panel == null)
 		return;
 
-	char sBuffer[SHOP_MAX_STRING_LENGTH], sItemId[16];
+	char sBuffer[256], sItemId[16];
 	IntToString(item_id, sItemId, sizeof(sItemId));
 	
 	SetGlobalTransTarget(client);
