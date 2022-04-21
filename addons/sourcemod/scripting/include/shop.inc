@@ -73,38 +73,38 @@ enum ShopMenu
 
 /**
  *	Called when the shop is ready to register items
- *	
+ *
  *	@noparams
- *	
+ *
  *	@noreturn
 */
 forward void Shop_Started();
 
 /**
  *	Checks whether the shop has been started
- *	
+ *
  *	@noparams
- *	
+ *
  *	@return	True if the shop is already started, false otherwise
 */
 native bool Shop_IsStarted();
 
 /**
  *	This must be called on PluginEnd. Fully unregisters the plugin. Unregisters items, categories and removes them from the shop and players' inventory
- *	
+ *
  *	@noparams
- *	
+ *
  *	@noreturn
 */
 native void Shop_UnregisterMe();
 
 /**
  *	Get path to the main config folder of the Shop
- *	
+ *
  *	@param buffer			Buffer to store the path in
  *	@param size				Max buffer length
  *	@param file				File to retrieve the path for
- *	
+ *
  *	@noreturn
 */
 stock void Shop_GetCfgFile(char[] buffer, int size, const char[] file)
@@ -112,7 +112,7 @@ stock void Shop_GetCfgFile(char[] buffer, int size, const char[] file)
 	BuildPath(Path_SM, buffer, size, "configs/shop/%s", file);
 }
 
-public SharedPlugin __pl_shop = 
+public SharedPlugin __pl_shop =
 {
 	name = "shop",
 	file = "shop.smx",
@@ -136,15 +136,15 @@ public void __pl_shop_SetNTVOptional()
 	MarkNativeAsOptional("Shop_ShowItemsOfCategory");
 	MarkNativeAsOptional("Shop_GetDatabase");
 	MarkNativeAsOptional("Shop_GetDatabasePrefix");
-	
+
 	MarkNativeAsOptional("Shop_ShowAdminMenu");
 	MarkNativeAsOptional("Shop_AddToAdminMenu");
 	MarkNativeAsOptional("Shop_RemoveFromAdminMenu");
-	
+
 	MarkNativeAsOptional("Shop_ShowFunctionsMenu");
 	MarkNativeAsOptional("Shop_AddToFunctionsMenu");
 	MarkNativeAsOptional("Shop_RemoveFromFunctionsMenu");
-	
+
 	MarkNativeAsOptional("Shop_RegisterCategory");
 	MarkNativeAsOptional("Shop_StartItem");
 	MarkNativeAsOptional("Shop_SetInfo");
@@ -155,7 +155,7 @@ public void __pl_shop_SetNTVOptional()
 	MarkNativeAsOptional("Shop_SetCustomInfoString");
 	MarkNativeAsOptional("Shop_KvCopySubKeysCustomInfo");
 	MarkNativeAsOptional("Shop_EndItem");
-	
+
 	MarkNativeAsOptional("Shop_GetItemCustomInfo");
 	MarkNativeAsOptional("Shop_SetItemCustomInfo");
 	MarkNativeAsOptional("Shop_GetItemCustomInfoFloat");
@@ -187,7 +187,7 @@ public void __pl_shop_SetNTVOptional()
 	MarkNativeAsOptional("Shop_FillArrayByItems");
 	MarkNativeAsOptional("Shop_FormatItem");
 	MarkNativeAsOptional("Shop_GetClientItems");
-	
+
 	MarkNativeAsOptional("Shop_GetClientId");
 	MarkNativeAsOptional("Shop_SetClientItemTimeleft");
 	MarkNativeAsOptional("Shop_GetClientItemTimeleft");
