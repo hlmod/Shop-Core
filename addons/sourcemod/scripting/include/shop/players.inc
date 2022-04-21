@@ -471,13 +471,13 @@ native bool Shop_UseClientItem(int client, ItemId item_id);
 
 /**
  *	Returns the array with player item ids.
- *	Must be freed via CloseHandle() / delete / Handle.Close().
+ *	@note You must close the Handle yourself.
+ *	@note If player has not items - array returned too, but empty.
  *
- *	@param	client				Client index
+ *	@param client				Client index
+ *  @error                      Invalid player index
  *
  *	@return	ArrayList handle with item ids.
- *	@error	Client is not connected/not loaded.
- *	@note	If player has not items - array returned too, but empty.
  */
 native ArrayList Shop_GetClientItems(int client);
 
