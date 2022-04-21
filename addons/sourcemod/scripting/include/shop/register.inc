@@ -1,26 +1,201 @@
+/**
+ *	Callback before the player is shown the category name in the menu
+ *
+ *	@param client				Client index
+ *	@param category_id			Category id of an item
+ *	@param category				Category unique name
+ *	@param name					Current display name
+ *	@param buffer				Buffer for new name
+ *	@param maxlen				Maximum buffer length
+ *	@param menu					Menu performing this action
+ *
+ *	@return true - apply new display name, false otherwise
+ */
 typedef Shop_CategoryDisplayCallback = function bool (int client, CategoryId category_id, const char[] category, const char[] name, char[] buffer, int maxlen, ShopMenu menu);
+
+/**
+ *	Callback before showing the player the category description in the menu
+ *
+ *	@param client				Client index
+ *	@param category_id			Category id of an item
+ *	@param category				Category unique name
+ *	@param description			The current description
+ *	@param buffer				Buffer for new description
+ *	@param maxlen				Maximum buffer length
+ *	@param menu					Menu performing this action
+ *
+ *	@return true - apply new description, false otherwise
+ */
 typedef Shop_CategoryDescriptionCallback = function bool (int client, CategoryId category_id, const char[] category, const char[] description, char[] buffer, int maxlen, ShopMenu menu);
+
+/**
+ *	Callback before a category is shown to the player in the menu
+ *
+ *	@param client				Client index
+ *	@param category_id			Category id of an item
+ *	@param category				Category unique name
+ *	@param menu					Menu performing this action
+ *
+ *	@return true - show on the menu, false otherwise
+ */
 typedef Shop_CategoryShouldDisplayCallback = function bool (int client, CategoryId category_id, const char[] category, ShopMenu menu);
+
+/**
+ *	Callback before the player selects a category from the menu
+ *
+ *	@param client				Client index
+ *	@param category_id			Category id of an item
+ *	@param category				Category unique name
+ *	@param menu					Menu performing this action
+ *
+ *	@return false - cancel selection, true otherwise
+ */
 typedef Shop_CategorySelectCallback = function bool (int client, CategoryId category_id, const char[] category, ShopMenu menu);
 
+/**
+ *	Callback on use or toggle of the item
+ *
+ *	@param client				Client index
+ *	@param category_id			Category id of an item
+ *	@param category				Category unique name
+ *	@param item_id				Item id of an item
+ *	@param item					Item's unique name
+ *	@param isOn					Item state
+ *	@param elapsed				Item elapsed
+ *
+ *	@return see ShopAction enum
+ */
 typeset Shop_ItemUseToggleCallback
 {
 	function ShopAction (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item);
 	function ShopAction (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, bool isOn, bool elapsed);
 }
+
+/**
+ *	Callback to get ItemId
+ *
+ *	@param category_id			Category id of an item
+ *	@param category				Category unique name
+ *	@param item_id				Item id of an item
+ *	@param item					Item's unique name
+ *
+ *	@noreturn
+ */
 typedef Shop_ItemRegister = function void (CategoryId category_id, const char[] category, const char[] item, ItemId item_id);
+
+/**
+ *	Callback to display an item preview for the player
+ *
+ *	@param client				Client index
+ *	@param category_id			Category id of an item
+ *	@param category				Category unique name
+ *	@param item_id				Item id of an item
+ *	@param item					Item's unique name
+ *
+ *	@noreturn
+ */
 typedef Shop_ItemCommon = function void(int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item);
+
+/**
+ *	Callback before an item is shown to the player in the menu
+ *
+ *	@param client				Client index
+ *	@param category_id			Category id of an item
+ *	@param category				Category unique name
+ *	@param item_id				Item id of an item
+ *	@param item					Item's unique name
+ *	@param menu					Menu performing this action
+ *
+ *	@return true - show on the menu, false otherwise
+ */
 typedef Shop_ItemShouldDisplayCallback = function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ShopMenu menu);
+
+/**
+ *	Callback before the player is shown the item's name in the menu
+ *
+ *	@param client				Client index
+ *	@param category_id			Category id of an item
+ *	@param category				Category unique name
+ *	@param item_id				Item id of an item
+ *	@param item					Item's unique name
+ *	@param menu					Menu performing this action
+ *	@param disabled				True - make this item not selectable in the menu (ITEMDRAW_DISABLED), false by default
+ *	@param name					Current display name
+ *	@param buffer				Buffer for new name
+ *	@param maxlen				Maximum buffer length
+ *
+ *	@return true - apply new display name, false otherwise
+ */
 typedef Shop_ItemDisplayCallback = function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ShopMenu menu, bool &disabled, const char[] name, char[] buffer, int maxlen);
+
+/**
+ *	Callback before showing the player the description of the item in the menu
+ *
+ *	@param client				Client index
+ *	@param category_id			Category id of an item
+ *	@param category				Category unique name
+ *	@param item_id				Item id of an item
+ *	@param item					Item's unique name
+ *	@param menu					Menu performing this action
+ *	@param description			The current description
+ *	@param buffer				Buffer for new description
+ *	@param maxlen				Maximum buffer length
+ *
+ *	@return true - apply new description, false otherwise
+ */
 typedef Shop_ItemDescriptionCallback = function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ShopMenu menu, const char[] description, char[] buffer, int maxlen);
+
+/**
+ *	Callback before the player selects an item from the menu
+ *
+ *	@param client				Client index
+ *	@param category_id			Category id of an item
+ *	@param category				Category unique name
+ *	@param item_id				Item id of an item
+ *	@param item					Item's unique name
+ *	@param menu					Menu performing this action
+ *
+ *	@return false - cancel selection, true otherwise
+ */
 typedef Shop_ItemSelectCallBack = function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ShopMenu menu);
 
+/**
+ *	Callback before a player buys an item
+ *
+ *	@param client				Client index
+ *	@param category_id			Category id of an item
+ *	@param category				Category unique name
+ *	@param item_id				Item id of an item
+ *	@param item					Item's unique name
+ *	@param type					Item type. See ItemType enum
+ *	@param price				Item price. Can not be lower than sell_price
+ *	@param sell_price			Item sell price. 0 - free, -1 - not purchasable
+ *	@param value				Quantity - if it's an Item_Finite, duration - if it's an Item_Togglable
+ *	@param gold_price			Item price. -1 - not sold for gold
+ *	@param gold_sell_price		Item sell price in Gold. 0 - free, -1 - not purchasable with gold
+ *
+ *	@return true - allow the purchase, false - otherwise
+ */
 typeset Shop_ItemBuyCallback
 {
 	function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ItemType type, int price, int sell_price, int value);
 	function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ItemType type, int price, int sell_price, int value, int gold_price, int gold_sell_price);
 }
 
+/**
+ *	Callback before a player sells an item
+ *
+ *	@param client				Client index
+ *	@param category_id			Category id of an item
+ *	@param category				Category unique name
+ *	@param item_id				Item id of an item
+ *	@param item					Item's unique name
+ *	@param type					Item type. See ItemType enum
+ *	@param sell_price			Item sell price. 0 to make item free and -1 to make it unsaleable by credits. Can not be higher than price
+ *	@param gold_sell_price		Item sell price in Gold. 0 to make item free by gold price and -1 to disable sell by gold. Can not be higher than price
+ *
+ *	@return true - allow sale, false - otherwise
+ */
 typeset Shop_ItemSellCallback
 {
 	function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ItemType type, int sell_price);
