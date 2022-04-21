@@ -152,7 +152,7 @@ methodmap ItemId __nullable__
 	// Forces the player to buy the item from the shop
 	//
 	// @param client				Client index
-	// @return						True if the player successfuly bought, false otherwise
+	// @return						True if the player successfully bought, false otherwise
 	public bool Buy(int client) {
 		return Shop_BuyClientItem(client, this);
 	}
@@ -160,7 +160,7 @@ methodmap ItemId __nullable__
 	// Forces the player to sell the item from the inventory
 	//
 	// @param client				Client index
-	// @return						True if the player successfuly sold, false otherwise
+	// @return						True if the player successfully sold, false otherwise
 	public bool Sell(int client) {
 		return Shop_SellClientItem(client, this);
 	}

@@ -366,7 +366,7 @@ native void Shop_SetClientGold(int client, int amount);
  *	@param client				Client index
  *	@param item_id				The item id
  *
- *	@return	True if the player successfuly bought, false otherwise
+ *	@return	True if the player successfully bought, false otherwise
 */
 native bool Shop_BuyClientItem(int client, ItemId item_id);
 
@@ -376,7 +376,7 @@ native bool Shop_BuyClientItem(int client, ItemId item_id);
  *	@param client				Client index
  *	@param item_id				The item id
  *
- *	@return	True if the player successfuly sold, false otherwise
+ *	@return	True if the player successfully sold, false otherwise
 */
 native bool Shop_SellClientItem(int client, ItemId item_id);
 

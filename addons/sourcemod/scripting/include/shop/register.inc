@@ -182,7 +182,7 @@ native void Shop_SetCustomInfoString(const char[] info, char[] value);
 native void Shop_KvCopySubKeysCustomInfo(KeyValues kv);
 
 /**
- *	Copletes the item info structure and start to register. Can not be used before an item has been started to register
+ *	Completes the item info structure and start to register. Can not be used before an item has been started to register
  *
  *	@noparams
  *
