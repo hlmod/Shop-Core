@@ -2,7 +2,7 @@
 	Library of the [Shop] Core v3
 	Author: FrozDark
 	www.hlmod.ru
-*/
+ */
 
 #if defined _shop_included
  #endinput
@@ -77,7 +77,7 @@ enum ShopMenu
  *	@noparams
  *
  *	@noreturn
-*/
+ */
 forward void Shop_Started();
 
 /**
@@ -86,7 +86,7 @@ forward void Shop_Started();
  *	@noparams
  *
  *	@return	True if the shop is already started, false otherwise
-*/
+ */
 native bool Shop_IsStarted();
 
 /**
@@ -95,7 +95,7 @@ native bool Shop_IsStarted();
  *	@noparams
  *
  *	@noreturn
-*/
+ */
 native void Shop_UnregisterMe();
 
 /**
@@ -106,7 +106,7 @@ native void Shop_UnregisterMe();
  *	@param file				File to retrieve the path for
  *
  *	@noreturn
-*/
+ */
 stock void Shop_GetCfgFile(char[] buffer, int size, const char[] file)
 {
 	BuildPath(Path_SM, buffer, size, "configs/shop/%s", file);

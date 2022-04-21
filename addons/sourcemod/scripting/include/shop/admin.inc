@@ -6,7 +6,7 @@
  *	@param maxlength		    Max length of the buffer
  *
  *	@noreturn
-*/
+ */
 typedef Shop_AdminDisplay = function void (int client, char[] buffer, int maxlength);
 
 /**
@@ -15,7 +15,7 @@ typedef Shop_AdminDisplay = function void (int client, char[] buffer, int maxlen
  *	@param client			    Client index performing selection
  *
  *	@return true to allow performing and false to block
-*/
+ */
 typedef Shop_AdminSelect = function bool (int client);
 
 /**
@@ -25,7 +25,7 @@ typedef Shop_AdminSelect = function bool (int client);
  *	@param callback_select		Callback when the item is being selected
  *
  *	@noreturn
-*/
+ */
 native void Shop_AddToAdminMenu(Shop_AdminDisplay callback_display, Shop_AdminSelect callback_select);
 
 /**
@@ -35,7 +35,7 @@ native void Shop_AddToAdminMenu(Shop_AdminDisplay callback_display, Shop_AdminSe
  *	@param callback_select		Callback to remove
  *
  *	@return true on success, false otherwise
-*/
+ */
 native bool Shop_RemoveFromAdminMenu(Shop_AdminDisplay callback_display, Shop_AdminSelect callback_select);
 
 /**
@@ -44,5 +44,5 @@ native bool Shop_RemoveFromAdminMenu(Shop_AdminDisplay callback_display, Shop_Ad
  *	@param client				Client index to show to
  *
  *	@noreturn
-*/
+ */
 native void Shop_ShowAdminMenu(int client);

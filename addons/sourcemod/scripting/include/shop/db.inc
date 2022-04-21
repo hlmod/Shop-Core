@@ -11,7 +11,7 @@ enum ShopDBType
  *	@noparams
  *
  *	@return	Database Handle
-*/
+ */
 native Database Shop_GetDatabase();
 
 /**
@@ -20,7 +20,7 @@ native Database Shop_GetDatabase();
  *	@noparams
  *
  *	@return	Database type
-*/
+ */
 native ShopDBType Shop_GetDatabaseType();
 
 /**
@@ -30,5 +30,5 @@ native ShopDBType Shop_GetDatabaseType();
  *	@param maxlength			Max buffer length
  *
  *	@return	Number of bytes written
-*/
+ */
 native int Shop_GetDatabasePrefix(char[] buffer, int maxlength);

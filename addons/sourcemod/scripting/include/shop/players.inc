@@ -18,7 +18,7 @@ forward void Shop_OnAuthorized(int client);
  *	@param maxlength			Maxlength of the title
  *
  *	@return true to apply new value and false to ignore
-*/
+ */
 forward bool Shop_OnMenuTitle(int client, ShopMenu menu_action, const char[] title, char[] buffer, int maxlength);
 
 /**
@@ -32,7 +32,7 @@ forward bool Shop_OnMenuTitle(int client, ShopMenu menu_action, const char[] tit
  *	@param bPercent				Whether the commission was set by the percent By reference
  *
  *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block
-*/
+ */
 forward Action Shop_OnCreditsTransfer(int client, int target, int &amount_give, int &amount_remove, int &amount_commission, bool bPercent);
 
 /**
@@ -45,7 +45,7 @@ forward Action Shop_OnCreditsTransfer(int client, int target, int &amount_give, 
  *	@param amount_commission	Amount of credits the commission was set
  *
  *	@noreturn
-*/
+ */
 forward void Shop_OnCreditsTransfered(int client, int target, int amount_give, int amount_remove, int amount_commission);
 
 /**
@@ -56,7 +56,7 @@ forward void Shop_OnCreditsTransfered(int client, int target, int amount_give, i
  *	@param by_who				See CREDITS_BY_* definitions for more info and any higher value is the admin index
  *
  *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block
-*/
+ */
 forward Action Shop_OnCreditsSet(int client, int &credits, int by_who);
 
 /**
@@ -67,7 +67,7 @@ forward Action Shop_OnCreditsSet(int client, int &credits, int by_who);
  *	@param by_who				See CREDITS_BY_* definitions for more info and any higher value is the admin index
  *
  *	@noreturn
-*/
+ */
 forward void Shop_OnCreditsSet_Post(int client, int credits, int by_who);
 
 /**
@@ -78,7 +78,7 @@ forward void Shop_OnCreditsSet_Post(int client, int credits, int by_who);
  *	@param by_who				See CREDITS_BY_* definitions for more info and any higher values is the admin index
  *
  *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block
-*/
+ */
 forward Action Shop_OnCreditsGiven(int client, int &credits, int by_who);
 
 /**
@@ -89,7 +89,7 @@ forward Action Shop_OnCreditsGiven(int client, int &credits, int by_who);
  *	@param by_who				See CREDITS_BY_* definitions for more info and any higher values is the admin index
  *
  *	@return noreturn
-*/
+ */
 forward void Shop_OnCreditsGiven_Post(int client, int credits, int by_who);
 
 /**
@@ -100,7 +100,7 @@ forward void Shop_OnCreditsGiven_Post(int client, int credits, int by_who);
  *	@param by_who				See CREDITS_BY_* definitions for more info and any higher value is the admin index
  *
  *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block
-*/
+ */
 forward Action Shop_OnCreditsTaken(int client, int &credits, int by_who);
 
 /**
@@ -111,7 +111,7 @@ forward Action Shop_OnCreditsTaken(int client, int &credits, int by_who);
  *	@param by_who				See CREDITS_BY_* definitions for more info and any higher value is the admin index
  *
  *	@return noreturn
-*/
+ */
 forward void Shop_OnCreditsTaken_Post(int client, int credits, int by_who);
 
 /**
@@ -122,7 +122,7 @@ forward void Shop_OnCreditsTaken_Post(int client, int credits, int by_who);
  *	@param by_who				See CREDITS_BY_* definitions for more info and any higher value is the admin index
  *
  *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block
-*/
+ */
 forward Action Shop_OnGoldSet(int client, int &amount, int by_who);
 
 /**
@@ -133,7 +133,7 @@ forward Action Shop_OnGoldSet(int client, int &amount, int by_who);
  *	@param by_who				See CREDITS_BY_* definitions for more info and any higher values is the admin index
  *
  *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block
-*/
+ */
 forward Action Shop_OnGoldGiven(int client, int &amount, int by_who);
 
 /**
@@ -144,7 +144,7 @@ forward Action Shop_OnGoldGiven(int client, int &amount, int by_who);
  *	@param by_who				See CREDITS_BY_* definitions for more info and any higher value is the admin index
  *
  *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block
-*/
+ */
 forward Action Shop_OnGoldTaken(int client, int &amount, int by_who);
 
 /**
@@ -153,7 +153,7 @@ forward Action Shop_OnGoldTaken(int client, int &amount, int by_who);
  *	@param client				Client index who is perfroming
  *
  *	@return true to allow performing and false to block
-*/
+ */
 forward bool Shop_OnClientLuckProcess(int client);
 
 /**
@@ -164,7 +164,7 @@ forward bool Shop_OnClientLuckProcess(int client);
  *	@param luck_chance			luck chance (by reference)
  *	-
  *	@return Plugin_Changed to apply custom changes. >= Plugin_Handled to block, Plugin_Continue - to proceed without changes.
-*/
+ */
 forward Action Shop_OnClientShouldLuckItemChance(int client, ItemId item_id, int &luck_chance);
 
 /**
@@ -174,7 +174,7 @@ forward Action Shop_OnClientShouldLuckItemChance(int client, ItemId item_id, int
  *	@param item_id				Item id of the item
  *
  *	@noreturn
-*/
+ */
 forward void Shop_OnClientItemLucked(int client, ItemId item_id);
 
 /**
@@ -183,7 +183,7 @@ forward void Shop_OnClientItemLucked(int client, ItemId item_id);
  *	@param client				Client index to get for
  *
  *	@return player id in the database or 0 if client doesn't in database
-*/
+ */
 native int Shop_GetClientId(int client);
 
 /**
@@ -195,7 +195,7 @@ native int Shop_GetClientId(int client);
  *	@param reset_duration		Reset duration
  *
  *	@return True on success and false it client has not this item
-*/
+ */
 native bool Shop_SetClientItemTimeleft(int client, ItemId item_id, int timeleft, bool reset_duration = true);
 
 /**
@@ -205,7 +205,7 @@ native bool Shop_SetClientItemTimeleft(int client, ItemId item_id, int timeleft,
  *	@param item_id				Item id to get for
  *
  *	@return item timeleft in seconds. 0 if item has no timelimit
-*/
+ */
 native int Shop_GetClientItemTimeleft(int client, ItemId item_id);
 
 /**
@@ -216,7 +216,7 @@ native int Shop_GetClientItemTimeleft(int client, ItemId item_id);
  *  @param isGold				True to retrieve gold value, false to get credits
  *
  *	@return sell price of the item
-*/
+ */
 native int Shop_GetClientItemSellPrice(int client, ItemId item_id, bool isGold = false);
 
 /**
@@ -226,7 +226,7 @@ native int Shop_GetClientItemSellPrice(int client, ItemId item_id, bool isGold =
  *	@param item_id				Item id to check
  *
  *	@return true if player has item toggled on and false otherwise
-*/
+ */
 native bool Shop_IsClientItemToggled(int client, ItemId item_id);
 
 /**
@@ -236,7 +236,7 @@ native bool Shop_IsClientItemToggled(int client, ItemId item_id);
  *	@param item_id				Item id to check
  *
  *	@return true if player has item and false otherwise
-*/
+ */
 native bool Shop_IsClientHasItem(int client, ItemId item_id);
 
 /**
@@ -247,7 +247,7 @@ native bool Shop_IsClientHasItem(int client, ItemId item_id);
  *	@param toggle				Toggle state. See ToggleState enum
  *
  *	@return true on success and false otherwise
-*/
+ */
 native bool Shop_ToggleClientItem(int client, ItemId item_id, ToggleState toggle = Toggle);
 
 /**
@@ -257,7 +257,7 @@ native bool Shop_ToggleClientItem(int client, ItemId item_id, ToggleState toggle
  *	@param category_id			The category id
  *
  *	@noreturn
-*/
+ */
 native void Shop_ToggleClientCategoryOff(int client, CategoryId category_id);
 
 /**
@@ -266,7 +266,7 @@ native void Shop_ToggleClientCategoryOff(int client, CategoryId category_id);
  *	@param client				Client index to check
  *
 	@return	True if the player loaded, false otherwise
-*/
+ */
 native bool Shop_IsAuthorized(int client);
 
 /**
@@ -275,7 +275,7 @@ native bool Shop_IsAuthorized(int client);
  *	@param client				Client index to check
  *
 	@return	True if the player has access, false otherwise
-*/
+ */
 native bool Shop_IsAdmin(int client);
 
 /**
@@ -286,7 +286,7 @@ native bool Shop_IsAdmin(int client);
  *	@param by_who				Optional param to set by who the credits being given from
  *
  *	@return	New amount of credits
-*/
+ */
 native int Shop_GiveClientCredits(int client, int amount, int by_who = CREDITS_BY_NATIVE);
 
 /**
@@ -297,7 +297,7 @@ native int Shop_GiveClientCredits(int client, int amount, int by_who = CREDITS_B
  *	@param by_who				Optional param to set by who the credits being given from
  *
  *	@return	New amount of credits
-*/
+ */
 native int Shop_TakeClientCredits(int client, int amount, int by_who = CREDITS_BY_NATIVE);
 
 /**
@@ -306,7 +306,7 @@ native int Shop_TakeClientCredits(int client, int amount, int by_who = CREDITS_B
  *	@param client				Client index
  *
  *	@return	Amount of credits a player has, -1 on failure
-*/
+ */
 native int Shop_GetClientCredits(int client);
 
 /**
@@ -316,7 +316,7 @@ native int Shop_GetClientCredits(int client);
  *	@param credits				Amount of credits to set
  *
  *	@noreturn
-*/
+ */
 native void Shop_SetClientCredits(int client, int credits);
 
 /**
@@ -327,7 +327,7 @@ native void Shop_SetClientCredits(int client, int credits);
  *	@param by_who				Optional param to set by who the gold being given from
  *
  *	@return	New amount of gold
-*/
+ */
 native int Shop_GiveClientGold(int client, int amount, int by_who = CREDITS_BY_NATIVE);
 
 /**
@@ -338,7 +338,7 @@ native int Shop_GiveClientGold(int client, int amount, int by_who = CREDITS_BY_N
  *	@param by_who				Optional param to set by who the gold being given from
  *
  *	@return	New amount of gold
-*/
+ */
 native int Shop_TakeClientGold(int client, int amount, int by_who = CREDITS_BY_NATIVE);
 
 /**
@@ -347,7 +347,7 @@ native int Shop_TakeClientGold(int client, int amount, int by_who = CREDITS_BY_N
  *	@param client				Client index
  *
  *	@return	Amount of gold a player has, -1 on failure
-*/
+ */
 native int Shop_GetClientGold(int client);
 
 /**
@@ -357,7 +357,7 @@ native int Shop_GetClientGold(int client);
  *	@param amount				Amount of gold to set
  *
  *	@noreturn
-*/
+ */
 native void Shop_SetClientGold(int client, int amount);
 
 /**
@@ -367,7 +367,7 @@ native void Shop_SetClientGold(int client, int amount);
  *	@param item_id				The item id
  *
  *	@return	True if the player successfully bought, false otherwise
-*/
+ */
 native bool Shop_BuyClientItem(int client, ItemId item_id);
 
 /**
@@ -377,7 +377,7 @@ native bool Shop_BuyClientItem(int client, ItemId item_id);
  *	@param item_id				The item id
  *
  *	@return	True if the player successfully sold, false otherwise
-*/
+ */
 native bool Shop_SellClientItem(int client, ItemId item_id);
 
 /**
@@ -388,7 +388,7 @@ native bool Shop_SellClientItem(int client, ItemId item_id);
  *	@param count				Number of count to remove
  *
  *	@return	True on success, false otherwise
-*/
+ */
 native bool Shop_RemoveClientItem(int client, ItemId item_id, int count = 0);
 
 /**
@@ -399,7 +399,7 @@ native bool Shop_RemoveClientItem(int client, ItemId item_id, int count = 0);
  *	@param value				Count if the item is finite and duration if the item is togglable or non-togglable.
  *
  *	@return	True on success, false otherwise
-*/
+ */
 native bool Shop_GiveClientItem(int client, ItemId item_id, int value = 1);
 
 /**
@@ -409,7 +409,7 @@ native bool Shop_GiveClientItem(int client, ItemId item_id, int value = 1);
  *	@param item_id				The item id
  *
  *	@return	Amount of item that player has
-*/
+ */
 native int Shop_GetClientItemCount(int client, ItemId item_id);
 
 /**
@@ -419,7 +419,7 @@ native int Shop_GetClientItemCount(int client, ItemId item_id);
  *	@param item_id				The item id
  *
  *	@noreturn
-*/
+ */
 native void Shop_SetClientItemCount(int client, ItemId item_id, int count = 0);
 /**
  *	Forces a player to use an item
@@ -428,7 +428,7 @@ native void Shop_SetClientItemCount(int client, ItemId item_id, int count = 0);
  *	@param item_id				Item id to force for
  *
  *	@return true on success and false otherwise
-*/
+ */
 native bool Shop_UseClientItem(int client, ItemId item_id);
 
 /**
@@ -450,7 +450,7 @@ native ArrayList Shop_GetClientItems(int client);
  *	@param item_id				Item id of the item
  *
  *	@return true if a panel has been shown, false otherwise
-*/
+ */
 native bool Shop_ShowItemPanel(int client, ItemId item_id);
 
 /**
@@ -459,7 +459,7 @@ native bool Shop_ShowItemPanel(int client, ItemId item_id);
  *	@param client				Client index
  *
  *	@noreturn
-*/
+ */
 native void Shop_OpenMainMenu(int client);
 
 /**
@@ -468,7 +468,7 @@ native void Shop_OpenMainMenu(int client);
  *	@param client				Client index
  *
  *	@return true if categories has been shown, false otherwise
-*/
+ */
 native bool Shop_ShowCategory(int client);
 
 /**
@@ -477,7 +477,7 @@ native bool Shop_ShowCategory(int client);
  *	@param client				Client index
  *
  *	@return true if the inventory has been shown, false otherwise
-*/
+ */
 native bool Shop_ShowInventory(int client);
 
 /**
@@ -488,7 +488,7 @@ native bool Shop_ShowInventory(int client);
  *	@param inventory			To show items of his inventory
  *
  *	@return true if the items has been shown, false otherwise
-*/
+ */
 native bool Shop_ShowItemsOfCategory(int client, CategoryId category_id, bool inventory = false);
 
 /**
@@ -497,5 +497,5 @@ native bool Shop_ShowItemsOfCategory(int client, CategoryId category_id, bool in
  *	@param client				Client index to show to
  *
  *	@noreturn
-*/
+ */
 native void Shop_ShowFunctionsMenu(int client);
