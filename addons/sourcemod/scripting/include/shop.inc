@@ -1,4 +1,4 @@
-/*
+/**
 	Library of the [Shop] Core v3
 	Author: FrozDark
 	www.hlmod.ru
@@ -23,36 +23,36 @@ enum ItemId
 
 enum ItemType
 {
-	Item_None = 0,			// For nothing is used
-	Item_Finite = 1,		// Can only be used, they have quantity
-	Item_Togglable = 2,		// Can be toggleable, turn on or off
-	Item_BuyOnly = 3		// Can only be bought
+	Item_None = 0,			// For nothing is used.
+	Item_Finite = 1,		// Can only be used, they have quantity.
+	Item_Togglable = 2,		// Can be toggleable, turn on or off.
+	Item_BuyOnly = 3		// Can only be bought.
 }
 
 enum ToggleState
 {
-	Toggle,					// Toggleable in reverse position
-	Toggle_On,				// Turn on
-	Toggle_Off				// Turn off
+	Toggle,					// Toggleable in reverse position.
+	Toggle_On,				// Turn on.
+	Toggle_Off				// Turn off.
 }
 
 enum ShopAction
 {
-	Shop_Raw = 0,			// Cancel use or toggleable
-	Shop_UseOn = 1,			// Confirm Item Enablement
-	Shop_UseOff = 2			// Confirm item deactivation
+	Shop_Raw = 0,			// Cancel use or toggleable.
+	Shop_UseOn = 1,			// Confirm Item Enablement.
+	Shop_UseOff = 2			// Confirm item deactivation.
 }
 
 enum ShopMenu
 {
 	Menu_Main,				// Main menu (first menu by sm_shop command)
-	Menu_Buy,				// Buy Menu
-	Menu_Inventory,			// Player Inventory
-	Menu_Functions,			// Shop menu functions
-	Menu_ExtraFunctions,	// Extra shop menu functions
-	Menu_AdminPanel,		// Admin panel in the menu
-	Menu_CreditsTransfer,	// Credit transfer menu
-	Menu_ItemTransfer		// Item transfer menu
+	Menu_Buy,				// Buy Menu.
+	Menu_Inventory,			// Player Inventory.
+	Menu_Functions,			// Shop menu functions.
+	Menu_ExtraFunctions,	// Extra shop menu functions.
+	Menu_AdminPanel,		// Admin panel in the menu.
+	Menu_CreditsTransfer,	// Credit transfer menu.
+	Menu_ItemTransfer		// Item transfer menu.
 }
 
 #define	IGNORE_FORWARD_HOOK	-5				//**< Param to set to avoid calling forward hook */
@@ -72,7 +72,7 @@ enum ShopMenu
 #include <shop/methodmaps>
 
 /**
- *	Called when the shop is ready to register items
+ *	Called when the shop is ready to register items.
  *
  *	@noparams
  *
@@ -81,16 +81,16 @@ enum ShopMenu
 forward void Shop_Started();
 
 /**
- *	Checks whether the shop has been started
+ *	Checks whether the shop has been started.
  *
  *	@noparams
  *
- *	@return	True if the shop is already started, false otherwise
+ *	@return	True if the shop is already started, false otherwise.
  */
 native bool Shop_IsStarted();
 
 /**
- *	This must be called on PluginEnd. Fully unregisters the plugin. Unregisters items, categories and removes them from the shop and players' inventory
+ *	This must be called on PluginEnd. Fully unregisters the plugin. Unregisters items, categories and removes them from the shop and players' inventory.
  *
  *	@noparams
  *
@@ -99,11 +99,11 @@ native bool Shop_IsStarted();
 native void Shop_UnregisterMe();
 
 /**
- *	Get path to the main config folder of the Shop
+ *	Get path to the main config folder of the Shop.
  *
- *	@param buffer			Buffer to store the path in
- *	@param size				Max buffer length
- *	@param file				File to retrieve the path for
+ *	@param buffer			Buffer to store the path in.
+ *	@param size				Max buffer length.
+ *	@param file				File to retrieve the path for.
  *
  *	@noreturn
  */
