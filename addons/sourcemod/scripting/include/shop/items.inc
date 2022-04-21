@@ -363,7 +363,7 @@ native bool Shop_IsItemExists(ItemId item_id);
  *
  *	@param category_id			Category id
  *
- *	@return True if item is exists, false otherwise
+ *	@return True if category is exists, false otherwise
  */
 native bool Shop_IsValidCategory(CategoryId category_id);
 
