@@ -26,8 +26,8 @@ native ShopDBType Shop_GetDatabaseType();
 /**
  *	Get the database prefix
  *	
- *	@param buffer			Buffer to store the prefix in
- *	@param maxlength		Max buffer length
+ *	@param buffer				Buffer to store the prefix in
+ *	@param maxlength			Max buffer length
  *	
  *	@return	Number of bytes written
 */

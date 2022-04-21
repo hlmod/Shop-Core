@@ -1,11 +1,11 @@
 /**
  *	Called when an item is being drawn
  *	
- *	@param client			Client index an item is being drawn to
- *	@param menu_action		Menu performing this action
- *	@param category_id		Category id of an item
- *	@param item_id			Item id of an item
- *	@param disable			Whether an item should be disabled of to be selected
+ *	@param client				Client index an item is being drawn to
+ *	@param menu_action			Menu performing this action
+ *	@param category_id			Category id of an item
+ *	@param item_id				Item id of an item
+ *	@param disable				Whether an item should be disabled of to be selected
  *	
  *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block an item to shown. Plugin_Continue otherwise
 */
@@ -14,10 +14,10 @@ forward Action Shop_OnItemDraw(int client, ShopMenu menu_action, CategoryId cate
 /**
  *	Called when an item is being select
  *	
- *	@param client			Client index an item is being select to
- *	@param menu_action		Menu performing this action
- *	@param category_id		Category id of an item
- *	@param item_id			Item id of an item
+ *	@param client				Client index an item is being select to
+ *	@param menu_action			Menu performing this action
+ *	@param category_id			Category id of an item
+ *	@param item_id				Item id of an item
  *	
  *	@return Plugin_Handled to block an item to select, and show items of category. Plugin_Stop to close menu. Plugin_Continue or Plugin_Changed otherwise
 */
@@ -26,10 +26,10 @@ forward Action Shop_OnItemSelect(int client, ShopMenu menu_action, CategoryId ca
 /**
  *	Called when an item is being select
  *	
- *	@param client			Client index an item is being select to
- *	@param menu_action		Menu performing this action
- *	@param category_id		Category id of an item
- *	@param item_id			Item id of an item
+ *	@param client				Client index an item is being select to
+ *	@param menu_action			Menu performing this action
+ *	@param category_id			Category id of an item
+ *	@param item_id				Item id of an item
  *	
  *	@noreturn
 */
@@ -38,13 +38,13 @@ forward void Shop_OnItemSelected(int client, ShopMenu menu_action, CategoryId ca
 /**
  *	Called when an item is being displayd
  *	
- *	@param client			Client index an item is being displayed to
- *	@param menu_action		Menu performing this action
- *	@param category_id		Category id of an item
- *	@param item_id			Item id of an item
- *	@param display			Display name being shown
- *	@param buffer			Buffer to store new display name
- *	@param maxlength		Max length of the buffer
+ *	@param client				Client index an item is being displayed to
+ *	@param menu_action			Menu performing this action
+ *	@param category_id			Category id of an item
+ *	@param item_id				Item id of an item
+ *	@param display				Display name being shown
+ *	@param buffer				Buffer to store new display name
+ *	@param maxlength			Max length of the buffer
  *	
  *	@return true to apply new display name, false otherwise
 */
@@ -53,13 +53,13 @@ forward bool Shop_OnItemDisplay(int client, ShopMenu menu_action, CategoryId cat
 /**
  *	Called when an item's description is being displayd
  *	
- *	@param client			Client index an item's description is being displayed to
- *	@param menu_action		Menu performing this action
- *	@param category_id		Category id of an item
- *	@param item_id			Item id of an item
- *	@param description		Description being shown
- *	@param buffer			Buffer to store new description
- *	@param maxlength		Max length of the buffer
+ *	@param client				Client index an item's description is being displayed to
+ *	@param menu_action			Menu performing this action
+ *	@param category_id			Category id of an item
+ *	@param item_id				Item id of an item
+ *	@param description			Description being shown
+ *	@param buffer				Buffer to store new description
+ *	@param maxlength			Max length of the buffer
  *	
  *	@return true to apply new description, false otherwise
 */
@@ -68,17 +68,17 @@ forward bool Shop_OnItemDescription(int client, ShopMenu menu_action, CategoryId
 /**
  *	Called when an item is being bought
  *	
- *	@param client			Client index that performing this
- *	@param category_id		Category id of an item
- *	@param category			Category unique name
- *	@param item_id			Item id of an item
- *	@param item				Item's unique name
- *	@param type				Item type
- *	@param price			Price of the item. Set by reference
- *	@param sell_price		Sell price of the item. Set by reference
- *	@param value			Count if the item is finite and duration if the item is togglable or non-togglable. Set by reference
- *	@param gold_price		Gold price of the item. Set by reference
-*	@param gold_sell_price	Gold sell price of the item. Set by reference
+ *	@param client				Client index that performing this
+ *	@param category_id			Category id of an item
+ *	@param category				Category unique name
+ *	@param item_id				Item id of an item
+ *	@param item					Item's unique name
+ *	@param type					Item type
+ *	@param price				Price of the item. Set by reference
+ *	@param sell_price			Sell price of the item. Set by reference
+ *	@param value				Count if the item is finite and duration if the item is togglable or non-togglable. Set by reference
+ *	@param gold_price			Gold price of the item. Set by reference
+*	@param gold_sell_price		Gold sell price of the item. Set by reference
  *	
  *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block. Plugin_Continue otherwise
 */
@@ -87,14 +87,14 @@ forward Action Shop_OnItemBuy(int client, CategoryId category_id, const char[] c
 /**
  *	Called when an item is being bought
  *	
- *	@param client			Client index that performing this
- *	@param category_id		Category id of an item
- *	@param category			Category unique name
- *	@param item_id			Item id of an item
- *	@param item				Item's unique name
- *	@param type				Item type
- *	@param sell_price		Sell price of the item. Set by reference
- *	@param gold_sell_price  Gold sell price of the item. Set by reference
+ *	@param client				Client index that performing this
+ *	@param category_id			Category id of an item
+ *	@param category				Category unique name
+ *	@param item_id				Item id of an item
+ *	@param item					Item's unique name
+ *	@param type					Item type
+ *	@param sell_price			Sell price of the item. Set by reference
+ *	@param gold_sell_price  	Gold sell price of the item. Set by reference
  *	
  *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block. Plugin_Continue otherwise
 */
@@ -103,12 +103,12 @@ forward Action Shop_OnItemSell(int client, CategoryId category_id, const char[] 
 /**
  *	Called when an item has been toggled
  *	
- *	@param client			Client index that performing this
- *	@param category_id		Category id of an item
- *	@param category			Category unique name
- *	@param item_id			Item id of an item
- *	@param item				Item's unique name
- *	@param toggle			State of the toggle. See ToggleState enum
+ *	@param client				Client index that performing this
+ *	@param category_id			Category id of an item
+ *	@param category				Category unique name
+ *	@param item_id				Item id of an item
+ *	@param item					Item's unique name
+ *	@param toggle				State of the toggle. See ToggleState enum
  *	
  *	@noreturn
 */
@@ -117,11 +117,11 @@ forward void Shop_OnItemToggled(int client, CategoryId category_id, const char[]
 /**
  *	Called when an item has been elapsed
  *	
- *	@param client			Client index whose item has been elapsed
- *	@param category_id		Category id of an item
- *	@param category			Category unique name
- *	@param item_id			Item id of an item
- *	@param item				Item's unique name
+ *	@param client				Client index whose item has been elapsed
+ *	@param category_id			Category id of an item
+ *	@param category				Category unique name
+ *	@param item_id				Item id of an item
+ *	@param item					Item's unique name
  *	
  *	@noreturn
 */
@@ -130,9 +130,9 @@ forward void Shop_OnItemElapsed(int client, CategoryId category_id, const char[]
 /**
  *	Called when a player is transferring an item
  *	
- *	@param client			Origin player
- *	@param target			Destination player
- *	@param item_id			Item id of an item
+ *	@param client				Origin player
+ *	@param target				Destination player
+ *	@param item_id				Item id of an item
  *	
  *	@return true to allow transfer and false to block
 */
@@ -141,9 +141,9 @@ forward bool Shop_OnItemTransfer(int client, int target, ItemId item_id);
 /**
  *	Called when a player has transfered an item
  *	
- *	@param client			Origin player
- *	@param target			Destination player
- *	@param item_id			Item id of an item
+ *	@param client				Origin player
+ *	@param target				Destination player
+ *	@param item_id				Item id of an item
  *	
  *	@noreturn
 */
@@ -361,7 +361,7 @@ native bool Shop_IsItemExists(ItemId item_id);
 /**
  *	Whether the category is valid (registered)
  *	
- *	@param category_id				Category id
+ *	@param category_id			Category id
  *	
  *	@return True if item is exists, false otherwise
 */
@@ -370,8 +370,8 @@ native bool Shop_IsValidCategory(CategoryId category_id);
 /**
  *	Gets item id of the item unique name
  *	
- *	@param category_id				Category id where the item is registered
- *	@param item						Item unique name to get for
+ *	@param category_id			Category id where the item is registered
+ *	@param item					Item unique name to get for
  *	
  *	@return Item id of the item
 */
@@ -421,7 +421,7 @@ native bool Shop_GetItemCanLuck(ItemId item_id);
  *	Set feature "Try luck"
  *	
  *	@param item_id				Item id to set for
- *	@param bCanLuck			true - available, false - restricted
+ *	@param bCanLuck				true - available, false - restricted
  *	
  *	@noreturn
 */
@@ -440,7 +440,7 @@ native bool Shop_GetItemHide(ItemId item_id);
  *	Set feature "Hide"
  *	
  *	@param item_id				Item id to set for
- *	@param state			true - to hide item, false - to show in buyable list
+ *	@param state				true - to hide item, false - to show in buyable list
  *	
  *	@noreturn
 */
@@ -489,7 +489,7 @@ native bool Shop_GetCategoryNameById(CategoryId category_id, char[] buffer, int 
 /**
  *	Fills an adt_array by the item ids. Note that array is cleared before being filled
  *	
- *	@param array			ADT array to use
+ *	@param array				ADT array to use
  *	
  *	@return Number of bytes that written to ArrayList
 */
@@ -498,11 +498,11 @@ native int Shop_FillArrayByItems(ArrayList array);
 /**
  *	Formats item display name to use in menu
  *	
- *	@param client			Client index to get format for
- *	@param item_id			Item id to format
- *	@param menu				Menu to get formatted for
- *	@param buffer			Buffer to store the result in
- *	@param maxlength		Max length of the buffer
+ *	@param client				Client index to get format for
+ *	@param item_id				Item id to format
+ *	@param menu					Menu to get formatted for
+ *	@param buffer				Buffer to store the result in
+ *	@param maxlength			Max length of the buffer
  *	
  *	@return True if item formatted, false if param menu is Menu_Inventory and the player has not this item and the item is not formatted
 */
@@ -511,7 +511,7 @@ native bool Shop_FormatItem(int client, ItemId item_id, ShopMenu menu, char[] bu
 /**
  *	Creates and ADT array of item ids
  *	
- *	@param size			Optional param to store array size
+ *	@param size					Optional param to store array size
  *	
  *	@return ArrayList
 */
@@ -525,8 +525,8 @@ stock ArrayList Shop_CreateArrayOfItems(int &size = 0)
 /**
  *	Retrieves an item id from an array
  *	
- *	@param array			Array handle
- *	@param index			Index in the array
+ *	@param array				Array handle
+ *	@param index				Index in the array
  *	
  *	@return Item id
 */

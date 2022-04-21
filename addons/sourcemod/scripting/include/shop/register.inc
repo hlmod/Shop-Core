@@ -31,8 +31,8 @@ typeset Shop_ItemSellCallback
  *	Called when category registered at first time
  *  That means only once per unique name
  *	
- *	@param category_id		CategoryId of category
- *	@param name				Unique name of category
+ *	@param category_id			CategoryId of category
+ *	@param name					Unique name of category
  *	
  *	@noreturn
 */
@@ -42,10 +42,10 @@ forward void Shop_OnCategoryRegistered(CategoryId category_id, const char[] name
  *	Called when item registered at first time
  *  That means only once per unique name
  *	
- *	@param category_id		CategoryId of category
- *	@param category			Unique name of category
- *	@param item_id			ItemId of item
- *	@param item				Unique name of item
+ *	@param category_id			CategoryId of category
+ *	@param category				Unique name of category
+ *	@param item_id				ItemId of item
+ *	@param item					Unique name of item
  *	
  *	@noreturn
 */
@@ -135,7 +135,7 @@ native void Shop_SetCallbacks(Shop_ItemRegister register=INVALID_FUNCTION,
 /**
  *	Allows to hide item in buy panel, givable only by native or admin panel
  *	
- *	@param state			true - hide, false - show
+ *	@param state				true - hide, false - show
  *	
  *	@noreturn
 */
@@ -144,8 +144,8 @@ native void Shop_SetHide(bool state);
 /**
  *	Sets item custom info
  *	
- *	@param info			Name of the key
- *	@param value			Value to set
+ *	@param info					Name of the key
+ *	@param value				Value to set
  *	
  *	@noreturn
 */
@@ -154,8 +154,8 @@ native void Shop_SetCustomInfo(const char[] info, int value);
 /**
  *	Sets item custom info
  *	
- *	@param info			Name of the key
- *	@param value			Value to set
+ *	@param info					Name of the key
+ *	@param value				Value to set
  *	
  *	@noreturn
 */
@@ -164,8 +164,8 @@ native void Shop_SetCustomInfoFloat(const char[] info, float value);
 /**
  *	Sets item custom info
  *	
- *	@param info			Name of the key
- *	@param value			Value to set
+ *	@param info					Name of the key
+ *	@param value				Value to set
  *	
  *	@noreturn
 */
@@ -174,8 +174,8 @@ native void Shop_SetCustomInfoString(const char[] info, char[] value);
 /**
  *	Copies sub keys of the given kv structure to the item
  *	
- *	@param info			Name of the key
- *	@param value			Value to set
+ *	@param info					Name of the key
+ *	@param value				Value to set
  *	
  *	@noreturn
 */
