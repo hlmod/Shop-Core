@@ -53,7 +53,7 @@ forward void Shop_OnCreditsTransfered(int client, int target, int amount_give, i
  *
  *	@param client				Client index who is being set to
  *	@param credits				Amount of credits a client is being set to. By reference
- *	@param by_who				See CREDITS_BY_* definitions for more info and any higher value is the admin index
+ *	@param by_who				See CREDITS_BY_*	definitions for more info and any higher value is the admin index
  *
  *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block
 */
@@ -64,7 +64,7 @@ forward Action Shop_OnCreditsSet(int client, int &credits, int by_who);
  *
  *	@param client				Client index who is been set
  *	@param credits				Amount of credits a client is been set
- *	@param by_who				See CREDITS_BY_* definitions for more info and any higher value is the admin index
+ *	@param by_who				See CREDITS_BY_*	definitions for more info and any higher value is the admin index
  *
  *	@noreturn
 */
@@ -75,7 +75,7 @@ forward void Shop_OnCreditsSet_Post(int client, int credits, int by_who);
  *
  *	@param client				Client index who is being given to
  *	@param credits				Amount of credits a client is being given to. By reference
- *	@param by_who				See CREDITS_BY_* definitions for more info and any higher values is the admin index
+ *	@param by_who				See CREDITS_BY_*	definitions for more info and any higher values is the admin index
  *
  *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block
 */
@@ -86,7 +86,7 @@ forward Action Shop_OnCreditsGiven(int client, int &credits, int by_who);
  *
  *	@param client				Client index who is been given
  *	@param credits				Amount of credits a client is been given
- *	@param by_who				See CREDITS_BY_* definitions for more info and any higher values is the admin index
+ *	@param by_who				See CREDITS_BY_*	definitions for more info and any higher values is the admin index
  *
  *	@return noreturn
 */
@@ -97,7 +97,7 @@ forward void Shop_OnCreditsGiven_Post(int client, int credits, int by_who);
  *
  *	@param client				Client index who is being taken from
  *	@param credits				Amount of credits a client is being taken for. By reference
- *	@param by_who				See CREDITS_BY_* definitions for more info and any higher value is the admin index
+ *	@param by_who				See CREDITS_BY_*	definitions for more info and any higher value is the admin index
  *
  *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block
 */
@@ -108,7 +108,7 @@ forward Action Shop_OnCreditsTaken(int client, int &credits, int by_who);
  *
  *	@param client				Client index who is been taken
  *	@param credits				Amount of credits a client is been taken
- *	@param by_who				See CREDITS_BY_* definitions for more info and any higher value is the admin index
+ *	@param by_who				See CREDITS_BY_*	definitions for more info and any higher value is the admin index
  *
  *	@return noreturn
 */
@@ -119,7 +119,7 @@ forward void Shop_OnCreditsTaken_Post(int client, int credits, int by_who);
  *
  *	@param client				Client index who is being set to
  *	@param amount				Amount of gold a client is being set to. By reference
- *	@param by_who				See CREDITS_BY_* definitions for more info and any higher value is the admin index
+ *	@param by_who				See CREDITS_BY_*	definitions for more info and any higher value is the admin index
  *
  *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block
 */
@@ -130,7 +130,7 @@ forward Action Shop_OnGoldSet(int client, int &amount, int by_who);
  *
  *	@param client				Client index who is being given to
  *	@param amount				Amount of gold a client is being given to. By reference
- *	@param by_who				See CREDITS_BY_* definitions for more info and any higher values is the admin index
+ *	@param by_who				See CREDITS_BY_*	definitions for more info and any higher values is the admin index
  *
  *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block
 */
@@ -141,7 +141,7 @@ forward Action Shop_OnGoldGiven(int client, int &amount, int by_who);
  *
  *	@param client				Client index who is being taken from
  *	@param amount				Amount of gold a client is being taken for. By reference
- *	@param by_who				See CREDITS_BY_* definitions for more info and any higher value is the admin index
+ *	@param by_who				See CREDITS_BY_*	definitions for more info and any higher value is the admin index
  *
  *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block
 */
@@ -213,7 +213,7 @@ native int Shop_GetClientItemTimeleft(int client, ItemId item_id);
  *
  *	@param client				Client index to get from
  *	@param item_id				Item id to get for
- *  @param isGold				True to retrieve gold value, false to get credits
+ *	@param isGold				True to retrieve gold value, false to get credits
  *
  *	@return sell price of the item
 */
@@ -432,14 +432,14 @@ native void Shop_SetClientItemCount(int client, ItemId item_id, int count = 0);
 native bool Shop_UseClientItem(int client, ItemId item_id);
 
 /**
- * Returns the array with player item ids.
- * Must be freed via CloseHandle() / delete / Handle.Close().
+ *	Returns the array with player item ids.
+ *	Must be freed via CloseHandle() / delete / Handle.Close().
  *
- * @param	client				Client index
+ *	@param	client				Client index
  *
- * @return	ArrayList handle with item ids.
- * @error	Client is not connected/not loaded.
- * @note	If player has not items - array returned too, but empty.
+ *	@return	ArrayList handle with item ids.
+ *	@error	Client is not connected/not loaded.
+ *	@note	If player has not items - array returned too, but empty.
  */
 native ArrayList Shop_GetClientItems(int client);
 
