@@ -2,7 +2,7 @@
 methodmap CategoryId __nullable__
 {
 	// Registers new category id
-	// 
+	//
 	// @param category				Category unique name
 	// @param name					Default category display name
 	// @param description			Default category description
@@ -11,46 +11,46 @@ methodmap CategoryId __nullable__
 	// @param cat_should			Callback called whether the category should be displayed to a player
 	// @param cat_select			Callback called when a player is trying to select the category
 	// @return					  	Category id of the category
-	public native CategoryId(const char[] category, const char[] name, const char[] description, 
-							 Shop_CategoryDisplayCallback cat_display=INVALID_FUNCTION, 
+	public native CategoryId(const char[] category, const char[] name, const char[] description,
+							 Shop_CategoryDisplayCallback cat_display=INVALID_FUNCTION,
 							 Shop_CategoryDescriptionCallback cat_desc=INVALID_FUNCTION,
 							 Shop_CategoryShouldDisplayCallback cat_should=INVALID_FUNCTION,
 							 Shop_CategorySelectCallback cat_select=INVALID_FUNCTION);
 
 	// Starts an item to register
-	// 
+	//
  	// @param item					Item unique name
  	// @return true to success, false otherwise
 	public native bool NewItem(const char[] item);
 
 	// Gets item id of the item unique name from category_id
-	// 
+	//
 	// @param item					Item unique name to get for
 	// @return					  	Item id of the item
 	public native ItemId GetItemId(const char[] item);
 
 	// Gets the category unique name by its id
-	// 
+	//
 	// @param category				Category unique name
 	// @return					  	Category id of the category
 	public static native CategoryId GetByUnique(char[] category);
 
 	// Gets the category unique name by its id
-	// 
+	//
 	// @param buffer				Buffer to store the unique name
 	// @param maxlength				Max length of the buffer
 	// @return					  	True on success, false otherwise
 	public native bool GetUniqueName(char[] buffer, int maxlength);
 
 	// Gets the category name by its id
-	// 
+	//
 	// @param buffer				Buffer to store the unique name
 	// @param maxlength				Max length of the buffer
 	// @return					  	True on success, false otherwise
 	public native bool GetDisplayName(char[] buffer, int maxlength);
 
 	// Toggles all items of category off
-	// 
+	//
 	// @param client				Client index
 	// @noreturn
 	public void ToggleOff(int client) {
@@ -66,35 +66,35 @@ methodmap CategoryId __nullable__
 methodmap ItemId __nullable__
 {
 	// Gets an item custom info
-	// 
+	//
 	// @param info					Info key to get
 	// @param defaultvalue			Optional default value to use if the key is not found
 	// @return					 	Integer value of the key
 	public native int GetCustomInfo(const char[] info, int defaultvalue = 0);
 
 	// Sets an item custom info
-	// 
+	//
 	// @param info					Info key to get
 	// @param value					Value to set
 	// @noreturn
 	public native void SetCustomInfo(const char[] info, int value);
 
 	// Gets an item custom info
-	// 
+	//
 	// @param info					Info key to get
 	// @param defaultvalue			Optional default value to use if the key is not found
 	// @return					  	Float value of the key
 	public native float GetCustomInfoFloat(const char[] info, float defaultvalue = 0.0);
 
 	// Sets an item custom info
-	// 
+	//
 	// @param info					Info key to get
 	// @param value					Value to set
 	// @noreturn
 	public native void SetCustomInfoFloat(const char[] info, float value);
 
 	// Gets an item custom info
-	// 
+	//
 	// @param info					Info key to get
 	// @param buffer				Buffer to store the value in
 	// @param maxlength				Max length of the buffer
@@ -103,27 +103,27 @@ methodmap ItemId __nullable__
 	public native int GetCustomInfoString(const char[] info, char[] buffer, int maxlength, const char[] defaultvalue = "");
 
 	// Sets an item custom info
-	// 
+	//
 	// @param info					Info key to get
 	// @param value					Value to set
 	// @noreturn
 	public native void SetCustomInfoString(const char[] info, const char[] value);
 
 	// Copies SubKeys of a KeyValue structure to the item info
-	// 
+	//
 	// @param kv					KeyValue structure to copy
 	// @return					  	true on success, false otherwise
 	public native bool KvCopyCustomInfo(KeyValues kv);
 
 	// Gets the item unique name by its id
-	// 
+	//
 	// @param buffer				Buffer to store the unique name
 	// @param maxlength				Max length of the buffer
 	// @return					  	Number of bytes written
 	public native int GetUniqueName(char[] buffer, int maxlength);
 
 	// Gets the item  name by its id
-	// 
+	//
 	// @param buffer				Buffer to store the unique name
 	// @param maxlength				Max length of the buffer
 	// @return					  	Number of bytes written
@@ -150,7 +150,7 @@ methodmap ItemId __nullable__
 	}
 
 	// Forces the player to buy the item from the shop
-	// 
+	//
 	// @param client				Client index
 	// @return						True if the player successfuly bought, false otherwise
 	public bool Buy(int client) {
@@ -158,7 +158,7 @@ methodmap ItemId __nullable__
 	}
 
 	// Forces the player to sell the item from the inventory
-	// 
+	//
 	// @param client				Client index
 	// @return						True if the player successfuly sold, false otherwise
 	public bool Sell(int client) {
@@ -166,7 +166,7 @@ methodmap ItemId __nullable__
 	}
 
 	// Forces a player to use an item
-	// 
+	//
 	// @param client				Client index to force to
 	// @return 						true on success and false otherwise
 	public bool Use(int client) {
@@ -174,7 +174,7 @@ methodmap ItemId __nullable__
 	}
 
 	// Remove the item from the player's inventory
-	// 
+	//
 	// @param client				Client index
 	// @param count					Number of count to remove
 	// @return						True on success, false otherwise
@@ -183,7 +183,7 @@ methodmap ItemId __nullable__
 	}
 
 	// Get's count of an item a player has
-	// 
+	//
 	// @param client				Client index
 	// @return						Amount of item that player has
 	public int GetCount(int client) {
@@ -191,15 +191,15 @@ methodmap ItemId __nullable__
 	}
 
 	// Set count of an item a player has
-	// 
+	//
 	// @param client				Client index
 	// @noreturn
 	public void SetCount(int client, int count = 0) {
 		Shop_SetClientItemCount(client, this, count);
 	}
-	
+
 	// Sets timeleft for an item. 0 to set no timelimit
-	// 
+	//
 	// @param client				Client index to set to
 	// @param timeleft				Timeleft to set. 0 to make it forever
 	// @param reset_duration		Reset duration
@@ -209,7 +209,7 @@ methodmap ItemId __nullable__
 	}
 
 	// Gets timeleft for an item
-	// 
+	//
 	// @param client				Client index to get from
 	// @return 						item timeleft in seconds. 0 if item has no timelimit
 	public int GetTimeLeft(int client) {
@@ -217,25 +217,25 @@ methodmap ItemId __nullable__
 	}
 
 	// Gets an absolute sell price for an item a player hold
-	// 
+	//
 	// @param client				Client index to get from
 	// @param isGold				True to retrieve gold value, false to get credits
-	// 		
+	//
 	// @return 						sell price of the item
 	public int GetSellPrice(int client, bool isGold = false) {
 		return Shop_GetClientItemSellPrice(client, this, isGold);
 	}
 
 	// Whether a player has toggled on an item
-	// 
+	//
 	// @param client				Client index to check to
 	// @return 						true if player has item toggled on and false otherwise
 	public bool IsToggled(int client) {
 		return Shop_IsClientItemToggled(client, this);
 	}
-	
+
 	// Whether a player has an item
-	// 
+	//
 	// @param client				Client index to check to
 	// @return 						true if player has item and false otherwise
 	public bool IsHas(int client) {
@@ -243,7 +243,7 @@ methodmap ItemId __nullable__
 	}
 
 	// Toggles a client's item
-	// 
+	//
 	// @param client				Client index
 	// @param toggle				Toggle state. See ToggleState enum
 	// @return 						true on success and false otherwise
@@ -268,7 +268,7 @@ methodmap ItemId __nullable__
 		public native set(int value);
 	}
 
-	// Get or set an item count if item is finite 
+	// Get or set an item count if item is finite
 	// and duration if item is togglable or non-togglable (-1 if duration is unlimited)
 	property int Value {
 		public native get();
@@ -291,7 +291,7 @@ methodmap ItemId __nullable__
 	property ItemType Type {
 		public native get();
 	}
-	
+
 	// Whether the item is exists (registered)
 	property bool Exist {
 		public native get();
