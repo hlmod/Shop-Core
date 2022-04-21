@@ -6,7 +6,7 @@
 #tryinclude <SteamWorks>
 #define REQUIRE_EXTENSIONS
 
-#define SHOP_VERSION "3.0E4"
+#define SHOP_VERSION "3.0E5"
 #define SHOP_MYSQL_CHARSET "utf8mb4"
 
 #pragma newdecls required
@@ -32,6 +32,12 @@ ConVar g_hAdminFlags;
 int g_iAdminFlags;
 ConVar g_hItemTransfer;
 int g_iItemTransfer;
+ConVar g_hConfirmBuy;
+bool g_bConfirmBuy;
+ConVar g_hConfirmSell;
+bool g_bConfirmSell;
+ConVar g_hConfirmTryLuck;
+bool g_bConfirmTryLuck;
 
 ConVar g_hHideCategoriesItemsCount;
 
@@ -228,6 +234,18 @@ void CreateConfigs()
 	g_hItemTransfer.AddChangeHook(OnConVarChange);
 	
 	g_hHideCategoriesItemsCount = CreateConVar("sm_shop_category_items_hideamount", "0", "Hide amount of items in category", 0, true, 0.0, true, 1.0);
+
+	g_hConfirmBuy = CreateConVar("sm_shop_confirm_buy", "1", "Enable confirm item purchase menu or not, Set this to 0 the client will purchase instantly after press buy button.", 0, true, 0.0, true, 1.0);
+	g_bConfirmBuy = g_hConfirmBuy.BoolValue;
+	g_hConfirmBuy.AddChangeHook(OnConVarChange);
+
+	g_hConfirmSell = CreateConVar("sm_shop_confirm_sell", "1", "Enable confirm item selling menu or not, Set this to 0 the client will sell item instantly after press sell button.", 0, true, 0.0, true, 1.0);
+	g_bConfirmSell = g_hConfirmSell.BoolValue;
+	g_hConfirmSell.AddChangeHook(OnConVarChange);
+
+	g_hConfirmTryLuck = CreateConVar("sm_shop_confirm_tryluck", "1", "Enable confirm try luck menu or not, Set this to 0 the client will try a luck instantly after press a button.", 0, true, 0.0, true, 1.0);
+	g_bConfirmTryLuck = g_hConfirmTryLuck.BoolValue;
+	g_hConfirmTryLuck.AddChangeHook(OnConVarChange);
 	
 	KeyValues kv_settings = new KeyValues("Settings");
 	Shop_GetCfgFile(sBuffer, sizeof(sBuffer), "settings.txt");
@@ -251,6 +269,18 @@ public void OnConVarChange(ConVar convar, const char[] oldValue, const char[] ne
 	else if (convar == g_hItemTransfer)
 	{
 		g_iItemTransfer = convar.IntValue;
+	}
+	else if (convar == g_hConfirmBuy)
+	{
+		g_bConfirmBuy = convar.BoolValue;
+	}
+	else if (convar == g_hConfirmSell)
+	{
+		g_bConfirmSell = convar.BoolValue;
+	}
+	else
+	{
+		g_bConfirmTryLuck = convar.BoolValue;
 	}
 }
 
@@ -821,6 +851,9 @@ public int OnItemSelect(Menu menu, MenuAction action, int param1, int param2)
 
 int iButton[MAXPLAYERS+1][11];
 
+#define CONFIRM_YES 1
+#define CONFIRM_NO 2
+
 bool ShowItemInfo(int client, int item_id)
 {
 	Panel panel = ItemManager_CreateItemPanelInfo(client, item_id, bInv[client] ? Menu_Inventory : Menu_Buy);
@@ -1107,14 +1140,29 @@ public int ItemPanel_Handler(Menu menu, MenuAction action, int param1, int param
 			{
 				case BUTTON_BUY :
 				{
-					BuyItem(param1, iClItemId[param1], false);
-					ShowItemInfo(param1, iClItemId[param1]);
+					if (g_bConfirmBuy)
+					{
+						ConfirmBuy(param1, iClItemId[param1]);
+					}
+					else
+					{
+						BuyItem(param1, iClItemId[param1], false);
+						ShowItemInfo(param1, iClItemId[param1]);
+					}
 				}
 				case BUTTON_SELL :
 				{
 					if (has)
 					{
-						SellItem(param1, iClItemId[param1]);
+						if (g_bConfirmSell)
+						{
+							ConfirmSell(param1, iClItemId[param1]);
+						}
+						else
+						{
+							SellItem(param1, iClItemId[param1]);
+							ShowItemInfo(param1, iClItemId[param1]);
+						}
 					}
 					if (bInv[param1] && PlayerManager_GetItemCount(param1, iClItemId[param1]) < 1)
 					{
@@ -1123,10 +1171,6 @@ public int ItemPanel_Handler(Menu menu, MenuAction action, int param1, int param
 							ShowMainMenu(param1);
 							CPrintToChat(param1, "%t", "EmptyInventory");
 						}
-					}
-					else
-					{
-						ShowItemInfo(param1, iClItemId[param1]);
 					}
 				}
 				case BUTTON_PREVIEW :
@@ -1194,6 +1238,144 @@ public int ItemPanel_Handler(Menu menu, MenuAction action, int param1, int param
 					}
 				}
 			}
+		}
+	}
+}
+
+void ConfirmBuy(int client, int item_id)
+{
+	Panel panel = ItemManager_ConfirmItemPanelInfo(client, item_id, Menu_Buy, true);
+
+	if (panel == null)
+		return;
+
+	char sBuffer[256], sItemId[16];
+	IntToString(item_id, sItemId, sizeof(sItemId));
+	
+	SetGlobalTransTarget(client);
+	
+	int credits = GetCredits(client);
+	
+	FormatEx(sBuffer, sizeof(sBuffer), "%t\n ", "credits", credits);
+	panel.SetTitle(sBuffer, false);
+	
+	ItemType type = ItemManager_GetItemTypeEx(sItemId);
+
+	panel.DrawItem(" ", ITEMDRAW_SPACER|ITEMDRAW_RAWLINE);
+
+	if(type == Item_Finite)
+	{
+		int count = PlayerManager_GetItemCountEx(client, sItemId);
+		FormatEx(sBuffer, sizeof(sBuffer), "%t: %d", "You have", count);
+		panel.DrawText(sBuffer);
+		
+		panel.DrawItem(" ", ITEMDRAW_SPACER|ITEMDRAW_RAWLINE);
+	}
+		
+	FormatEx(sBuffer, sizeof(sBuffer), "%t", "You Buy Sure");
+	panel.DrawText(sBuffer);
+
+	FormatEx(sBuffer, sizeof(sBuffer), "%t", "Yes");
+	panel.DrawItem(sBuffer);
+
+	FormatEx(sBuffer, sizeof(sBuffer), "%t", "No");
+	panel.DrawItem(sBuffer);
+
+	iClItemId[client] = item_id;
+	
+	panel.Send(client, BuyConfirmPanel_Handler, MENU_TIME_FOREVER);
+	delete panel;
+}
+
+public int BuyConfirmPanel_Handler(Menu menu, MenuAction action, int param1, int param2)
+{
+	switch (action)
+	{
+		case MenuAction_Select :
+		{
+			switch (param2)
+			{
+				case CONFIRM_YES :
+				{
+					BuyItem(param1, iClItemId[param1], false);
+					ShowItemInfo(param1, iClItemId[param1]);
+				}
+				case CONFIRM_NO :
+				{
+					ShowItemInfo(param1, iClItemId[param1]);
+				}
+			}
+		}
+	}
+}
+
+void ConfirmSell(int client, int item_id)
+{
+	Panel panel = ItemManager_ConfirmItemPanelInfo(client, item_id, Menu_Buy, false);
+	
+	if (panel == null)
+		return;
+
+	char sBuffer[256], sItemId[16];
+	IntToString(item_id, sItemId, sizeof(sItemId));
+	
+	SetGlobalTransTarget(client);
+	
+	int credits = GetCredits(client);
+	
+	FormatEx(sBuffer, sizeof(sBuffer), "%t\n ", "credits", credits);
+	panel.SetTitle(sBuffer, false);
+	
+	ItemType type = ItemManager_GetItemTypeEx(sItemId);
+
+	panel.DrawItem(" ", ITEMDRAW_SPACER|ITEMDRAW_RAWLINE);
+	
+	if(type == Item_Finite)
+	{
+		int count = PlayerManager_GetItemCountEx(client, sItemId);
+		FormatEx(sBuffer, sizeof(sBuffer), "%t: %d", "You have", count);
+		panel.DrawText(sBuffer);
+		
+		panel.DrawItem(" ", ITEMDRAW_SPACER|ITEMDRAW_RAWLINE);
+	}
+
+	FormatEx(sBuffer, sizeof(sBuffer), "%t", "You Sell Sure");
+	panel.DrawText(sBuffer);
+
+	FormatEx(sBuffer, sizeof(sBuffer), "%t", "Yes");
+	panel.DrawItem(sBuffer);
+
+	FormatEx(sBuffer, sizeof(sBuffer), "%t", "No");
+	panel.DrawItem(sBuffer);
+	
+	iClItemId[client] = item_id;
+	
+	panel.Send(client, SellConfirmPanel_Handler, MENU_TIME_FOREVER);
+	delete panel;
+}
+
+public int SellConfirmPanel_Handler(Menu menu, MenuAction action, int param1, int param2)
+{
+	switch (action)
+	{
+		case MenuAction_Select :
+		{
+			switch (param2)
+			{
+				case CONFIRM_YES :
+				{
+					SellItem(param1, iClItemId[param1]);
+					ShowItemInfo(param1, iClItemId[param1]);
+				}
+				case CONFIRM_NO :
+				{
+					ShowItemInfo(param1, iClItemId[param1]);
+				}
+			}
+		}
+		case MenuAction_End :
+		{
+			delete menu;
 		}
 	}
 }

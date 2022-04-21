@@ -650,7 +650,7 @@ public int PlayerManager_ToggleClientCategoryOff(Handle plugin, int numParams)
 	h_KvClientItems[client].Rewind();
 }
 
-public int PlayerManager_GetClientItems(Handle plugin, int numParams)
+public any PlayerManager_GetClientItems(Handle plugin, int numParams)
 {
 	int client = GetNativeCell(1);
 	
@@ -673,7 +673,9 @@ public int PlayerManager_GetClientItems(Handle plugin, int numParams)
 		while (hKVItems.GotoNextKey());
 	}
 
-	return view_as<int>(hArrayItems);
+	ArrayList _hArrayItems = view_as<ArrayList>(CloneHandle(hArrayItems, plugin));
+	delete hArrayItems;
+	return _hArrayItems;
 }
 
 public Action PlayerManager_OnPlayerItemElapsed(Handle timer, DataPack dp)
