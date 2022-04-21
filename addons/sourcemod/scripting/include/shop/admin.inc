@@ -42,6 +42,7 @@ native bool Shop_RemoveFromAdminMenu(Shop_AdminDisplay callback_display, Shop_Ad
  *	Shows admin panel to a player
  *
  *	@param client				Client index to show to
+ *  @error                      Invalid player index
  *
  *	@noreturn
  */

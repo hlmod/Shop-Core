@@ -181,6 +181,7 @@ forward void Shop_OnClientItemLucked(int client, ItemId item_id);
  *	Gets a player's id for the database
  *
  *	@param client				Client index to get for
+ *  @error                      Invalid player index
  *
  *	@return player id in the database or 0 if client doesn't in database
  */
@@ -193,6 +194,8 @@ native int Shop_GetClientId(int client);
  *	@param item_id				Item id to set for
  *	@param timeleft				Timeleft to set. 0 to make it forever
  *	@param reset_duration		Reset duration
+ *  @error                      Invalid player index
+ *	@error						Invalid ItemId
  *
  *	@return True on success and false it client has not this item
  */
@@ -203,6 +206,8 @@ native bool Shop_SetClientItemTimeleft(int client, ItemId item_id, int timeleft,
  *
  *	@param client				Client index to get from
  *	@param item_id				Item id to get for
+ *  @error                      Invalid player index
+ *	@error						Invalid ItemId
  *
  *	@return item timeleft in seconds. 0 if item has no timelimit
  */
@@ -214,6 +219,8 @@ native int Shop_GetClientItemTimeleft(int client, ItemId item_id);
  *	@param client				Client index to get from
  *	@param item_id				Item id to get for
  *  @param isGold				True to retrieve gold value, false to get credits
+ *  @error                      Invalid player index
+ *	@error						Invalid ItemId
  *
  *	@return sell price of the item
  */
@@ -224,6 +231,8 @@ native int Shop_GetClientItemSellPrice(int client, ItemId item_id, bool isGold =
  *
  *	@param client				Client index to check to
  *	@param item_id				Item id to check
+ *  @error                      Invalid player index
+ *	@error						Invalid ItemId
  *
  *	@return true if player has item toggled on and false otherwise
  */
@@ -234,6 +243,8 @@ native bool Shop_IsClientItemToggled(int client, ItemId item_id);
  *
  *	@param client				Client index to check to
  *	@param item_id				Item id to check
+ *  @error                      Invalid player index
+ *	@error						Invalid ItemId
  *
  *	@return true if player has item and false otherwise
  */
@@ -245,6 +256,8 @@ native bool Shop_IsClientHasItem(int client, ItemId item_id);
  *	@param client				Client index
  *	@param item_id				Item id to toggle
  *	@param toggle				Toggle state. See ToggleState enum
+ *  @error                      Invalid player index
+ *	@error						Invalid ItemId
  *
  *	@return true on success and false otherwise
  */
@@ -255,6 +268,8 @@ native bool Shop_ToggleClientItem(int client, ItemId item_id, ToggleState toggle
  *
  *	@param client				Client index
  *	@param category_id			The category id
+ *  @error                      Invalid player index
+ *	@error						Invalid CategoryId
  *
  *	@noreturn
  */
@@ -264,6 +279,7 @@ native void Shop_ToggleClientCategoryOff(int client, CategoryId category_id);
  *	Checks whether the player has been loaded from database
  *
  *	@param client				Client index to check
+ *  @error                      Invalid player index
  *
 	@return	True if the player loaded, false otherwise
  */
@@ -273,6 +289,7 @@ native bool Shop_IsAuthorized(int client);
  *	Checks whether a player has access to admin panel
  *
  *	@param client				Client index to check
+ *  @error                      Invalid player index
  *
 	@return	True if the player has access, false otherwise
  */
@@ -284,6 +301,7 @@ native bool Shop_IsAdmin(int client);
  *	@param client				Client index
  *	@param amount				Amount to give
  *	@param by_who				Optional param to set by who the credits being given from
+ *  @error                      Invalid player index
  *
  *	@return	New amount of credits
  */
@@ -295,6 +313,7 @@ native int Shop_GiveClientCredits(int client, int amount, int by_who = CREDITS_B
  *	@param client				Client index
  *	@param amount				Amount to take
  *	@param by_who				Optional param to set by who the credits being given from
+ *  @error                      Invalid player index
  *
  *	@return	New amount of credits
  */
@@ -304,6 +323,7 @@ native int Shop_TakeClientCredits(int client, int amount, int by_who = CREDITS_B
  *	Gets the amount of credits of the player
  *
  *	@param client				Client index
+ *  @error                      Invalid player index
  *
  *	@return	Amount of credits a player has, -1 on failure
  */
@@ -314,6 +334,7 @@ native int Shop_GetClientCredits(int client);
  *
  *	@param client				Client index
  *	@param credits				Amount of credits to set
+ *  @error                      Invalid player index
  *
  *	@noreturn
  */
@@ -325,6 +346,7 @@ native void Shop_SetClientCredits(int client, int credits);
  *	@param client				Client index
  *	@param amount				Amount to give
  *	@param by_who				Optional param to set by who the gold being given from
+ *  @error                      Invalid player index
  *
  *	@return	New amount of gold
  */
@@ -336,6 +358,7 @@ native int Shop_GiveClientGold(int client, int amount, int by_who = CREDITS_BY_N
  *	@param client				Client index
  *	@param amount				Amount to take
  *	@param by_who				Optional param to set by who the gold being given from
+ *  @error                      Invalid player index
  *
  *	@return	New amount of gold
  */
@@ -345,6 +368,7 @@ native int Shop_TakeClientGold(int client, int amount, int by_who = CREDITS_BY_N
  *	Gets the amount of gold of the player
  *
  *	@param client				Client index
+ *  @error                      Invalid player index
  *
  *	@return	Amount of gold a player has, -1 on failure
  */
@@ -355,6 +379,7 @@ native int Shop_GetClientGold(int client);
  *
  *	@param client				Client index
  *	@param amount				Amount of gold to set
+ *  @error                      Invalid player index
  *
  *	@noreturn
  */
@@ -365,6 +390,7 @@ native void Shop_SetClientGold(int client, int amount);
  *
  *	@param client				Client index
  *	@param item_id				The item id
+ *  @error                      Invalid player index
  *
  *	@return	True if the player successfully bought, false otherwise
  */
@@ -375,6 +401,8 @@ native bool Shop_BuyClientItem(int client, ItemId item_id);
  *
  *	@param client				Client index
  *	@param item_id				The item id
+ *  @error                      Invalid player index
+ *	@error						Invalid ItemId
  *
  *	@return	True if the player successfully sold, false otherwise
  */
@@ -386,6 +414,8 @@ native bool Shop_SellClientItem(int client, ItemId item_id);
  *	@param client				Client index
  *	@param item_id				The item id
  *	@param count				Number of count to remove
+ *  @error                      Invalid player index
+ *	@error						Invalid ItemId
  *
  *	@return	True on success, false otherwise
  */
@@ -397,6 +427,8 @@ native bool Shop_RemoveClientItem(int client, ItemId item_id, int count = 0);
  *	@param client				Client index
  *	@param item_id				The item id
  *	@param value				Count if the item is finite and duration if the item is togglable or non-togglable.
+ *  @error                      Invalid player index
+ *	@error						Invalid ItemId
  *
  *	@return	True on success, false otherwise
  */
@@ -407,6 +439,8 @@ native bool Shop_GiveClientItem(int client, ItemId item_id, int value = 1);
  *
  *	@param client				Client index
  *	@param item_id				The item id
+ *  @error                      Invalid player index
+ *	@error						Invalid ItemId
  *
  *	@return	Amount of item that player has
  */
@@ -417,6 +451,8 @@ native int Shop_GetClientItemCount(int client, ItemId item_id);
  *
  *	@param client				Client index
  *	@param item_id				The item id
+ *  @error                      Invalid player index
+ *	@error						Invalid ItemId
  *
  *	@noreturn
  */
@@ -426,6 +462,8 @@ native void Shop_SetClientItemCount(int client, ItemId item_id, int count = 0);
  *
  *	@param client				Client index to force to
  *	@param item_id				Item id to force for
+ *  @error                      Invalid player index
+ *	@error						Invalid ItemId
  *
  *	@return true on success and false otherwise
  */
@@ -448,6 +486,8 @@ native ArrayList Shop_GetClientItems(int client);
  *
  *	@param client				Client index
  *	@param item_id				Item id of the item
+ *  @error                      Invalid player index
+ *	@error						Invalid ItemId
  *
  *	@return true if a panel has been shown, false otherwise
  */
@@ -457,6 +497,7 @@ native bool Shop_ShowItemPanel(int client, ItemId item_id);
  *	Opens main menu for a player
  *
  *	@param client				Client index
+ *  @error                      Invalid player index
  *
  *	@noreturn
  */
@@ -466,6 +507,7 @@ native void Shop_OpenMainMenu(int client);
  *	Shows a player categories of the shop
  *
  *	@param client				Client index
+ *  @error                      Invalid player index
  *
  *	@return true if categories has been shown, false otherwise
  */
@@ -475,6 +517,7 @@ native bool Shop_ShowCategory(int client);
  *	Shows a player his inventory
  *
  *	@param client				Client index
+ *  @error                      Invalid player index
  *
  *	@return true if the inventory has been shown, false otherwise
  */
@@ -486,6 +529,8 @@ native bool Shop_ShowInventory(int client);
  *	@param client				Client index
  *	@param category_id			Category id to show
  *	@param inventory			To show items of his inventory
+ *  @error                      Invalid player index
+ *	@error						Invalid CategoryId
  *
  *	@return true if the items has been shown, false otherwise
  */
@@ -495,6 +540,7 @@ native bool Shop_ShowItemsOfCategory(int client, CategoryId category_id, bool in
  *	Shows functions menu to a player
  *
  *	@param client				Client index to show to
+ *  @error                      Invalid player index
  *
  *	@noreturn
  */

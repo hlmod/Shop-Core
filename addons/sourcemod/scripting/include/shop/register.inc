@@ -250,6 +250,7 @@ native CategoryId Shop_RegisterCategory(const char[] category, const char[] name
  *
  *	@param category_id			Category id to register an item for
  *	@param item					Item unique name
+ *	@error						Invalid CategoryId
  *
  *	@return true to success, false otherwise
  */
