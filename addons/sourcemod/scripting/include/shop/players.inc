@@ -88,7 +88,7 @@ forward Action Shop_OnCreditsGiven(int client, int &credits, int by_who);
  *	@param credits				Amount of credits a client is been given.
  *	@param by_who				See CREDITS_BY_* definitions for more info and any higher values is the admin index.
  *
- *	@return noreturn
+ *	@noreturn
  */
 forward void Shop_OnCreditsGiven_Post(int client, int credits, int by_who);
 
@@ -110,7 +110,7 @@ forward Action Shop_OnCreditsTaken(int client, int &credits, int by_who);
  *	@param credits				Amount of credits a client is been taken.
  *	@param by_who				See CREDITS_BY_* definitions for more info and any higher value is the admin index.
  *
- *	@return noreturn
+ *	@noreturn
  */
 forward void Shop_OnCreditsTaken_Post(int client, int credits, int by_who);
 
