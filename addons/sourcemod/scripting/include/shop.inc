@@ -23,36 +23,36 @@ enum ItemId
 
 enum ItemType
 {
-	Item_None = 0,		/**< Can not be used */
-	Item_Finite = 1,	/**< Can be used like a medkit */
-	Item_Togglable = 2,	/**< Can be switched on or off */
-	Item_BuyOnly = 3	/**< Only for buy */
+	Item_None = 0,			// For nothing is used
+	Item_Finite = 1,		// Can only be used, they have quantity
+	Item_Togglable = 2,		// Can be toggleable, turn on or off
+	Item_BuyOnly = 3		// Can only be bought
 }
 
 enum ToggleState
 {
-	Toggle,
-	Toggle_On,
-	Toggle_Off
+	Toggle,					// Toggleable in reverse position
+	Toggle_On,				// Turn on
+	Toggle_Off				// Turn off
 }
 
 enum ShopAction
 {
-	Shop_Raw = 0,
-	Shop_UseOn = 1,
-	Shop_UseOff = 2
+	Shop_Raw = 0,			// Cancel use or toggleable
+	Shop_UseOn = 1,			// Confirm Item Enablement
+	Shop_UseOff = 2			// Confirm item deactivation
 }
 
 enum ShopMenu
 {
-	Menu_Main,
-	Menu_Buy,
-	Menu_Inventory,
-	Menu_Functions,
-	Menu_ExtraFunctions,
-	Menu_AdminPanel,
-	Menu_CreditsTransfer,
-	Menu_ItemTransfer
+	Menu_Main,				// Main menu (first menu by sm_shop command)
+	Menu_Buy,				// Buy Menu
+	Menu_Inventory,			// Player Inventory
+	Menu_Functions,			// Shop menu functions
+	Menu_ExtraFunctions,	// Extra shop menu functions
+	Menu_AdminPanel,		// Admin panel in the menu
+	Menu_CreditsTransfer,	// Credit transfer menu
+	Menu_ItemTransfer		// Item transfer menu
 }
 
 #define	IGNORE_FORWARD_HOOK	-5				//**< Param to set to avoid calling forward hook */
