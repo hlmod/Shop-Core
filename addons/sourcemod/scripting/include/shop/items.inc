@@ -36,7 +36,7 @@ forward Action Shop_OnItemSelect(int client, ShopMenu menu_action, CategoryId ca
 forward void Shop_OnItemSelected(int client, ShopMenu menu_action, CategoryId category_id, ItemId item_id);
 
 /**
- *	Called when an item is being displayd
+ *	Called when an item is being display
  *
  *	@param client				Client index an item is being displayed to
  *	@param menu_action			Menu performing this action
@@ -51,7 +51,7 @@ forward void Shop_OnItemSelected(int client, ShopMenu menu_action, CategoryId ca
 forward bool Shop_OnItemDisplay(int client, ShopMenu menu_action, CategoryId category_id, ItemId item_id, const char[] display, char[] buffer, int maxlength);
 
 /**
- *	Called when an item's description is being displayd
+ *	Called when an item's description is being display
  *
  *	@param client				Client index an item's description is being displayed to
  *	@param menu_action			Menu performing this action
