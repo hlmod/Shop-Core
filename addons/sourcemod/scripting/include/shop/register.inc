@@ -210,7 +210,7 @@ typeset Shop_ItemSellCallback
  *	@param name					Unique name of category
  *
  *	@noreturn
-*/
+ */
 forward void Shop_OnCategoryRegistered(CategoryId category_id, const char[] name);
 
 /**
@@ -223,7 +223,7 @@ forward void Shop_OnCategoryRegistered(CategoryId category_id, const char[] name
  *	@param item					Unique name of item
  *
  *	@noreturn
-*/
+ */
 forward void Shop_OnItemRegistered(CategoryId category_id, const char[] category, ItemId item_id, const char[] item);
 
 /**
@@ -238,7 +238,7 @@ forward void Shop_OnItemRegistered(CategoryId category_id, const char[] category
  *	@param cat_select			Callback called when a player is trying to select the category
  *
  *	@return Category id of the category
-*/
+ */
 native CategoryId Shop_RegisterCategory(const char[] category, const char[] name, const char[] description,
 								Shop_CategoryDisplayCallback cat_display=INVALID_FUNCTION,
 								Shop_CategoryDescriptionCallback cat_desc=INVALID_FUNCTION,
@@ -252,7 +252,7 @@ native CategoryId Shop_RegisterCategory(const char[] category, const char[] name
  *	@param item					Item unique name
  *
  *	@return true to success, false otherwise
-*/
+ */
 native bool Shop_StartItem(CategoryId category_id, const char[] item);
 
 /**
@@ -268,7 +268,7 @@ native bool Shop_StartItem(CategoryId category_id, const char[] item);
  *	@param gold_sell_price		Item sell price. 0 to make item free by gold price and -1 to disable sell by gold. Can not be higher than price
  *
  *	@noreturn
-*/
+ */
 native void Shop_SetInfo(const char[] name, const char[] description, int price, int sell_price = -1, ItemType type, int value = 1, int gold_price = -1, int gold_sell_price = -1);
 
 /**
@@ -277,7 +277,7 @@ native void Shop_SetInfo(const char[] name, const char[] description, int price,
  *	@param luck_chance			Luck chance to set. From 0 to 100. 0 can not be lucked and 100 is always lucked by the general chance set in cvar. Default item chance is 100
  *
  *	@noreturn
-*/
+ */
 native void Shop_SetLuckChance(int luck_chance);
 
 /**
@@ -295,7 +295,7 @@ native void Shop_SetLuckChance(int luck_chance);
  *	@param select				Callback called when the item is selected in menu
  *
  *	@noreturn
-*/
+ */
 native void Shop_SetCallbacks(Shop_ItemRegister register=INVALID_FUNCTION,
 							Shop_ItemUseToggleCallback use_toggle=INVALID_FUNCTION,
 							Shop_ItemShouldDisplayCallback should=INVALID_FUNCTION,
@@ -313,7 +313,7 @@ native void Shop_SetCallbacks(Shop_ItemRegister register=INVALID_FUNCTION,
  *	@param state				true - hide, false - show
  *
  *	@noreturn
-*/
+ */
 native void Shop_SetHide(bool state);
 
 /**
@@ -323,7 +323,7 @@ native void Shop_SetHide(bool state);
  *	@param value				Value to set
  *
  *	@noreturn
-*/
+ */
 native void Shop_SetCustomInfo(const char[] info, int value);
 
 /**
@@ -333,7 +333,7 @@ native void Shop_SetCustomInfo(const char[] info, int value);
  *	@param value				Value to set
  *
  *	@noreturn
-*/
+ */
 native void Shop_SetCustomInfoFloat(const char[] info, float value);
 
 /**
@@ -343,7 +343,7 @@ native void Shop_SetCustomInfoFloat(const char[] info, float value);
  *	@param value				Value to set
  *
  *	@noreturn
-*/
+ */
 native void Shop_SetCustomInfoString(const char[] info, char[] value);
 
 /**
@@ -353,7 +353,7 @@ native void Shop_SetCustomInfoString(const char[] info, char[] value);
  *	@param value				Value to set
  *
  *	@noreturn
-*/
+ */
 native void Shop_KvCopySubKeysCustomInfo(KeyValues kv);
 
 /**
@@ -362,5 +362,5 @@ native void Shop_KvCopySubKeysCustomInfo(KeyValues kv);
  *	@noparams
  *
  *	@noreturn
-*/
+ */
 native void Shop_EndItem();
