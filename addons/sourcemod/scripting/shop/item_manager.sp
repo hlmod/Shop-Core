@@ -2104,52 +2104,6 @@ void ItemManager_OnPlayerItemElapsed(int client, int item_id)
 	}
 }
 
-stock void ItemManager_OnUseToggleCategory(int client, int category_id)
-{
-	h_KvItems.Rewind();
-	if (!h_KvItems.GotoFirstSubKey())
-		return;
-	
-	char sItemId[16], category[SHOP_MAX_STRING_LENGTH], item[SHOP_MAX_STRING_LENGTH];
-	do
-	{
-		if (h_KvItems.GetNum("category_id", -1) != category_id || !h_KvItems.GetSectionName(sItemId, sizeof(sItemId)))
-			continue;
-		
-		Handle plugin = view_as<Handle>(h_KvItems.GetNum("plugin", 0));
-		
-		DataPack dpCallback = view_as<DataPack>(h_KvItems.GetNum("callbacks", 0));
-		if (dpCallback == null)
-			ThrowNativeError(SP_ERROR_NATIVE, "Callbacks for this item not found");
-		
-		dpCallback.Position = ITEM_DATAPACKPOS_USE;
-		Function callback = dpCallback.ReadFunction();
-		
-		if (IsCallValid(plugin, callback))
-		{
-			ItemManager_GetCategoryById(category_id, category, sizeof(category));
-			h_KvItems.GetString("item", item, sizeof(item));
-			
-			h_KvItems.Rewind();
-		
-			Call_StartFunction(plugin, callback);
-			Call_PushCell(client);
-			Call_PushCell(category_id);
-			Call_PushString(category);
-			Call_PushCell(StringToInt(sItemId));
-			Call_PushString(item);
-			Call_PushCell(true);
-			Call_PushCell(true);
-			Call_Finish();
-			
-			h_KvItems.JumpToKey(sItemId);
-		}
-	}
-	while (h_KvItems.GotoNextKey());
-	
-	h_KvItems.Rewind();
-}
-
 stock ShopAction ItemManager_OnUseToggleItem(int client, int item_id, bool by_native = false, ToggleState toggle = Toggle, bool ignore = false)
 {
 	char sItemId[16];
