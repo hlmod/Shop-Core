@@ -84,7 +84,7 @@ typeset Shop_ItemUseToggleCallback
 typedef Shop_ItemRegister = function void (CategoryId category_id, const char[] category, const char[] item, ItemId item_id);
 
 /**
- *	Callback to display an item preview for the player.
+ *	Callback to display a preview of the element for the player or the element has elapsed.
  *
  *	@param client				Client index.
  *	@param category_id			Category id of an item.
