@@ -51,7 +51,7 @@ ConVar g_hHideCategoriesItemsCount;
 #include "shop/item_manager.sp"
 #include "shop/player_manager.sp"
 #if defined _SteamWorks_Included
-#include "shop/stats.sp"
+	#include "shop/stats.sp"
 #endif
 
 public Plugin myinfo =
@@ -1693,15 +1693,15 @@ bool RemoveItemEx(int client, const char[] sItemId, int count = 1)
 	return PlayerManager_RemoveItemEx(client, sItemId, count);
 }
 
-bool GiveItem(int client, int item_id)
+bool GiveItem(int client, int item_id, int giveCount = 1)
 {
 	char sItemId[16];
 	IntToString(item_id, sItemId, sizeof(sItemId));
 	
-	return GiveItemEx(client, sItemId);
+	return GiveItemEx(client, sItemId, giveCount);
 }
 
-bool GiveItemEx(int client, const char[] sItemId)
+bool GiveItemEx(int client, const char[] sItemId, int giveCount = 1)
 {
 	int category_id, price, sell_price, count, duration;
 	ItemType type;
@@ -1718,7 +1718,7 @@ bool GiveItemEx(int client, const char[] sItemId)
 		{
 			char category[SHOP_MAX_STRING_LENGTH];
 			ItemManager_GetCategoryById(category_id, category, sizeof(category));
-			if (!ItemManager_OnItemBuyEx(client, category_id, category, StringToInt(sItemId), item, type, price, sell_price, (type == Item_Finite) ? count : duration))
+			if (!ItemManager_OnItemBuyEx(client, category_id, category, StringToInt(sItemId), item, type, price, sell_price, (type == Item_Finite) ? giveCount : duration))
 			{
 				return false;
 			}
@@ -1728,7 +1728,9 @@ bool GiveItemEx(int client, const char[] sItemId)
 		{
 			if (ClientHasItemEx(client, sItemId))
 			{
-				return false;
+				int timeleft = PlayerManager_GetItemTimeleftEx(client, sItemId);
+				if(timeleft <= 0) return true; // Do not change a time of an infinite item
+				return PlayerManager_SetItemTimeleftEx(client, sItemId, timeleft + duration * giveCount);
 			}
 		}
 	}
