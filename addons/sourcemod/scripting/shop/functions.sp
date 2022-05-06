@@ -34,6 +34,8 @@ public int Functions_AddToMenuNative(Handle plugin, int numParams)
 	
 	g_hFuncArray.Push(plugin);
 	g_hFuncArray.Push(dp);
+
+	return 0;
 }
 
 public int Functions_RemoveFromMenuNative(Handle plugin, int numParams)
@@ -69,6 +71,8 @@ public int Functions_ShowMenuNative(Handle plugin, int numParams)
 		ThrowNativeError(SP_ERROR_NATIVE, error);
 	
 	Functions_ShowMenu(client);
+
+	return 0;
 }
 
 void Functions_OnPluginStart()
@@ -289,6 +293,8 @@ public int Functions_Menu_Handler(Menu menu, MenuAction action, int param1, int 
 		}
 		case MenuAction_End : delete menu;
 	}
+
+	return 0;
 }
 
 public void Function_ConfirmLuckMenu(int client)
@@ -332,6 +338,8 @@ public int Menu_ConfirmTryLuck(Menu menu, MenuAction action, int param1, int par
 			} 
 		}
 	}
+
+	return 0;
 }
 
 bool Functions_ShowCreditsTransferMenu(int client)
@@ -380,7 +388,7 @@ public int Functions_MenuCreditsTransfer_Handler(Menu menu, MenuAction action, i
 			{
 				Functions_ShowCreditsTransferMenu(param1);
 				CPrintToChat(param1, "%t", "target_left_game");
-				return;
+				return 0;
 			}
 			
 			Functions_SetupCreditsTransfer(param1, userid);
@@ -394,6 +402,8 @@ public int Functions_MenuCreditsTransfer_Handler(Menu menu, MenuAction action, i
 		}
 		case MenuAction_End : delete menu;
 	}
+
+	return 0;
 }
 
 void Functions_SetupCreditsTransfer(int client, int target_userid)
@@ -526,7 +536,7 @@ public int Functions_PanelHandler(Menu menu, MenuAction action, int param1, int 
 						Functions_OnClientDisconnect_Post(param1);
 						Functions_ShowCreditsTransferMenu(param1);
 						CPrintToChat(param1, "%t", "target_left_game");
-						return;
+						return 0;
 					}
 					
 					int amount_remove = g_iCreditsTransferAmount[param1];
@@ -545,7 +555,7 @@ public int Functions_PanelHandler(Menu menu, MenuAction action, int param1, int 
 						{
 							Functions_OnClientDisconnect_Post(param1);
 							Functions_ShowMenu(param1);
-							return;
+							return 0;
 						}
 					}
 					
@@ -595,6 +605,8 @@ public int Functions_PanelHandler(Menu menu, MenuAction action, int param1, int 
 			}
 		}
 	}
+
+	return 0;
 }
 
 Action Functions_OnClientSayCommand(int client, const char[] text)

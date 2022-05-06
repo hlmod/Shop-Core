@@ -92,6 +92,8 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 	MarkNativeAsOptional("PbSetBool");
 	MarkNativeAsOptional("PbSetString");
 	MarkNativeAsOptional("PbAddString");
+
+	return APLRes_Success;
 }
 
 public int Native_IsStarted(Handle plugin, int params)
@@ -104,6 +106,8 @@ public int Native_UnregisterMe(Handle plugin, int params)
 	ItemManager_UnregisterMe(plugin);
 	Functions_UnregisterMe(plugin);
 	Admin_UnregisterMe(plugin);
+
+	return 0;
 }
 
 public int Native_ShowItemPanel(Handle plugin, int params)
@@ -131,6 +135,8 @@ public int Native_OpenMainMenu(Handle plugin, int params)
 		ThrowNativeError(1, "Client index %d is not authorized in the shop!", client);
 	}
 	ShowMainMenu(client);
+
+	return 0;
 }
 
 public int Native_ShowCategory(Handle plugin, int params)
@@ -217,6 +223,7 @@ public void OnPluginEnd()
 public Action OnEverySecond(Handle timer)
 {
 	global_timer++;
+	return Plugin_Continue;
 }
 
 void CreateConfigs()
@@ -399,6 +406,8 @@ public int InfoHandle(Menu menu, MenuAction action, int param1, int param2)
 			}
 		}
 	}
+
+	return 0;
 }
 
 void DatabaseClear()
@@ -545,6 +554,8 @@ public int MainMenu_Handler(Menu menu, MenuAction action, int param1, int param2
 			}
 		}
 	}
+
+	return 0;
 }
 
 bool ShowInventory(int client)
@@ -584,7 +595,7 @@ public int OnInventorySelect(Menu menu, MenuAction action, int param1, int param
 			
 			if (!ItemManager_OnCategorySelect(param1, category_id, Menu_Inventory))
 			{
-				return;
+				return 0;
 			}
 
 			if (!ShowItemsOfCategory(param1, StringToInt(info), true) && !ShowInventory(param1))
@@ -605,6 +616,8 @@ public int OnInventorySelect(Menu menu, MenuAction action, int param1, int param
 			delete menu;
 		}
 	}
+
+	return 0;
 }
 
 bool ShowCategories(int client)
@@ -645,7 +658,7 @@ public int OnCategorySelect(Menu menu, MenuAction action, int param1, int param2
 			
 			if (!ItemManager_OnCategorySelect(param1, category_id, Menu_Buy))
 			{
-				return;
+				return 0;
 			}
 			
 			if (!ShowItemsOfCategory(param1, category_id, false) && !ShowCategories(param1))
@@ -663,6 +676,8 @@ public int OnCategorySelect(Menu menu, MenuAction action, int param1, int param2
 		}
 		case MenuAction_End : delete menu;
 	}
+
+	return 0;
 }
 
 bool ShowItemsOfCategory(int client, int category_id, bool inventory, int pos = 0)
@@ -1240,6 +1255,8 @@ public int ItemPanel_Handler(Menu menu, MenuAction action, int param1, int param
 			}
 		}
 	}
+
+	return 0;
 }
 
 void ConfirmBuy(int client, int item_id)
@@ -1307,6 +1324,8 @@ public int BuyConfirmPanel_Handler(Menu menu, MenuAction action, int param1, int
 			}
 		}
 	}
+
+	return 0;
 }
 
 void ConfirmSell(int client, int item_id)
@@ -1378,6 +1397,8 @@ public int SellConfirmPanel_Handler(Menu menu, MenuAction action, int param1, in
 			delete menu;
 		}
 	}
+
+	return 0;
 }
 
 bool SetupItemTransfer(int client, int pos = 0)
@@ -1420,20 +1441,20 @@ public int Menu_TransItemHandler(Menu menu, MenuAction action, int param1, int p
 			{
 				SetupItemTransfer(param1);
 				CPrintToChat(param1, "%t", "target_left_game");
-				return;
+				return 0;
 			}
 			ItemType type = GetItemType(iClItemId[param1]);
 			if (type != Item_Finite && ClientHasItem(target, iClItemId[param1]))
 			{
 				SetupItemTransfer(param1, GetMenuSelectionPosition());
 				CPrintToChat(param1, "%t", "already_has", target);
-				return;
+				return 0;
 			}
 			if (!ClientHasItem(param1, iClItemId[param1]))
 			{
 				ShowItemInfo(param1, iClItemId[param1]);
 				CPrintToChat(param1, "%t", "no_item");
-				return;
+				return 0;
 			}
 			
 			g_iItemTransTarget[param1] = userid;
@@ -1448,6 +1469,8 @@ public int Menu_TransItemHandler(Menu menu, MenuAction action, int param1, int p
 		}
 		case MenuAction_End : delete menu;
 	}
+
+	return 0;
 }
 
 void ShowTransItemInfo(int client)
@@ -1529,13 +1552,13 @@ public int ItemTransPanel_Handler(Menu menu, MenuAction action, int param1, int 
 					{
 						ShowItemInfo(param1, iClItemId[param1]);
 						CPrintToChat(param1, "%t", "target_left_game");
-						return;
+						return 0;
 					}
 					
 					if (!Forward_OnItemTransfer(param1, target, iClItemId[param1]))
 					{
 						ShowItemInfo(param1, iClItemId[param1]);
-						return;
+						return 0;
 					}
 					
 					PlayerManager_TransferItem(param1, target, iClItemId[param1]);
@@ -1561,6 +1584,8 @@ public int ItemTransPanel_Handler(Menu menu, MenuAction action, int param1, int 
 			}
 		}
 	}
+
+	return 0;
 }
 
 bool FillMenuByItemTransTarget(Menu menu, int client, int item_id)
