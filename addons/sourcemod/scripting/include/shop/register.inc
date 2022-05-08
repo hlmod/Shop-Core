@@ -52,22 +52,34 @@ typedef Shop_CategoryShouldDisplayCallback = function bool (int client, Category
  */
 typedef Shop_CategorySelectCallback = function bool (int client, CategoryId category_id, const char[] category, ShopMenu menu);
 
-/**
- *	Callback on use or toggle of the item.
- *
- *	@param client				Client index.
- *	@param category_id			Category id of an item.
- *	@param category				Category unique name.
- *	@param item_id				Item id of an item.
- *	@param item					Item's unique name.
- *	@param isOn					Item state.
- *	@param elapsed				Item elapsed.
- *
- *	@return see ShopAction enum.
- */
 typeset Shop_ItemUseToggleCallback
 {
+	/**
+	 *	Callback when an item is used.
+	 *
+	 *	@param client				Client index.
+	 *	@param category_id			Category id of an item.
+	 *	@param category				Category unique name.
+	 *	@param item_id				Item id of an item.
+	 *	@param item					Item's unique name.
+	 *
+	 *	@return see ShopAction enum.
+	 */
 	function ShopAction (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item);
+
+	/**
+	 *	Callback when item is toggled.
+	 *
+	 *	@param client				Client index.
+	 *	@param category_id			Category id of an item.
+	 *	@param category				Category unique name.
+	 *	@param item_id				Item id of an item.
+	 *	@param item					Item's unique name.
+	 *	@param isOn					Item state.
+	 *	@param elapsed				Item elapsed.
+	 *
+	 *	@return see ShopAction enum.
+	 */
 	function ShopAction (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, bool isOn, bool elapsed);
 }
 
@@ -159,46 +171,76 @@ typedef Shop_ItemDescriptionCallback = function bool (int client, CategoryId cat
  */
 typedef Shop_ItemSelectCallBack = function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ShopMenu menu);
 
-/**
- *	Callback before a player buys an item.
- *
- *	@param client				Client index.
- *	@param category_id			Category id of an item.
- *	@param category				Category unique name.
- *	@param item_id				Item id of an item.
- *	@param item					Item's unique name.
- *	@param type					Item type. See ItemType enum.
- *	@param price				Item price. Can not be lower than sell_price.
- *	@param sell_price			Item sell price. 0 - free, -1 - not purchasable.
- *	@param value				Quantity - if it's an Item_Finite, duration - if it's an Item_Togglable.
- *	@param gold_price			Item price. -1 - not sold for gold.
- *	@param gold_sell_price		Item sell price in Gold. 0 - free, -1 - not purchasable with gold.
- *
- *	@return true - allow the purchase, false - otherwise.
- */
 typeset Shop_ItemBuyCallback
 {
+	/**
+	 *	Callback before a player buys an item.
+	 *
+	 *	@param client				Client index.
+	 *	@param category_id			Category id of an item.
+	 *	@param category				Category unique name.
+	 *	@param item_id				Item id of an item.
+	 *	@param item					Item's unique name.
+	 *	@param type					Item type. See ItemType enum.
+	 *	@param price				Item price. Can not be lower than sell_price.
+	 *	@param sell_price			Item sell price. 0 - free, -1 - not purchasable.
+	 *	@param value				Quantity - if it's an Item_Finite, duration - if it's an Item_Togglable.
+	 *
+	 *	@return true - allow the purchase, false - otherwise.
+	 */
 	function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ItemType type, int price, int sell_price, int value);
+
+	/**
+	 *	Callback before a player buys an item (with gold).
+	 *
+	 *	@param client				Client index.
+	 *	@param category_id			Category id of an item.
+	 *	@param category				Category unique name.
+	 *	@param item_id				Item id of an item.
+	 *	@param item					Item's unique name.
+	 *	@param type					Item type. See ItemType enum.
+	 *	@param price				Item price. Can not be lower than sell_price.
+	 *	@param sell_price			Item sell price. 0 - free, -1 - not purchasable.
+	 *	@param value				Quantity - if it's an Item_Finite, duration - if it's an Item_Togglable.
+	 *	@param gold_price			Item price. -1 - not sold for gold.
+	 *	@param gold_sell_price		Item sell price in Gold. 0 - free, -1 - not purchasable with gold.
+	 *
+	 *	@return true - allow the purchase, false - otherwise.
+	 */
 	function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ItemType type, int price, int sell_price, int value, int gold_price, int gold_sell_price);
 }
 
-/**
- *	Callback before a player sells an item.
- *
- *	@param client				Client index.
- *	@param category_id			Category id of an item.
- *	@param category				Category unique name.
- *	@param item_id				Item id of an item.
- *	@param item					Item's unique name.
- *	@param type					Item type. See ItemType enum.
- *	@param sell_price			Item sell price. 0 to make item free and -1 to make it unsaleable by credits. Can not be higher than price.
- *	@param gold_sell_price		Item sell price in Gold. 0 to make item free by gold price and -1 to disable sell by gold. Can not be higher than price.
- *
- *	@return true - allow sale, false - otherwise.
- */
 typeset Shop_ItemSellCallback
 {
+	/**
+	 *	Callback before a player sells an item.
+	 *
+	 *	@param client				Client index.
+	 *	@param category_id			Category id of an item.
+	 *	@param category				Category unique name.
+	 *	@param item_id				Item id of an item.
+	 *	@param item					Item's unique name.
+	 *	@param type					Item type. See ItemType enum.
+	 *	@param sell_price			Item sell price. 0 to make item free and -1 to make it unsaleable by credits. Can not be higher than price.
+	 *
+	 *	@return true - allow sale, false - otherwise.
+	 */
 	function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ItemType type, int sell_price);
+
+	/**
+	 *	Callback before a player sells an item (with gold).
+	 *
+	 *	@param client				Client index.
+	 *	@param category_id			Category id of an item.
+	 *	@param category				Category unique name.
+	 *	@param item_id				Item id of an item.
+	 *	@param item					Item's unique name.
+	 *	@param type					Item type. See ItemType enum.
+	 *	@param sell_price			Item sell price. 0 to make item free and -1 to make it unsaleable by credits. Can not be higher than price.
+	 *	@param gold_sell_price		Item sell price in Gold. 0 to make item free by gold price and -1 to disable sell by gold. Can not be higher than price.
+	 *
+	 *	@return true - allow sale, false - otherwise.
+	 */
 	function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ItemType type, int sell_price, int gold_sell_price);
 }
 
