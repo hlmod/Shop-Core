@@ -1,6 +1,6 @@
 /**
 	Library of the [Shop] Core v3
-	Author: FrozDark
+	Author: FrozDark and FD-Forks team
 	www.hlmod.ru
  */
 
