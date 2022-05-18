@@ -519,8 +519,9 @@ public int ItemManager_KvCopySubKeysCustomInfo(Handle plugin, int numParams)
 	kv.GetNum("___SD__");
 	
 	plugin_kv.JumpToKey("CustomInfo", true);
-	KvCopySubkeys(kv, plugin_kv);
+	KvCopySubkeysEx(kv, plugin_kv);
 	plugin_kv.GoBack();
+
 	return 0;
 }
 
@@ -820,19 +821,12 @@ public int ItemManager_KvCopySubKeysItemCustomInfo(Handle plugin, int numParams)
 	KeyValues origin_kv = GetNativeCell(2);
 	if(origin_kv == INVALID_HANDLE) 
 		ThrowNativeError(SP_ERROR_NATIVE, "Handle is invalid!");
-	
-	bool result = false;
-	
-	if (h_KvItems.JumpToKey("CustomInfo", true))
-	{
-		KvCopySubkeys(origin_kv, h_KvItems);
-		
-		result = true;
-	}
-	
+
+	h_KvItems.JumpToKey("CustomInfo", true);
+	KvCopySubkeysEx(origin_kv, h_KvItems);
 	h_KvItems.Rewind();
 	
-	return result;
+	return true;
 }
 
 public int ItemManager_GetItemCustomInfoFloat(Handle plugin, int numParams)
@@ -2512,4 +2506,55 @@ ArrayList ItemManager_GetItemIdArrayFromPlugin(Handle plugin)
 	}
 	
 	return null;
+}
+
+void KvCopySubkeysEx(KeyValues input, KeyValues output)
+{
+	KeyValues temp = new KeyValues("Temp");
+
+	KvCopySubkeys(input, temp);
+	CopyKeyValuesKeys(temp, output);
+	CopyKeyValuesSection(temp, output);
+
+	delete temp;
+}
+
+void CopyKeyValuesSection(KeyValues input, KeyValues output)
+{
+	char name[PLATFORM_MAX_PATH];
+
+	input.SavePosition();
+	if(input.GotoFirstSubKey())
+	{
+		do
+		{
+			input.GetSectionName(name, sizeof(name));
+			output.JumpToKey(name, true);
+
+			CopyKeyValuesKeys(input, output);
+			CopyKeyValuesSection(input, output);
+
+			output.GoBack();
+		}
+		while(input.GotoNextKey());
+		input.GoBack();
+	}
+}
+
+void CopyKeyValuesKeys(KeyValues input, KeyValues output)
+{
+	char name[PLATFORM_MAX_PATH], value[PLATFORM_MAX_PATH];
+
+	input.SavePosition();
+	if(input.GotoFirstSubKey(false))
+	{
+		do
+		{
+			input.GetSectionName(name, sizeof(name));
+			input.GetString(NULL_STRING, value, sizeof(value));
+			output.SetString(name, value);
+		}
+		while(input.GotoNextKey(false));
+		input.GoBack();
+	}
 }
