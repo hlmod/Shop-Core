@@ -41,6 +41,6 @@ new CategoryId:category_id = Shop_RegisterCategory(CATEGORY, sName, sDescription
 
 ## Useless links
 - [HLMod Thread](https://hlmod.ru/threads/shop-core-fork.38351/)
-- [License](https://github.com/FD-Forks/Shop-Core/blob/master/LICENSE.md)
-- For translation make a [PR](https://github.com/FD-Forks/Shop-Core/pulls) on our master branch
-- How many servers uses this plugin [Statistics](https://stats.tibari.ru/plugin/8)
+- [License](https://github.com/hlmod/Shop-Core/blob/master/LICENSE.md)
+- For translation make a [PR](https://github.com/hlmod/Shop-Core/pulls) on our master branch
+- How many servers uses this plugin [Statistics](https://stats.tibari.dev/plugin/8)
