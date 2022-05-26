@@ -33,11 +33,12 @@ jobs:
 
       - name: Run compiler
         run: |
-          cd addons/sourcemod
           wget http://users.alliedmods.net/~kyles/builds/SteamWorks/${{ env.STEAMWORKS_VERS }}-linux.tar.gz
           wget http://users.alliedmods.net/~kyles/builds/SteamWorks/${{ env.STEAMWORKS_VERS }}-windows.zip
-          tar -xzf ${{ env.STEAMWORKS_VERS }}-linux.tar.gz extensions/SteamWorks.ext.so scripting/include/SteamWorks.inc
-          unzip -j ${{ env.STEAMWORKS_VERS }}-windows.zip extensions/SteamWorks.ext.dll -d $EXTENSIONS
+          tar -xzf ${{ env.STEAMWORKS_VERS }}-linux.tar.gz addons/sourcemod/extensions/SteamWorks.ext.so addons/sourcemod/scripting/include/SteamWorks.inc
+          unzip -j ${{ env.STEAMWORKS_VERS }}-windows.zip addons/sourcemod/extensions/SteamWorks.ext.dll -d $EXTENSIONS
+          rm ${{ env.STEAMWORKS_VERS }}-linux.tar.gz ${{ env.STEAMWORKS_VERS }}-linux.tar.gz
+          cd addons/sourcemod
           mkdir plugins
           cd scripting
           spcomp shop.sp -E -o ../plugins/shop.smx -iinclude ${{ matrix.compiler-options }}
