@@ -21,6 +21,7 @@ jobs:
           echo "GITHUB_SHA_SHORT=${GITHUB_SHA::7}" >> $GITHUB_ENV
           SMVERSION_FULL=${{ matrix.sm-version }}
           echo "SMVERSION_SHORT=${SMVERSION_FULL:0:-2}" >> $GITHUB_ENV
+          STEAMWORKS_VERS=SteamWorks-git132
       - uses: actions/checkout@v2
 
       - name: Setup SP
@@ -31,6 +32,10 @@ jobs:
       - name: Run compiler
         run: |
           cd addons/sourcemod
+          wget http://users.alliedmods.net/~kyles/builds/SteamWorks/${{ env.STEAMWORKS_VERS }}-linux.tar.gz
+          wget http://users.alliedmods.net/~kyles/builds/SteamWorks/${{ env.STEAMWORKS_VERS }}-windows.zip
+          tar -xzf ${{ env.STEAMWORKS_VERS }}-linux.tar.gz extensions/SteamWorks.ext.so scripting/include/SteamWorks.inc
+          unzip -j ${{ env.STEAMWORKS_VERS }}-windows.zip extensions/SteamWorks.ext.dll -d $EXTENSIONS
           mkdir plugins
           cd scripting
           spcomp shop.sp -E -o ../plugins/shop.smx -iinclude ${{ matrix.compiler-options }}
