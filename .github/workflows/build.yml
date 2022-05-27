@@ -35,6 +35,7 @@ jobs:
         run: |
           wget http://users.alliedmods.net/~kyles/builds/SteamWorks/${{ env.STEAMWORKS_VERS }}-linux.tar.gz
           wget http://users.alliedmods.net/~kyles/builds/SteamWorks/${{ env.STEAMWORKS_VERS }}-windows.zip
+          wget -O addons/sourcemod/scripting/include/SteamWorks.inc https://raw.githubusercontent.com/JoinedSenses/SourceMod-IncludeLibrary/master/include/steamworks.inc
           tar -xzf ${{ env.STEAMWORKS_VERS }}-linux.tar.gz addons/sourcemod/extensions/SteamWorks.ext.so
           unzip -j ${{ env.STEAMWORKS_VERS }}-windows.zip addons/sourcemod/extensions/SteamWorks.ext.dll -d addons/sourcemod/extensions
           cd addons/sourcemod
