@@ -1,5 +1,5 @@
 stock const char API_KEY[] = "e34fa2f3adb922bf76fb7b06807caa3c";
-stock const char URL[] = "http://stats.tibari.ru/api/v1/add_server";
+stock const char URL[] = "http://stats.tibari.dev/api/v1/add_server";
 
 /* Stats pusher */
 public int SteamWorks_SteamServersConnected()

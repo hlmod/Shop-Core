@@ -42,6 +42,8 @@ public int Admin_AddToMenuNative(Handle plugin, int numParams)
 	
 	g_hAdminArray.Push(plugin);
 	g_hAdminArray.Push(dp);
+
+	return 0;
 }
 
 public int Admin_RemoveFromMenuNative(Handle plugin, int numParams)
@@ -77,6 +79,7 @@ public int Admin_ShowAdminMenu(Handle plugin, int numParams)
 		ThrowNativeError(SP_ERROR_NATIVE, error);
 	
 	Admin_ShowMenu(client);
+	return 0;
 }
 
 void Admin_UnregisterMe(Handle hPlugin)
@@ -141,7 +144,7 @@ public int Admin_MenuCount_Handler(Menu menu, MenuAction action, int param1, int
 			
 			if (!target)
 			{
-				return;
+				return 0;
 			}
 			
 			switch (g_iOpt[param1].AdminOption)
@@ -168,7 +171,7 @@ public int Admin_MenuCount_Handler(Menu menu, MenuAction action, int param1, int
 			{
 				CPrintToChat(param1, "target_left_game");
 				Admin_ShowMenu(param1);
-				return;
+				return 0;
 			}
 			
 			char info[16];
@@ -201,6 +204,8 @@ public int Admin_MenuCount_Handler(Menu menu, MenuAction action, int param1, int
 			}
 		}
 	}
+
+	return 0;
 }
 
 void Admin_ShowMenu(int client, int pos = 0)
@@ -319,7 +324,7 @@ public int Admin_Menu_Handler(Menu menu, MenuAction action, int param1, int para
 					if (!result)
 						Admin_ShowMenu(param1, GetMenuSelectionPosition());
 					
-					return;
+					return 0;
 				}
 			}
 			
@@ -341,6 +346,8 @@ public int Admin_Menu_Handler(Menu menu, MenuAction action, int param1, int para
 			delete menu;
 		}
 	}
+
+	return 0;
 }
 
 bool Admin_ShowTargetsMenu(int client, int pos = 0)
@@ -379,7 +386,7 @@ public int Admin_TargetsMenu_Handler(Menu menu, MenuAction action, int param1, i
 			{
 				CPrintToChat(param1, "target_left_game");
 				Admin_ShowTargetsMenu(param1, GetMenuSelectionPosition());
-				return;
+				return 0;
 			}
 			
 			g_iOpt[param1].AdminTarget = userid;
@@ -408,6 +415,8 @@ public int Admin_TargetsMenu_Handler(Menu menu, MenuAction action, int param1, i
 			delete menu;
 		}
 	}
+
+	return 0;
 }
 
 void Admin_ShowCreditsAmount(int client, int pos = 0)
@@ -451,7 +460,7 @@ public int Admin_CategoriesMenu_Handler(Menu menu, MenuAction action, int param1
 			{
 				CPrintToChat(param1, "%t", "target_left_game");
 				Admin_ShowTargetsMenu(param1, GetMenuSelectionPosition());
-				return;
+				return 0;
 			}
 			
 			g_iOpt[param1].AdminCategory = StringToInt(info);
@@ -470,6 +479,8 @@ public int Admin_CategoriesMenu_Handler(Menu menu, MenuAction action, int param1
 			delete menu;
 		}
 	}
+
+	return 0;
 }
 
 bool Admin_ShowItemsOfCategory(int client, int category_id, int pos = 0)

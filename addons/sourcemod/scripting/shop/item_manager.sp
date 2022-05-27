@@ -36,7 +36,9 @@ void ItemManager_CreateNatives()
 	h_KvItems = new KeyValues("Items");
 	
 	CreateNative("Shop_RegisterCategory", ItemManager_RegisterCategory);
+	CreateNative("CategoryId.CategoryId", ItemManager_RegisterCategory);
 	CreateNative("Shop_StartItem", ItemManager_StartItem);
+	CreateNative("CategoryId.NewItem", ItemManager_StartItem);
 	CreateNative("Shop_SetInfo", ItemManager_SetInfo);
 	CreateNative("Shop_SetLuckChance", ItemManager_SetLuckChance);
 	CreateNative("Shop_SetCustomInfo", ItemManager_SetCustomInfo);
@@ -50,45 +52,73 @@ void ItemManager_CreateNatives()
 	CreateNative("Shop_UnregisterItem", ItemManager_UnregisterItem);
 	
 	CreateNative("Shop_GetItemCustomInfo", ItemManager_GetItemCustomInfo);
+	CreateNative("ItemId.GetCustomInfo", ItemManager_GetItemCustomInfo);
 	CreateNative("Shop_SetItemCustomInfo", ItemManager_SetItemCustomInfo);
+	CreateNative("ItemId.SetCustomInfo", ItemManager_SetItemCustomInfo);
 	
 	CreateNative("Shop_GetItemCustomInfoFloat", ItemManager_GetItemCustomInfoFloat);
+	CreateNative("ItemId.GetCustomInfoFloat", ItemManager_GetItemCustomInfoFloat);
 	CreateNative("Shop_SetItemCustomInfoFloat", ItemManager_SetItemCustomInfoFloat);
+	CreateNative("ItemId.SetCustomInfoFloat", ItemManager_SetItemCustomInfoFloat);
 	
 	CreateNative("Shop_GetItemCustomInfoString", ItemManager_GetItemCustomInfoString);
+	CreateNative("ItemId.GetCustomInfoString", ItemManager_GetItemCustomInfoString);
 	CreateNative("Shop_SetItemCustomInfoString", ItemManager_SetItemCustomInfoString);
+	CreateNative("ItemId.SetCustomInfoString", ItemManager_SetItemCustomInfoString);
+
 	CreateNative("Shop_KvCopySubKeysItemCustomInfo", ItemManager_KvCopySubKeysItemCustomInfo);
+	CreateNative("ItemId.KvCopyCustomInfo", ItemManager_KvCopySubKeysItemCustomInfo);
 	
 	CreateNative("Shop_GetItemPrice", ItemManager_GetItemPrice);
+	CreateNative("ItemId.Price.get", ItemManager_GetItemPrice);
 	CreateNative("Shop_SetItemPrice", ItemManager_SetItemPrice);
+	CreateNative("ItemId.Price.set", ItemManager_SetItemPrice);
 	
 	CreateNative("Shop_GetItemSellPrice", ItemManager_GetItemSellPrice);
+	CreateNative("ItemId.SellPrice.get", ItemManager_GetItemSellPrice);
 	CreateNative("Shop_SetItemSellPrice", ItemManager_SetItemSellPrice);
+	CreateNative("ItemId.SellPrice.set", ItemManager_SetItemSellPrice);
 	
 	CreateNative("Shop_GetItemValue", ItemManager_GetItemValue);
+	CreateNative("ItemId.Value.get", ItemManager_GetItemValue);
 	CreateNative("Shop_SetItemValue", ItemManager_SetItemValue);
+	CreateNative("ItemId.Value.set", ItemManager_SetItemValue);
 
 	CreateNative("Shop_GetItemLuckChance", ItemManager_GetItemLuckChance);
+	CreateNative("ItemId.LuckChange.get", ItemManager_GetItemLuckChance);
 	CreateNative("Shop_SetItemLuckChance", ItemManager_SetItemLuckChance);
+	CreateNative("ItemId.LuckChange.set", ItemManager_SetItemLuckChance);
 
 	CreateNative("Shop_GetItemId", ItemManager_GetItemId);
+	CreateNative("CategoryId.GetItemId", ItemManager_GetItemId);
 	CreateNative("Shop_GetItemById", ItemManager_GetItemById);
+	CreateNative("ItemId.GetUniqueName", ItemManager_GetItemById);
 	CreateNative("Shop_GetItemNameById", ItemManager_GetItemNameById);
+	CreateNative("ItemId.GetDisplayName", ItemManager_GetItemNameById);
 
 	CreateNative("Shop_GetItemHide", ItemManager_GetItemHide);
+	CreateNative("ItemId.Hide.get", ItemManager_GetItemHide);
 	CreateNative("Shop_SetItemHide", ItemManager_SetItemHide);
+	CreateNative("ItemId.Hide.set", ItemManager_SetItemHide);
 
 	CreateNative("Shop_GetItemType", ItemManager_GetItemTypeNative);
+	CreateNative("ItemId.Type.get", ItemManager_GetItemTypeNative);
 
 	CreateNative("Shop_GetItemCategoryId", ItemManager_GetItemCategoryIdNative);
+	CreateNative("ItemId.CategoryId.get", ItemManager_GetItemCategoryIdNative);
 	
 	CreateNative("Shop_IsItemExists", ItemManager_IsItemExistsNative);
+	CreateNative("ItemId.Exist.get", ItemManager_IsItemExistsNative);
 	
 	CreateNative("Shop_IsValidCategory", ItemManager_IsValidCategoryNative);
+	CreateNative("CategoryId.Exist.get", ItemManager_IsValidCategoryNative);
 	
 	CreateNative("Shop_GetCategoryId", ItemManager_GetCategoryIdNative);
+	CreateNative("CategoryId.GetByUnique", ItemManager_GetCategoryIdNative);
 	CreateNative("Shop_GetCategoryById", ItemManager_GetCategoryByIdNative);
+	CreateNative("CategoryId.GetUniqueName", ItemManager_GetCategoryByIdNative);
 	CreateNative("Shop_GetCategoryNameById", ItemManager_GetCategoryNameByIdNative);
+	CreateNative("CategoryId.GetDisplayName", ItemManager_GetCategoryNameByIdNative);
 	
 	CreateNative("Shop_FillArrayByItems", ItemManager_FillArrayByItemsNative);
 	CreateNative("Shop_FormatItem", ItemManager_FormatItemNative);
@@ -102,6 +132,7 @@ void ItemManager_OnPluginStart()
 public Action ItemManager_Dump(int argc)
 {
 	KeyValuesToFile(h_KvItems, "addons/items.txt");
+	return Plugin_Handled;
 }
 
 void ItemManager_OnPluginEnd()
@@ -413,6 +444,7 @@ public int ItemManager_SetInfo(Handle plugin, int numParams)
 	}
 	
 	plugin_kv.SetNum("hide", 0);
+	return 0;
 }
 
 public int ItemManager_SetLuckChance(Handle plugin, int numParams)
@@ -432,6 +464,7 @@ public int ItemManager_SetLuckChance(Handle plugin, int numParams)
 		iLuckChance = 100;
 	}
 	plugin_kv.SetNum("luck_chance", iLuckChance);
+	return 0;
 }
 
 public int ItemManager_SetCustomInfo(Handle plugin, int numParams)
@@ -445,6 +478,7 @@ public int ItemManager_SetCustomInfo(Handle plugin, int numParams)
 	plugin_kv.JumpToKey("CustomInfo", true);
 	plugin_kv.SetNum(info, GetNativeCell(2));
 	plugin_kv.GoBack();
+	return 0;
 }
 
 public int ItemManager_SetCustomInfoFloat(Handle plugin, int numParams)
@@ -458,6 +492,7 @@ public int ItemManager_SetCustomInfoFloat(Handle plugin, int numParams)
 	plugin_kv.JumpToKey("CustomInfo", true);
 	plugin_kv.SetFloat(info, GetNativeCell(2));
 	plugin_kv.GoBack();
+	return 0;
 }
 
 public int ItemManager_SetCustomInfoString(Handle plugin, int numParams)
@@ -472,6 +507,7 @@ public int ItemManager_SetCustomInfoString(Handle plugin, int numParams)
 	plugin_kv.JumpToKey("CustomInfo", true);
 	plugin_kv.SetString(info, value);
 	plugin_kv.GoBack();
+	return 0;
 }
 
 public int ItemManager_KvCopySubKeysCustomInfo(Handle plugin, int numParams)
@@ -485,6 +521,7 @@ public int ItemManager_KvCopySubKeysCustomInfo(Handle plugin, int numParams)
 	plugin_kv.JumpToKey("CustomInfo", true);
 	KvCopySubkeys(kv, plugin_kv);
 	plugin_kv.GoBack();
+	return 0;
 }
 
 public int ItemManager_SetCallbacks(Handle plugin, int numParams)
@@ -508,6 +545,7 @@ public int ItemManager_SetCallbacks(Handle plugin, int numParams)
 		hPack.WriteFunction(INVALID_FUNCTION);
 
 	plugin_kv.SetNum("callbacks", view_as<int>(hPack));
+	return 0;
 }
 
 public int ItemManager_SetHide(Handle plugin, int numParams)
@@ -516,6 +554,7 @@ public int ItemManager_SetHide(Handle plugin, int numParams)
 		ThrowNativeError(SP_ERROR_NATIVE, "No item is being registered");
 	
 	plugin_kv.SetNum("hide", GetNativeCell(1));
+	return 0;
 }
 
 public int ItemManager_EndItem(Handle plugin, int numParams)
@@ -581,6 +620,8 @@ public int ItemManager_EndItem(Handle plugin, int numParams)
 	plugin_array = null;
 	plugin_category[0] = '\0';
 	plugin_item[0] = '\0';
+
+	return 0;
 }
 
 public int ItemManager_UnregisterItem(Handle plugin, int numParams)
@@ -602,6 +643,7 @@ public int ItemManager_UnregisterItem(Handle plugin, int numParams)
 	
 	h_KvItems.DeleteThis();
 	h_KvItems.Rewind();
+	return 0;
 }
 
 public int ItemManager_OnItemRegistered(Handle owner, Handle hndl, const char[] error, DataPack dp)
@@ -625,7 +667,7 @@ public int ItemManager_OnItemRegistered(Handle owner, Handle hndl, const char[] 
 			delete kv;
 			delete dp;
 			
-			return;
+			return 0;
 		}
 	}
 	
@@ -636,7 +678,7 @@ public int ItemManager_OnItemRegistered(Handle owner, Handle hndl, const char[] 
 	if (hndl == null)
 	{
 		delete dp;
-		return;
+		return 0;
 	}
 	
 	int id;
@@ -661,7 +703,7 @@ public int ItemManager_OnItemRegistered(Handle owner, Handle hndl, const char[] 
 				
 				TQuery(ItemManager_OnItemRegistered, s_Query, dp);
 				
-				return;
+				return 0;
 			}
 			
 			id = SQL_FetchInt(hndl, 0);
@@ -715,6 +757,9 @@ public int ItemManager_OnItemRegistered(Handle owner, Handle hndl, const char[] 
 		Call_PushCell(id);
 		Call_Finish();
 	}
+
+	Forward_OnItemRegistered(category_id, category, id, item);
+	return 0;
 }
 
 public int ItemManager_GetItemCustomInfo(Handle plugin, int numParams)
@@ -772,10 +817,11 @@ public int ItemManager_KvCopySubKeysItemCustomInfo(Handle plugin, int numParams)
 	if (!h_KvItems.JumpToKey(buffer))
 		ThrowNativeError(SP_ERROR_NATIVE, "Item id %s is invalid", buffer);
 	
-	bool result = false;
-	
 	KeyValues origin_kv = GetNativeCell(2);
-	origin_kv.GetNum("___SD__");
+	if(origin_kv == INVALID_HANDLE) 
+		ThrowNativeError(SP_ERROR_NATIVE, "Handle is invalid!");
+	
+	bool result = false;
 	
 	if (h_KvItems.JumpToKey("CustomInfo", true))
 	{
@@ -936,6 +982,7 @@ public int ItemManager_SetItemPrice(Handle plugin, int numParams)
 	
 	h_KvItems.SetNum("price", price);
 	h_KvItems.Rewind();
+	return 0;
 }
 
 public int ItemManager_GetItemSellPrice(Handle plugin, int numParams)
@@ -980,6 +1027,7 @@ public int ItemManager_SetItemSellPrice(Handle plugin, int numParams)
 	h_KvItems.SetNum("sell_price", sell_price);
 	
 	h_KvItems.Rewind();
+	return 0;
 }
 
 public int ItemManager_GetItemValue(Handle plugin, int numParams)
@@ -1052,6 +1100,7 @@ public int ItemManager_SetItemValue(Handle plugin, int numParams)
 	}
 	
 	h_KvItems.Rewind();
+	return 0;
 }
 
 public int ItemManager_GetItemLuckChance(Handle plugin, int numParams)
@@ -1082,6 +1131,7 @@ public int ItemManager_SetItemLuckChance(Handle plugin, int numParams)
 	
 	h_KvItems.SetNum("luck_chance", iLuckChance);
 	h_KvItems.Rewind();
+	return 0;
 }
 
 public int ItemManager_GetItemId(Handle plugin, int numParams)
@@ -1202,6 +1252,7 @@ public int ItemManager_SetItemHide(Handle plugin, int numParams)
 	h_KvItems.SetNum("hide", GetNativeCell(2));
 	
 	h_KvItems.Rewind();
+	return 0;
 }
 
 public int ItemManager_GetItemCategoryIdNative(Handle plugin, int numParams)
@@ -1342,9 +1393,8 @@ bool ItemManager_FillCategories(Menu menu, int source_client, bool inventory = f
 				if(index != -1 && index != x)
 				{
 					hCategoriesArray.SwapAt(index, x);
-
-					++x;
 				}
+				++x;
 			}
 		}
 	}
@@ -1708,6 +1758,97 @@ Panel ItemManager_CreateItemPanelInfo(int source_client, int item_id, ShopMenu m
 	return panel;
 }
 
+Panel ItemManager_ConfirmItemPanelInfo(int source_client, int item_id, ShopMenu menu_act, bool isBuy)
+{
+	Panel panel;
+	
+	char sItemId[16];
+	IntToString(item_id, sItemId, sizeof(sItemId));
+	
+	h_KvItems.Rewind();
+	if (!h_KvItems.JumpToKey(sItemId))
+	{
+		return panel;
+	}
+	
+	int category_id = h_KvItems.GetNum("category_id");
+	Handle plugin = view_as<Handle>(h_KvItems.GetNum("plugin"));
+	
+	char buffer[256], category[SHOP_MAX_STRING_LENGTH], item[SHOP_MAX_STRING_LENGTH];
+	
+	h_arCategories.GetString(category_id, category, sizeof(category));
+	h_KvItems.GetString("item", item, sizeof(item));
+	h_KvItems.GetString("name", buffer, sizeof(buffer));
+	
+	DataPack dpCallback = view_as<DataPack>(h_KvItems.GetNum("callbacks"));
+	if (dpCallback == null)
+		ThrowNativeError(SP_ERROR_NATIVE, "Callbacks for this item not found");
+	
+	dpCallback.Position = ITEM_DATAPACKPOS_SELECT;
+	Function callback = dpCallback.ReadFunction();
+	
+	if(!ItemManager_OnItemSelect(plugin, callback, source_client, category_id, category, item_id, item, menu_act))
+	{
+		return panel;
+	}
+
+	dpCallback.Position = ITEM_DATAPACKPOS_DISPLAY;
+	callback = dpCallback.ReadFunction();
+	
+	h_KvItems.Rewind();
+	
+	ItemManager_OnItemDisplay(plugin, callback, source_client, category_id, category, item_id, item, menu_act, _, buffer, buffer, sizeof(buffer));
+	
+	OnItemDisplay(source_client, menu_act, category_id, item_id, buffer, buffer, sizeof(buffer));
+	
+	h_KvItems.JumpToKey(sItemId);
+	
+	panel = new Panel();
+	panel.DrawText(buffer);
+	
+	SetGlobalTransTarget(source_client);
+	
+	int price = h_KvItems.GetNum("price");
+	int sell_price = h_KvItems.GetNum("sell_price");
+	
+	if(isBuy)
+	{
+		if (price < 1)
+			FormatEx(buffer, sizeof(buffer), "%t: %t", "Price", "Free");
+		else
+			FormatEx(buffer, sizeof(buffer), "%t: %d", "Price", price);
+		panel.DrawText(buffer);
+	}
+	
+	else if(sell_price > 0)
+	{
+		FormatEx(buffer, sizeof(buffer), "%t: %d", "Sell Price", sell_price);
+		panel.DrawText(buffer);
+	}
+	
+	switch (view_as<ItemType>(h_KvItems.GetNum("type", 0))) // by default it will be ItemType_None
+	{
+		case Item_Finite :
+		{
+			FormatEx(buffer, sizeof(buffer), "%t: %d", "Count", h_KvItems.GetNum("count", 1));
+			panel.DrawText(buffer);
+		}
+		case Item_None, Item_Togglable :
+		{
+			int duration = h_KvItems.GetNum("duration", 0);
+			if (duration < 1)
+				FormatEx(buffer, sizeof(buffer), "%t: %t", "duration", "forever");
+			else
+			{
+				GetTimeFromStamp(buffer, sizeof(buffer), duration, source_client);
+				Format(buffer, sizeof(buffer), "%t: %s", "duration", buffer);
+			}
+			panel.DrawText(buffer);
+		}
+	}	
+	return panel;
+}
+
 stock int ItemManager_GetCategoryId(const char[] category)
 {
 	return h_arCategories.FindString(category);
@@ -1915,7 +2056,7 @@ void ItemManager_OnPlayerItemElapsed(int client, int item_id)
 	if (plugin == null)
 		return;
 	 
-	DataPack dpCallback = dpCallback = view_as<DataPack>(h_KvItems.GetNum("callbacks", 0));
+	DataPack dpCallback = view_as<DataPack>(h_KvItems.GetNum("callbacks", 0));
 	if (dpCallback == null)
 		ThrowNativeError(SP_ERROR_NATIVE, "Callbacks for this item not found");
 	
@@ -1957,54 +2098,6 @@ void ItemManager_OnPlayerItemElapsed(int client, int item_id)
 		Call_PushCell(true);
 		Call_Finish();
 	}
-}
-
-stock void ItemManager_OnUseToggleCategory(int client, int category_id)
-{
-	h_KvItems.Rewind();
-	if (!h_KvItems.GotoFirstSubKey())
-		return;
-	
-	char sItemId[16], category[SHOP_MAX_STRING_LENGTH], item[SHOP_MAX_STRING_LENGTH];
-	do
-	{
-		if (h_KvItems.GetNum("category_id", -1) != category_id || !h_KvItems.GetSectionName(sItemId, sizeof(sItemId)))
-			continue;
-		
-		ToggleItemCategoryOffEx(client, sItemId);
-		
-		Handle plugin = view_as<Handle>(h_KvItems.GetNum("plugin", 0));
-		
-		DataPack dpCallback = dpCallback = view_as<DataPack>(h_KvItems.GetNum("callbacks", 0));
-		if (dpCallback == null)
-			ThrowNativeError(SP_ERROR_NATIVE, "Callbacks for this item not found");
-		
-		dpCallback.Position = ITEM_DATAPACKPOS_USE;
-		Function callback = dpCallback.ReadFunction();
-		
-		if (IsCallValid(plugin, callback))
-		{
-			ItemManager_GetCategoryById(category_id, category, sizeof(category));
-			h_KvItems.GetString("item", item, sizeof(item));
-			
-			h_KvItems.Rewind();
-		
-			Call_StartFunction(plugin, callback);
-			Call_PushCell(client);
-			Call_PushCell(category_id);
-			Call_PushString(category);
-			Call_PushCell(StringToInt(sItemId));
-			Call_PushString(item);
-			Call_PushCell(true);
-			Call_PushCell(true);
-			Call_Finish();
-			
-			h_KvItems.JumpToKey(sItemId);
-		}
-	}
-	while (h_KvItems.GotoNextKey());
-	
-	h_KvItems.Rewind();
 }
 
 stock ShopAction ItemManager_OnUseToggleItem(int client, int item_id, bool by_native = false, ToggleState toggle = Toggle, bool ignore = false)
