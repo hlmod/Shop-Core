@@ -1320,18 +1320,14 @@ public int ItemManager_FormatItemNative(Handle plugin, int numParams)
 	return true;
 }
 
-bool ItemManager_FillCategories(Menu menu, int source_client, bool inventory = false, bool showAll = false)
+bool ItemManager_FillCategories(Menu menu, int source_client, bool inventory = false, bool showAll = false, ShopMenu shop_menu)
 {
 	char category[SHOP_MAX_STRING_LENGTH], display[128], buffer[SHOP_MAX_STRING_LENGTH], description[SHOP_MAX_STRING_LENGTH];
+	ArrayList array, hCategoriesArray = h_arCategories.Clone();
 	StringMap trie;
-	ArrayList array, hCategoriesArray;
 	char sCatId[16];
 	int iSize, x, i, index;
-	ShopMenu shop_menu = (showAll ? Menu_Inventory : Menu_Buy);
-	
 	bool result = false;
-	
-	hCategoriesArray = h_arCategories.Clone();
 	
 	if(g_hSortArray != null)
 	{

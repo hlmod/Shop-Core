@@ -520,7 +520,7 @@ public int MainMenu_Handler(Menu menu, MenuAction action, int param1, int param2
 bool ShowInventory(int client)
 {
 	Menu menu = new Menu(OnInventorySelect);
-	if (!ItemManager_FillCategories(menu, client, true))
+	if (!ItemManager_FillCategories(menu, client, true, _, Menu_Inventory))
 	{
 		delete menu;
 		return false;
@@ -581,7 +581,7 @@ bool ShowCategories(int client)
 {
 	Menu menu = new Menu(OnCategorySelect);
 	
-	if (!ItemManager_FillCategories(menu, client, false))
+	if (!ItemManager_FillCategories(menu, client, false, _, Menu_Buy))
 	{
 		delete menu;
 		return false;
@@ -1861,9 +1861,9 @@ bool IsAdmin(int client)
 	return view_as<bool>(GetUserFlagBits(client) & g_iAdminFlags);
 }
 
-bool FillCategories(Menu menu, int source_client, bool inventory = false, bool showAll = false)
+bool FillCategories(Menu menu, int source_client, bool inventory = false, bool showAll = false, ShopMenu shop_menu)
 {
-	return ItemManager_FillCategories(menu, source_client, inventory, showAll);
+	return ItemManager_FillCategories(menu, source_client, inventory, showAll, shop_menu);
 }
 
 bool FillItemsOfCategory(Menu menu, int client, int source_client, int category_id, bool showAll = false)
