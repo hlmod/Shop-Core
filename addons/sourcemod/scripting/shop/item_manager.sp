@@ -1371,7 +1371,7 @@ public int ItemManager_FormatItemNative(Handle plugin, int numParams)
 	return true;
 }
 
-bool ItemManager_FillCategories(Menu menu, int source_client, bool showAll = false, ShopMenu shop_menu)
+bool ItemManager_FillCategories(Menu menu, int source_client, ShopMenu shop_menu, bool showAll = false)
 {
 	char category[SHOP_MAX_STRING_LENGTH], display[128], buffer[SHOP_MAX_STRING_LENGTH], description[SHOP_MAX_STRING_LENGTH];
 	ArrayList array, hCategoriesArray = h_arCategories.Clone();
