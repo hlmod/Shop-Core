@@ -1320,7 +1320,7 @@ public int ItemManager_FormatItemNative(Handle plugin, int numParams)
 	return true;
 }
 
-bool ItemManager_FillCategories(Menu menu, int source_client, bool inventory = false, bool showAll = false, ShopMenu shop_menu)
+bool ItemManager_FillCategories(Menu menu, int source_client, bool showAll = false, ShopMenu shop_menu)
 {
 	char category[SHOP_MAX_STRING_LENGTH], display[128], buffer[SHOP_MAX_STRING_LENGTH], description[SHOP_MAX_STRING_LENGTH];
 	ArrayList array, hCategoriesArray = h_arCategories.Clone();
@@ -1355,7 +1355,7 @@ bool ItemManager_FillCategories(Menu menu, int source_client, bool inventory = f
 		hCategoriesArray.GetString(i, category, sizeof(category));
 		index = h_arCategories.FindString(category);
 		if (!h_trieCategories.GetValue(category, trie)) continue;
-		if (inventory)
+		if (shop_menu == Menu_Inventory)
 		{
 			x = GetClientCategorySize(source_client, index);
 			if (x < 1)
@@ -1429,7 +1429,7 @@ bool ItemManager_FillCategories(Menu menu, int source_client, bool inventory = f
 					on_desc_func = func_desc;
 				}
 				
-				if (!inventory)
+				if (shop_menu != Menu_Inventory)
 				{
 					x += icat_size;
 				}
