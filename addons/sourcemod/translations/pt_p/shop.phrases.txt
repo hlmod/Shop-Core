@@ -1,0 +1,504 @@
+"Phrases"
+{
+	"NoAccessToCommand"
+	{
+		"pt_p"		"{green}[Loja]{default} Não tens acesso a este comando!"
+	}
+
+	"TargetNotFound"
+	{
+		"#format"   "{1:s}"
+		"pt_p"		"{green}[loja]{default} Jogador {green}{1}{default} não encontrado!"
+	}
+
+	"select_target"
+	{
+		"pt_p"		"Seleciona o jogador:"
+	}
+
+	"select_category"
+	{
+		"pt_p"		"Seleciona a categoria:"
+	}
+
+	"select_item"
+	{
+		"pt_p"		"Seleciona o item:"
+	}
+
+	"no_targets"
+	{
+		"pt_p"		"{green}[Loja]{default} Sem alvos apropriados!"
+	}
+
+	"target_left_game"
+	{
+		"pt_p"		"{green}[Loja]{default} O jogador saiu do jogo!"
+	}
+
+	"trans_credits_operation"
+	{
+		"pt_p"		"Escreve a quantidade de créditos para transferir no chat\nou \"cancel\" para cancelar a operação!"
+	}
+
+	"TransferSuccess"
+	{
+		"#format"   "{1:i},{2:N}"
+		"pt_p"		"{green}[Loja]{default} Enviaste com sucesso {green}{1}{default} créditos para {green}{2}{default}!"
+	}
+
+	"ReceiveSuccess"
+	{
+		"#format"   "{1:i},{2:N}"
+		"pt_p"		"{green}[Loja]{default} Recebeste com sucesso {green}{1}{default} créditos de {green}{2}{default}!"
+	}
+
+	"ReceiveCommission"
+	{
+		"#format"	"{1:i}"
+		"pt_p"		"{green}[Loja]{default} Comissão: {green}{1} {default}créditos"
+	}
+
+	"receive_item"
+	{
+		"#format"   "{1:N},{2:s},{3:s}"
+		"pt_p"		"{green}[Loja]{default} Recebes-te {green}\"{3}\"{default} para a categoria {green}\"{2}\"{default} de {green}{1}{default}!"
+	}
+
+	"already_has"
+	{
+		"#format"   "{1:N}"
+		"pt_p"		"{green}[Loja]{default} O jogador {green}{1}{default} já tem este item!"
+	}
+
+	"no_item"
+	{
+		"pt_p"		"{green}[Loja]{default} Não tens este item no teu inventário!"
+	}
+
+	"IncorrectCredits"
+	{
+		"pt_p"		"Quantidade insuficiente de créditos!"
+	}
+
+	"credits_being_transfered"
+	{
+		"#format"   "{1:i}"
+		"pt_p"		"Quantidade de créditos: {1}"
+	}
+
+	"credits_to_transfer"
+	{
+		"#format"   "{1:i}"
+		"pt_p"		"Para enviar: {1}"
+	}
+
+	"credits_to_transfer_price"
+	{
+		"#format"   "{1:i}"
+		"pt_p"		"Custo de transferência: {1}"
+	}
+
+	"credits_to_transfer_commission"
+	{
+		"#format"   "{1:i}"
+		"pt_p"		"Comissão : {1} créditos"
+	}
+
+	"transfer_credits_left"
+	{
+		"#format"   "{1:i}"
+		"pt_p"		"Restantes: {1}"
+	}
+
+	"need_positive"
+	{
+		"#format"   "{1:i}"
+		"pt_p"		"Precisas de pelo menos {1} créditos"
+	}
+
+	"confirm"
+	{
+		"pt_p"		"Confirmar"
+	}
+
+	"cancel"
+	{
+		"pt_p"		"Cancelar"
+	}
+
+	"transfer"
+	{
+		"pt_p"		"Transferir"
+	}
+
+	"ItemTransferMenu"
+	{
+		"pt_p"		"Transferir item"
+	}
+
+	"ItemTransferMenu2"
+	{
+		"#format"   "{1:N}"
+		"pt_p"		"Transferir item\npara {1}"
+	}
+
+	"give_credits"
+	{
+		"pt_p"		"Dar créditos"
+	}
+
+	"take_credits"
+	{
+		"pt_p"		"Aceitar créditos"
+	}
+
+	"set_credits"
+	{
+		"pt_p"		"Definir créditos"
+	}
+
+	"give_items"
+	{
+		"pt_p"		"Dar items"
+	}
+
+	"take_items"
+	{
+		"pt_p"		"Aceitar items"
+	}
+
+	"give_item_success"
+	{
+		"pt_p"		"{green}[Loja]{default} Deste o item com sucesso!"
+	}
+
+	"take_item_success"
+	{
+		"pt_p"		"{green}[Loja]{default} Recebeste o item com sucesso!"
+	}
+
+	"give_credits_success"
+	{
+		"#format"   "{1:i},{2:s}"
+		"pt_p"		"{green}[Loja]{default} Enviaste {1} créditos para {green}{2}{default}!"
+	}
+
+	"remove_credits_success"
+	{
+		"#format"   "{1:i},{2:s}"
+		"pt_p"		"{green}[Loja]{default} Ficaste com {1} créditos de {green}{2}{default}!"
+	}
+
+	"set_credits_success"
+	{
+		"#format"   "{1:i},{2:s}"
+		"pt_p"		"{green}[Loja]{default} Enviaste {1} créditos para {green}{2}{default}!"
+	}
+
+	"set_you_credits"
+	{
+		"#format"   "{1:i}"
+		"pt_p"		"{green}[Loja]{default} Um STAFF definiu seus créditos para {green}{1}{default}!"
+	}
+
+	"take_you_credits"
+	{
+		"#format"   "{1:i}"
+		"pt_p"		"{green}[Loja]{default} Um STAFF ficou com {green}{1}{default} créditos!"
+	}
+
+	"give_you_credits"
+	{
+		"#format"   "{1:i}"
+		"pt_p"		"{green}[Loja]{default} Um STAFF deu-te {green}{1}{default} créditos!"
+	}
+
+	"EmptyInventory"
+	{
+		"pt_p"		"{green}[Loja]{default} Inventário vazio!"
+	}
+
+	"EmptyShop"
+	{
+		"pt_p"		"{green}[Loja]{default} Loja vazia!"
+	}
+
+	"EmptyCategory"
+	{
+		"pt_p"		"{green}[Loja]{default} Categoria vazia!"
+	}
+
+	"NothingToLuck"
+	{
+		"pt_p"		"{green}[Loja]{default} Não há nada que te possa dar sorte!"
+	}
+
+	"Looser"
+	{
+		"pt_p"		"{green}[Loja]{default} Tiveste azar! Não ganhas-te nada :("
+	}
+
+	"Lucker"
+	{
+		"#format"   "{1:s},{2:s}"
+		"pt_p"		"{green}[Loja]{default} Tiveste sorte desta vez :). Ganhaste {green}\"{2}\"{default} para a categoria {green}\"{1}\"{default}."
+	}
+
+	"ItemElapsed"
+	{
+		"#format"   "{1:s},{2:s}"
+		"pt_p"		"{green}[Loja]{default} O item {green}\"{2}\"{default} da categoria {green}\"{1}\"{default} já não existe!"
+	}
+
+	"trans_credits"
+	{
+		"pt_p"		"Transferir créditos"
+	}
+
+	"trans_credits_commision"
+	{
+		"#format"   "{1:i}"
+		"pt_p"		"[Comissão: {1}%%]"
+	}
+
+	"trans_credits_cost"
+	{
+		"#format"   "{1:i}"
+		"pt_p"		"[Preço: {1}]"
+	}
+
+	"trans_credits_disabled"
+	{
+		"pt_p"		"[Desabilitado]"
+	}
+
+	"luck_disabled"
+	{
+		"pt_p"		"[Desabilitado]"
+	}
+
+	"try_luck"
+	{
+		"pt_p"		"Tenta a tua sorte"
+	}
+
+	"luck_credits_chance"
+	{
+		"#format"   "{1:i},{2:i}"
+		"pt_p"		"[Chance: {2}%%|Preço: {1}]"
+	}
+
+	"Type"
+	{
+		"pt_p"		"Tipo"
+	}
+
+	"None"
+	{
+		"pt_p"		"Nenhum"
+	}
+
+	"Finite"
+	{
+		"pt_p"		"Finito"
+	}
+
+	"Togglable"
+	{
+		"pt_p"		"Alternável"
+	}
+
+	"BuyOnly"
+	{
+		"pt_p"		"Compra apenas"
+	}
+
+	"Price"
+	{
+		"pt_p"		"Preço"
+	}
+
+	"Sell Price"
+	{
+		"pt_p"		"Preço de venda"
+	}
+
+	"absolute_sellprice"
+	{
+		"pt_p"		"Preço no tempo restante"
+	}
+
+	"Free"
+	{
+		"pt_p"		"Grátis"
+	}
+
+	"Unsaleable"
+	{
+		"pt_p"		"Venda proibida"
+	}
+
+	"Count"
+	{
+		"pt_p"		"Conta"
+	}
+
+	"duration"
+	{
+		"pt_p"		"Duração"
+	}
+
+	"forever"
+	{
+		"pt_p"		"Permanente"
+	}
+
+	"timeleft"
+	{
+		"pt_p"		"Tempo restante"
+	}
+
+	"You have"
+	{
+		"pt_p"		"Tu tens"
+	}
+
+	"MainMenuTitle"
+	{
+		"pt_p"		"Loja"
+	}
+
+	"Shop"
+	{
+		"pt_p"		"Loja"
+	}
+
+	"credits"
+	{
+		"#format"   "{1:i}"
+		"pt_p"		"Créditos: {1}"
+	}
+
+	"buy"
+	{
+		"pt_p"		"Compra"
+	}
+
+	"buy_not"
+	{
+		"pt_p"		"Compra [Créditos insuficientes]"
+	}
+
+	"sell"
+	{
+		"pt_p"		"Vender"
+	}
+
+	"inventory"
+	{
+		"pt_p"		"Inventário"
+	}
+
+	"use"
+	{
+		"pt_p"		"Usa"
+	}
+
+	"ToggleOn"
+	{
+		"pt_p"		"Ativar"
+	}
+
+	"ToggleOff"
+	{
+		"pt_p"		"Desativar"
+	}
+
+	"preview"
+	{
+		"pt_p"		"Pré-visualização"
+	}
+
+	"preview_unavailable"
+	{
+		"pt_p"		"Pré-visualização indisponível"
+	}
+
+	"functions"
+	{
+		"pt_p"		"Funções"
+	}
+
+	"info"
+	{
+		"pt_p"		"Info"
+	}
+
+	"admin_panel"
+	{
+		"pt_p"		"Painel de Admin"
+	}
+
+	"Back"
+	{
+		"pt_p"		"Voltar"
+	}
+
+	"Exit"
+	{
+		"pt_p"		"Sair"
+	}
+	
+	"NotEnoughCredits"
+	{
+		"pt_p"		"{green}[Loja] {default}Créditos insuficientes!"
+	}
+
+	"PreviewIn"
+	{
+		"#format"   "{1:i}"
+		"pt_p"		"{green}[Loja]{default} Pré-visualização disponível em {1} sec.!"
+	}
+
+	"DataLoaded"
+	{
+		"#format"   "{1:s}"
+		"pt_p"		"{green}[Loja] {default}Os dados da tua Loja foram carregados! Escreve {green}!{1}{default} para abrir a loja!"
+	}
+
+	"DataLoaded2"
+	{
+		"pt_p"		"{green}[Loja] {default}Os dados da tua Loja foram carregados!"
+	}
+
+	"DataLoading"
+	{
+		"pt_p"		"{green}[Loja] {default}Os teus dados estão a ser carregados!"
+	}
+
+	"y."
+	{
+		"pt_p"		"a."
+	}
+
+	"d."
+	{
+		"pt_p"		"d."
+	}
+
+	"h."
+	{
+		"pt_p"		"h."
+	}
+
+	"m."
+	{
+		"pt_p"		"min."
+	}
+
+	"s."
+	{
+		"pt_p"		"sec."
+	}
+}

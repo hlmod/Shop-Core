@@ -477,6 +477,22 @@
 		"en"		"{green}[Shop] {default}Your data is being loaded!"
 	}
 
+	"You Buy Sure"
+	{
+		"en"		"Are you sure to purchase this item?"
+	}
+
+	"You Sell Sure"
+	{
+		"en"		"Are you sure to sell this item?"
+	}
+
+	"confirm_luck"
+	{
+		"#format"	"{1:i}"
+		"en"		"Are you sure to spend {1} credits for Try a Luck?"
+	}
+
 	"y."
 	{
 		"en"		"y."

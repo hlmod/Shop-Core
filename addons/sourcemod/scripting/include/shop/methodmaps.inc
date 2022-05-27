@@ -1,0 +1,459 @@
+
+methodmap CategoryId __nullable__
+{
+	/**
+	 *	Registers new category id.
+	 *
+	 *	@param category				Category unique name.
+	 *	@param name					Default category display name.
+	 *	@param description			Default category description.
+	 *	@param cat_display			Callback called on category being displayed.
+	 *	@param cat_desc				Callback called on category's description being displayed.
+	 *	@param cat_should			Callback called whether the category should be displayed to a player.
+	 *	@param cat_select			Callback called when a player is trying to select the category.
+	 *
+	 *	@return Category id of the category.
+	 */
+	public native CategoryId(const char[] category, const char[] name, const char[] description,
+							 Shop_CategoryDisplayCallback cat_display=INVALID_FUNCTION,
+							 Shop_CategoryDescriptionCallback cat_desc=INVALID_FUNCTION,
+							 Shop_CategoryShouldDisplayCallback cat_should=INVALID_FUNCTION,
+							 Shop_CategorySelectCallback cat_select=INVALID_FUNCTION);
+
+	/**
+	 *	Starts an item to register.
+	 *
+	 *	@param item					Item unique name.
+	 *	@error						Invalid CategoryId.
+	 *
+	 *	@return true to success, false otherwise.
+	 */
+	public native bool NewItem(const char[] item);
+
+	/**
+	 *	Gets item id of the item unique name.
+	 *
+	 *	@param item					Item unique name to get for.
+	 *	@error						Invalid CategoryId.
+	 *
+	 *	@return Item id of the item.
+	 */
+	public native ItemId GetItemId(const char[] item);
+
+	/**
+	 *	Gets category id of the category unique name.
+	 *
+	 *	@param category				Category unique name to get id for.
+	 *
+	 *	@return Category id of the category.
+	 */
+	public static native CategoryId GetByUnique(char[] category);
+
+	/**
+	 *	Gets the category unique name by its id.
+	 *
+	 *	@param buffer				Buffer to store the unique name.
+	 *	@param maxlength			Max length of the buffer.
+	 *	@error						Invalid CategoryId.
+	 *
+	 *	@return True on success, false otherwise.
+	 */
+	public native bool GetUniqueName(char[] buffer, int maxlength);
+
+	/**
+	 *	Gets the category name by its id.
+	 *
+	 *	@param buffer				Buffer to store the name.
+	 *	@param maxlength			Max length of the buffer.
+	 *	@error						Invalid CategoryId.
+	 *
+	 *	@return True on success, false otherwise.
+	 */
+	public native bool GetDisplayName(char[] buffer, int maxlength);
+
+	/**
+	 *	Toggles all items of category off.
+	 *
+	 *	@param client				Client index.
+	 *  @error                      Invalid player index.
+	 *	@error						Invalid CategoryId.
+	 *
+	 *	@noreturn
+	 */
+	public void ToggleOff(int client) {
+		Shop_ToggleClientCategoryOff(client, this);
+	}
+
+	/**
+	 *	Whether the category is valid (registered).
+	 *	@error						Invalid CategoryId.
+	 */
+	property bool Exist {
+		public native get();
+	}
+}
+
+methodmap ItemId __nullable__
+{
+	/**
+	 *	Gets an item custom info.
+	 *
+	 *	@param info					Info key to get.
+	 *	@param defaultvalue			Optional default value to use if the key is not found.
+	 *	@error						Invalid ItemId.
+	 *
+	 *	@return Integer value of the key.
+	 */
+	public native int GetCustomInfo(const char[] info, int defaultvalue = 0);
+
+	/**
+	 *	Sets an item custom info.
+	 *
+	 *	@param info					Info key to set.
+	 *	@param value				Value to set.
+	 *	@error						Invalid ItemId.
+	 *
+	 *	@return true on success, false otherwise.
+	 */
+	public native void SetCustomInfo(const char[] info, int value);
+
+	/**
+	 *	Gets an item custom info.
+	 *
+	 *	@param info					Info key to get.
+	 *	@param defaultvalue			Optional default value to use if the key is not found.
+	 *	@error						Invalid ItemId.
+	 *
+	 *	@return Float value of the key.
+	 */
+	public native float GetCustomInfoFloat(const char[] info, float defaultvalue = 0.0);
+
+	/**
+	 *	Sets an item custom info.
+	 *
+	 *	@param info					Info key to set.
+	 *	@param value				Value to set.
+	 *	@error						Invalid ItemId.
+	 *
+	 *	@return true on success, false otherwise.
+	 */
+	public native void SetCustomInfoFloat(const char[] info, float value);
+
+	/**
+	 *	Gets an item custom info.
+	 *
+	 *	@param info					Info key to get.
+	 *	@param buffer				Buffer to store the value in.
+	 *	@param maxlength			Max length of the buffer.
+	 *	@param defaultvalue			Optional default value to use if the key is not found.
+	 *	@error						Invalid ItemId.
+	 *
+	 *	@return Number of bytes written.
+	 */
+	public native int GetCustomInfoString(const char[] info, char[] buffer, int maxlength, const char[] defaultvalue = "");
+
+	/**
+	 *	Sets an item custom info.
+	 *
+	 *	@param info					Info key to set.
+	 *	@param value				Value to set.
+	 *	@error						Invalid ItemId.
+	 *
+	 *	@return true on success, false otherwise.
+	 */
+	public native void SetCustomInfoString(const char[] info, const char[] value);
+
+	/**
+	 *	Copies SubKeys of a KeyValue structure to the item info.
+	 *
+	 *	@param kv					KeyValue structure to copy.
+	 *	@error						Invalid ItemId.
+	 *	@error						Invalid KeyValues Handle.
+	 *
+	 *	@return true on success, false otherwise.
+	 */
+	public native bool KvCopyCustomInfo(KeyValues kv);
+
+	/**
+	 *	Gets the item unique name by its id.
+	 *
+	 *	@param buffer				Buffer to store the unique name.
+	 *	@param maxlength			Max length of the buffer.
+	 *	@error						Invalid ItemId.
+	 *
+	 *	@return Number of bytes written.
+	 */
+	public native int GetUniqueName(char[] buffer, int maxlength);
+
+	/**
+	 *	Get name of item.
+	 *
+	 *	@param buffer				Buffer to store the name.
+	 *	@param maxlength			Max length of the buffer.
+	 *	@error						Invalid ItemId.
+	 *
+	 *	@return Number of bytes written.
+	 */
+	public native int GetDisplayName(char[] buffer, int maxlength);
+
+	/**
+	 *	Formats item display name to use in menu.
+	 *
+	 *	@param client				Client index to get format for.
+	 *	@param menu					Menu to get formatted for.
+	 *	@param buffer				Buffer to store the result in.
+	 *	@param maxlength			Max length of the buffer.
+	 *  @error                      Invalid player index.
+	 *  @error                      Item has no callbacks.
+	 *	@error						Invalid ItemId.
+	 *
+	 *	@return True if item formatted, false if param menu is Menu_Inventory and the player has not this item and the item is not formatted.
+	 */
+	public bool Format(int client, ShopMenu menu, char[] buffer, int maxlength) {
+		return Shop_FormatItem(client, this, menu, buffer, maxlength);
+	}
+
+	/**
+	 *	Gives the item from the player's inventory.
+	 *
+	 *	@param client				Client index.
+	 *	@param value				Count if the item is finite and duration if the item is togglable or non-togglable.
+	 *  @error                      Invalid player index.
+	 *	@error						Invalid ItemId.
+	 *
+	 *	@return	True on success, false otherwise.
+	 */
+	public bool Give(int client, int value = 1) {
+		return Shop_GiveClientItem(client, this, value);
+	}
+
+	/**
+	 *	Forces the player to buy the item from the shop.
+	 *
+	 *	@param client				Client index.
+	 *  @error                      Invalid player index.
+	 *
+	 *	@return	True if the player successfully bought, false otherwise.
+	 */
+	public bool Buy(int client) {
+		return Shop_BuyClientItem(client, this);
+	}
+
+	/**
+	 *	Forces the player to sell the item from the inventory.
+	 *
+	 *	@param client				Client index.
+	 *  @error                      Invalid player index.
+	 *	@error						Invalid ItemId.
+	 *
+	 *	@return	True if the player successfully sold, false otherwise.
+	 */
+	public bool Sell(int client) {
+		return Shop_SellClientItem(client, this);
+	}
+
+	/**
+	 *	Forces a player to use an item.
+	 *
+	 *	@param client				Client index to force to.
+	 *  @error                      Invalid player index.
+	 *	@error						Invalid ItemId.
+	 *
+	 *	@return true on success and false otherwise.
+	 */
+	public bool Use(int client) {
+		return Shop_UseClientItem(client, this);
+	}
+
+	/**
+	 *	Remove the item from the player's inventory.
+	 *
+	 *	@param client				Client index.
+	 *	@param count				Number of count to remove.
+	 *  @error                      Invalid player index.
+	 *	@error						Invalid ItemId.
+	 *
+	 *	@return	True on success, false otherwise.
+	 */
+	public bool Remove(int client, int count = 0) {
+		return Shop_RemoveClientItem(client, this, count);
+	}
+
+	/**
+	 *	Get's count of an item a player has.
+	 *
+	 *	@param client				Client index.
+	 *  @error                      Invalid player index.
+	 *	@error						Invalid ItemId.
+	 *
+	 *	@return	Amount of item that player has.
+	 */
+	public int GetCount(int client) {
+		return Shop_GetClientItemCount(client, this);
+	}
+
+	/**
+	 *	Set count of an item a player has.
+	 *
+	 *	@param client				Client index.
+	 *  @error                      Invalid player index.
+	 *	@error						Invalid ItemId.
+	 *
+	 *	@noreturn
+	 */
+	public void SetCount(int client, int count = 0) {
+		Shop_SetClientItemCount(client, this, count);
+	}
+
+	/**
+	 *	Sets timeleft for an item. 0 to set no timelimit.
+	 *
+	 *	@param client				Client index to set to.
+	 *	@param timeleft				Timeleft to set. 0 to make it forever.
+	 *	@param reset_duration		Reset duration.
+	 *  @error                      Invalid player index.
+	 *	@error						Invalid ItemId.
+	 *
+	 *	@return True on success and false it client has not this item.
+	 */
+	public bool SetTimeLeft(int client, int timeleft, bool reset_duration = true) {
+		return Shop_SetClientItemTimeleft(client, this, timeleft, reset_duration);
+	}
+
+	/**
+	 *	Gets timeleft for an item.
+	 *
+	 *	@param client				Client index to get from.
+	 *  @error                      Invalid player index.
+	 *	@error						Invalid ItemId.
+	 *
+	 *	@return item timeleft in seconds. 0 if item has no timelimit.
+	 */
+	public int GetTimeLeft(int client) {
+		return Shop_GetClientItemTimeleft(client, this);
+	}
+
+	/**
+	 *	Gets an absolute sell price for an item a player hold.
+	 *
+	 *	@param client				Client index to get from.
+	 *  @param isGold				True to retrieve gold value, false to get credits.
+	 *  @error                      Invalid player index.
+	 *	@error						Invalid ItemId.
+	 *
+	 *	@return sell price of the item.
+	 */
+	public int GetSellPrice(int client, bool isGold = false) {
+		return Shop_GetClientItemSellPrice(client, this, isGold);
+	}
+
+	/**
+	 *	Whether a player has toggled on an item.
+	 *
+	 *	@param client				Client index to check to.
+	 *  @error                      Invalid player index.
+	 *	@error						Invalid ItemId.
+	 *
+	 *	@return true if player has item toggled on and false otherwise.
+	 */
+	public bool IsToggled(int client) {
+		return Shop_IsClientItemToggled(client, this);
+	}
+
+	/**
+	 *	Whether a player has an item.
+	 *
+	 *	@param client				Client index to check to.
+	 *  @error                      Invalid player index.
+	 *	@error						Invalid ItemId.
+	 *
+	 *	@return true if player has item and false otherwise.
+	 */
+	public bool IsHas(int client) {
+		return Shop_IsClientHasItem(client, this);
+	}
+
+	/**
+	 *	Toggles a client's item.
+	 *
+	 *	@param client				Client index.
+	 *	@param toggle				Toggle state. See ToggleState enum.
+	 *  @error                      Invalid player index.
+	 *	@error						Invalid ItemId.
+	 *
+	 *	@return true on success and false otherwise.
+	 */
+	public bool Toggle(int client, ToggleState toggle = Toggle) {
+		return Shop_ToggleClientItem(client, this, toggle);
+	}
+
+	/**
+	 *	Gets the item's category id.
+	 *	@error						Invalid ItemId.
+	 */	
+	property CategoryId CategoryId {
+		public native get();
+	}
+
+	/**
+	 *	Get or set an item credits price.
+	 *	@error						Invalid ItemId.
+	 */
+	property int Price {
+		public native get();
+		public native set(int value);
+	}
+
+	/**
+	 *	Get or set an item credits sell price.
+	 *	@error						Invalid ItemId.
+	 */
+	property int SellPrice {
+		public native get();
+		public native set(int value);
+	}
+
+	/**
+	 *	Get or set an item count if item is finite.
+	 *	And duration if item is togglable or non-togglable (-1 if duration is unlimited).
+	 *	@error						Invalid ItemId.
+	 */
+	property int Value {
+		public native get();
+		public native set(int value);
+	}
+
+	/**
+	 *	Get or set an item luck chance (0-100).
+	 *	@error						Invalid ItemId.
+	 */
+	property int LuckChange {
+		public native get();
+		public native set(int value);
+	}
+
+	/**
+	 *	Get or set feature "Hide".
+	 *	@error						Invalid ItemId.
+	 */
+	property bool Hide {
+		public native get();
+		public native set(bool value);
+	}
+
+	/**
+	 *	Gets the item type. See ItemType enumeration.
+	 *	@error						Invalid ItemId.
+	 */
+	property ItemType Type {
+		public native get();
+	}
+
+	/**
+	 *	Whether the item is exists (registered).
+	 *	@error						Invalid ItemId.
+	 */
+	property bool Exist {
+		public native get();
+	}
+}
