@@ -3,11 +3,11 @@
 
 | Status | Build Status | Discord |
 |:------:|:------------:|:-------:|
-| Passive updates | [![Build Status](https://api.travis-ci.com/FD-Forks/Shop-Core.svg?branch=master)](https://travis-ci.com/FD-Forks/Shop-Core) | [![Discord](https://img.shields.io/discord/315148933792006144.svg)](https://discord.gg/NTrASWm)
+| Passive updates | [![Build](https://github.com/hlmod/Shop-Core/actions/workflows/build.yml/badge.svg)](https://github.com/hlmod/Shop-Core/actions/workflows/build.yml) | [![Discord](https://img.shields.io/discord/315148933792006144.svg)](https://discord.gg/NTrASWm)
 
 ## Requirements
-- [SourceMod](https://www.sourcemod.net/downloads.php?branch=stable) 1.7+
-- Database section in `sourcemod/configs/databases.cfg`
+- [SourceMod](https://www.sourcemod.net/downloads.php?branch=stable) 1.10+
+- Database section in `addons/sourcemod/configs/databases.cfg`
 For SQLite usage, **shop supports MySQL and recommended to use**
 ```
 "shop"
@@ -16,7 +16,7 @@ For SQLite usage, **shop supports MySQL and recommended to use**
         "database"  "shop_core"
 }
 ```
-- [Steamworks](https://forums.alliedmods.net/showthread.php?t=229556)
+- (Optional) [Steamworks](https://forums.alliedmods.net/showthread.php?t=229556)
 
 ## Installation
 - Extract archive from [Releases](../../releases) page to server directory
