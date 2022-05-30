@@ -139,6 +139,7 @@ void Forward_OnClientItemLucked(int client, int item_id)
 
 Action Forward_OnItemDraw(int client, ShopMenu menu_action, int category_id, int item_id, bool &disabled)
 {
+	bool temp_disabled = disabled;
 	Action result = Plugin_Continue;
 	
 	Call_StartForward(h_fwdOnItemDraw);
@@ -146,8 +147,12 @@ Action Forward_OnItemDraw(int client, ShopMenu menu_action, int category_id, int
 	Call_PushCell(menu_action);
 	Call_PushCell(category_id);
 	Call_PushCell(item_id);
-	Call_PushCellRef(disabled);
+	Call_PushCellRef(temp_disabled);
 	Call_Finish(result);
+
+	if(result == Plugin_Changed) {
+		disabled = temp_disabled;
+	}
 	
 	return result;
 }

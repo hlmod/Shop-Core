@@ -682,7 +682,7 @@ public int OnCategorySelect(Menu menu, MenuAction action, int param1, int param2
 
 bool ShowItemsOfCategory(int client, int category_id, bool inventory, int pos = 0)
 {
-	Menu menu = new Menu(OnItemSelect, MENU_ACTIONS_DEFAULT|MenuAction_DrawItem|MenuAction_DisplayItem);
+	Menu menu = new Menu(OnItemSelect, MENU_ACTIONS_DEFAULT|MenuAction_DisplayItem);
 	if (!ItemManager_FillItemsOfCategory(menu, client, client, category_id, inventory))
 	{
 		delete menu;
@@ -758,30 +758,6 @@ public int OnItemSelect(Menu menu, MenuAction action, int param1, int param2)
 			}
 		}
 		case MenuAction_End : delete menu;
-		case MenuAction_DrawItem :
-		{
-			char info[16];
-			menu.GetItem(param2, info, sizeof(info));
-			
-			bool disabled;
-			
-			switch (Forward_OnItemDraw(param1, bInv[param1] ? Menu_Inventory : Menu_Buy, iClCategoryId[param1], StringToInt(info), disabled))
-			{
-				case Plugin_Continue:
-				{
-					disabled = false;
-				}
-				case Plugin_Handled, Plugin_Stop:
-				{
-					menu.RemoveItem(param2);
-					return 0;
-				}
-			}
-			if (disabled)
-			{
-				return ITEMDRAW_DISABLED;
-			}
-		}
 		case MenuAction_DisplayItem:
 		{
 			char info[16], sBuffer[SHOP_MAX_STRING_LENGTH];

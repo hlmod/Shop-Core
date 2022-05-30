@@ -1629,6 +1629,10 @@ bool ItemManager_FillItemsOfCategory(Menu menu, int client, int source_client, i
 			{
 				disabled = false;
 			}
+
+			if(Forward_OnItemDraw(client, inventory ? Menu_Inventory : Menu_Buy, category_id, item_id, disabled) >= Plugin_Handled) {
+				continue;
+			}
 			
 			h_KvItems.JumpToKey(sItemId);
 			
