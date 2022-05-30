@@ -682,7 +682,7 @@ public int OnCategorySelect(Menu menu, MenuAction action, int param1, int param2
 
 bool ShowItemsOfCategory(int client, int category_id, bool inventory, int pos = 0)
 {
-	Menu menu = new Menu(OnItemSelect, MENU_ACTIONS_DEFAULT|MenuAction_DisplayItem);
+	Menu menu = new Menu(OnItemSelect, MENU_ACTIONS_DEFAULT|MenuAction_DrawItem|MenuAction_DisplayItem);
 	if (!ItemManager_FillItemsOfCategory(menu, client, client, category_id, inventory))
 	{
 		delete menu;
