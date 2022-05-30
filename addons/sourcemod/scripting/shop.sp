@@ -764,20 +764,13 @@ public int OnItemSelect(Menu menu, MenuAction action, int param1, int param2)
 			menu.GetItem(param2, info, sizeof(info));
 			
 			bool disabled;
-			
-			switch (Forward_OnItemDraw(param1, bInv[param1] ? Menu_Inventory : Menu_Buy, iClCategoryId[param1], StringToInt(info), disabled))
+			Action result = Forward_OnItemDraw(param1, bInv[param1] ? Menu_Inventory : Menu_Buy, iClCategoryId[param1], StringToInt(info), disabled);
+
+			if(result >= Plugin_Handled) 
 			{
-				case Plugin_Continue:
-				{
-					disabled = false;
-				}
-				case Plugin_Handled, Plugin_Stop:
-				{
-					menu.RemoveItem(param2);
-					return 0;
-				}
-			}
-			if (disabled)
+				return ITEMDRAW_IGNORE;
+			} 
+			else if (result == Plugin_Changed && disabled) 
 			{
 				return ITEMDRAW_DISABLED;
 			}
