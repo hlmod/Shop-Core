@@ -429,7 +429,7 @@ bool Admin_ShowCategories(int client, int pos = 0)
 	SetGlobalTransTarget(client);
 	
 	Menu menu = new Menu(Admin_CategoriesMenu_Handler);
-	if (!FillCategories(menu, client, false, true))
+	if (!FillCategories(menu, client, Menu_AdminPanel, true))
 	{
 		CPrintToChat(client, "%t", "EmptyShop");
 		delete menu;
