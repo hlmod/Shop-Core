@@ -465,7 +465,10 @@ public int Admin_CategoriesMenu_Handler(Menu menu, MenuAction action, int param1
 			
 			g_iOpt[param1].AdminCategory = StringToInt(info);
 			
-			Admin_ShowItemsOfCategory(param1, g_iOpt[param1].AdminCategory);
+			if(!Admin_ShowItemsOfCategory(param1, g_iOpt[param1].AdminCategory))
+			{
+				Admin_ShowCategories(param1, menu.Selection);
+			}
 		}
 		case MenuAction_Cancel :
 		{
