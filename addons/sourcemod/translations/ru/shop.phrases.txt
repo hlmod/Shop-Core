@@ -395,7 +395,7 @@
 
 	"preview_unavailable"
 	{
-		"ru"		"Превью недоступен"
+		"ru"		"Превью недоступно"
 	}
 
 	"functions"
