@@ -1682,11 +1682,16 @@ Panel ItemManager_CreateItemPanelInfo(int source_client, int item_id, ShopMenu m
 	dpCallback.Position = ITEM_DATAPACKPOS_DISPLAY;
 	callback = dpCallback.ReadFunction();
 	
+	int price = h_KvItems.GetNum("price");
+	int sell_price = h_KvItems.GetNum("sell_price");
+
 	h_KvItems.Rewind();
 	
 	ItemManager_OnItemDisplay(plugin, callback, source_client, category_id, category, item_id, item, menu_act, _, buffer, buffer, sizeof(buffer));
 	
 	OnItemDisplay(source_client, menu_act, category_id, item_id, buffer, buffer, sizeof(buffer));
+
+	OnItemPricesDisplay(source_client, menu_act, category_id, category, item_id, item, price, sell_price);
 	
 	h_KvItems.JumpToKey(sItemId);
 	
@@ -1694,9 +1699,6 @@ Panel ItemManager_CreateItemPanelInfo(int source_client, int item_id, ShopMenu m
 	panel.DrawText(buffer);
 	
 	SetGlobalTransTarget(source_client);
-	
-	int price = h_KvItems.GetNum("price");
-	int sell_price = h_KvItems.GetNum("sell_price");
 	
 	if (price < 1)
 		FormatEx(buffer, sizeof(buffer), "%t: %t", "Price", "Free");

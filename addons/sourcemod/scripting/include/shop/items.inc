@@ -51,6 +51,21 @@ forward void Shop_OnItemSelected(int client, ShopMenu menu_action, CategoryId ca
 forward bool Shop_OnItemDisplay(int client, ShopMenu menu_action, CategoryId category_id, ItemId item_id, const char[] display, char[] buffer, int maxlength);
 
 /**
+ *	Called before the sell and buy prices are displayed in the item's management menu.
+ *	@note Prices change only in the menu! Does not affect prices when buying/selling.
+ *	
+ *	@param client				Client index an item's description is being displayed to.
+ *	@param menu_action			Menu performing this action.
+ *	@param category_id			Category id of an item.
+ *	@param item_id				Item id of an item.
+ *	@param price				Price.
+ *	@param sell_price			Sell price.
+ *	
+ *	@return true to apply new values, false otherwise
+*/
+forward bool Shop_OnItemPricesDisplay(int client, ShopMenu menu_action, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, int &price, int &sell_price);
+
+/**
  *	Called when an item's description is being display.
  *
  *	@param client				Client index an item's description is being displayed to.
@@ -62,7 +77,7 @@ forward bool Shop_OnItemDisplay(int client, ShopMenu menu_action, CategoryId cat
  *	@param maxlength			Max length of the buffer.
  *
  *	@return true to apply new description, false otherwise.
- */
+*/
 forward bool Shop_OnItemDescription(int client, ShopMenu menu_action, CategoryId category_id, ItemId item_id, const char[] description, char[] buffer, int maxlength);
 
 /**
