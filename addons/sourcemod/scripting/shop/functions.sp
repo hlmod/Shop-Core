@@ -34,6 +34,8 @@ public int Functions_AddToMenuNative(Handle plugin, int numParams)
 	
 	g_hFuncArray.Push(plugin);
 	g_hFuncArray.Push(dp);
+
+	return 0;
 }
 
 public int Functions_RemoveFromMenuNative(Handle plugin, int numParams)
@@ -69,6 +71,8 @@ public int Functions_ShowMenuNative(Handle plugin, int numParams)
 		ThrowNativeError(SP_ERROR_NATIVE, error);
 	
 	Functions_ShowMenu(client);
+
+	return 0;
 }
 
 void Functions_OnPluginStart()
@@ -246,8 +250,15 @@ public int Functions_Menu_Handler(Menu menu, MenuAction action, int param1, int 
 				}
 				case 'b' :
 				{
-					Functions_SetupLuck(param1);
-					Functions_ShowMenu(param1, GetMenuSelectionPosition());
+					if (g_bConfirmTryLuck)
+					{
+						Function_ConfirmLuckMenu(param1);
+					}
+					else
+					{
+						Functions_SetupLuck(param1);
+						Functions_ShowMenu(param1, GetMenuSelectionPosition());
+					}
 				}
 				default :
 				{
@@ -282,6 +293,53 @@ public int Functions_Menu_Handler(Menu menu, MenuAction action, int param1, int 
 		}
 		case MenuAction_End : delete menu;
 	}
+
+	return 0;
+}
+
+public void Function_ConfirmLuckMenu(int client)
+{
+	char buffer[256];
+	Menu menu = new Menu(Menu_ConfirmTryLuck);
+
+	FormatEx(buffer, sizeof(buffer), "%T\n ", "confirm_luck", client, g_hLuckCredits.IntValue);
+	menu.SetTitle(buffer);
+	FormatEx(buffer, sizeof(buffer), "%T", "Yes", client);
+	menu.AddItem("yes", buffer);
+	FormatEx(buffer, sizeof(buffer), "%T", "No", client);
+	menu.AddItem("no", buffer);
+
+	menu.ExitBackButton = false;
+	menu.ExitButton = false;
+	menu.Display(client, MENU_TIME_FOREVER);
+}
+
+public int Menu_ConfirmTryLuck(Menu menu, MenuAction action, int param1, int param2)
+{
+	switch (action)
+	{
+		case MenuAction_End:
+		{
+		    delete menu;
+		}
+		case MenuAction_Select:
+		{
+			char info[16];
+			menu.GetItem(param2, info, sizeof(info));
+		
+			if (info[0] == 'y')
+			{
+				Functions_SetupLuck(param1);
+				Functions_ShowMenu(param1, GetMenuSelectionPosition());
+			}
+			else
+			{
+				Functions_ShowMenu(param1, GetMenuSelectionPosition());
+			} 
+		}
+	}
+
+	return 0;
 }
 
 bool Functions_ShowCreditsTransferMenu(int client)
@@ -330,7 +388,7 @@ public int Functions_MenuCreditsTransfer_Handler(Menu menu, MenuAction action, i
 			{
 				Functions_ShowCreditsTransferMenu(param1);
 				CPrintToChat(param1, "%t", "target_left_game");
-				return;
+				return 0;
 			}
 			
 			Functions_SetupCreditsTransfer(param1, userid);
@@ -344,6 +402,8 @@ public int Functions_MenuCreditsTransfer_Handler(Menu menu, MenuAction action, i
 		}
 		case MenuAction_End : delete menu;
 	}
+
+	return 0;
 }
 
 void Functions_SetupCreditsTransfer(int client, int target_userid)
@@ -476,7 +536,7 @@ public int Functions_PanelHandler(Menu menu, MenuAction action, int param1, int 
 						Functions_OnClientDisconnect_Post(param1);
 						Functions_ShowCreditsTransferMenu(param1);
 						CPrintToChat(param1, "%t", "target_left_game");
-						return;
+						return 0;
 					}
 					
 					int amount_remove = g_iCreditsTransferAmount[param1];
@@ -495,7 +555,7 @@ public int Functions_PanelHandler(Menu menu, MenuAction action, int param1, int 
 						{
 							Functions_OnClientDisconnect_Post(param1);
 							Functions_ShowMenu(param1);
-							return;
+							return 0;
 						}
 					}
 					
@@ -545,6 +605,8 @@ public int Functions_PanelHandler(Menu menu, MenuAction action, int param1, int 
 			}
 		}
 	}
+
+	return 0;
 }
 
 Action Functions_OnClientSayCommand(int client, const char[] text)
@@ -558,6 +620,7 @@ Action Functions_OnClientSayCommand(int client, const char[] text)
 	{
 		Functions_OnClientDisconnect_Post(client);
 		Functions_ShowCreditsTransferMenu(client);
+		return Plugin_Handled;
 	}
 	
 	g_iCreditsTransferAmount[client] = StringToInt(text);
@@ -629,7 +692,8 @@ void Functions_SetupLuck(int client)
 	
 	// Get lucked item or INVALID_ITEM if no luck
 	int item_id = GetItemRollLuck(hArray, client);
-	bIsWinner = view_as<ItemId>(item_id) == INVALID_ITEM;
+	bIsWinner = view_as<ItemId>(item_id) != INVALID_ITEM;
+	
 	if (!bIsWinner)
 	{
 		// Looser
@@ -659,7 +723,6 @@ int FilterItemsInLuckArray(ArrayList hArray, int client, bool &wasOverriden)
 	int dummy, iLuckChance, iNewLuckValue;
 	ItemType type;
 	Action luckAction;
-	bool bShouldLuck;
 	for (int i = 0; i < hArray.Length; ++i)
 	{
 		dummy = hArray.Get(i);
@@ -667,7 +730,6 @@ int FilterItemsInLuckArray(ArrayList hArray, int client, bool &wasOverriden)
 		iLuckChance = GetItemLuckChance(dummy);
 		iNewLuckValue = iLuckChance;
 		luckAction = OnClientShouldLuckItemChance(client, dummy, iNewLuckValue);
-		bShouldLuck = OnClientShouldLuckItem(client, dummy);
 		
 		// To override luck for item
 		if (luckAction == Plugin_Changed)
@@ -678,8 +740,9 @@ int FilterItemsInLuckArray(ArrayList hArray, int client, bool &wasOverriden)
 			wasOverriden = true;
 		}
 		
-		if (type != Item_Finite && type != Item_BuyOnly && ClientHasItem(client, dummy) || iLuckChance == 0 || luckAction == Plugin_Handled || !bShouldLuck)
+		if (type != Item_Finite && type != Item_BuyOnly && ClientHasItem(client, dummy) || iLuckChance == 0 || luckAction == Plugin_Handled)
 		{
+			//PrintToChatAll("Item %d removed from luck. Type = %d, Client = %N, ClientHasItem = %d, iLuckChance = %d, luckAction = %d, bShouldLuck = %d, gold_price = %d", dummy, type, client, ClientHasItem(client, dummy), iLuckChance, luckAction, bShouldLuck, gold_price);
 			hArray.Erase(i--);
 		}
 	}
@@ -695,6 +758,7 @@ bool IsWinLuckWithCvar(bool wasOverriden)
 		int rand = GetRandomIntEx(1, 100);
 		
 		winner = rand <= g_hLuckChance.IntValue;
+		//PrintToChatAll("IsWinLuckWithCvar randomization: %d <= %d", rand, g_hLuckChance.IntValue);
 	}
 	
 	return winner;
@@ -703,7 +767,7 @@ bool IsWinLuckWithCvar(bool wasOverriden)
 int GetItemRollLuck(ArrayList hArray, int client)
 {
 	Action luckAction;
-	int dummy, item_id, item_luck_chance, iNewLuckValue, size;
+	int dummy, item_luck_chance, iNewLuckValue, size;
 	size = hArray.Length;
 	while (size > 0)
 	{
@@ -713,12 +777,18 @@ int GetItemRollLuck(ArrayList hArray, int client)
 		item_luck_chance = GetItemLuckChance(dummy);
 		
 		luckAction = OnClientShouldLuckItemChance(client, dummy, iNewLuckValue);
+		
+		//PrintToChatAll("Item %d luck chance = %d, luckAction = %d, iNewLuckValue = %d", dummy, item_luck_chance, luckAction, iNewLuckValue);
 		if (luckAction == Plugin_Changed)
 		{
 			item_luck_chance = iNewLuckValue;
 		}
 		
-		if (GetRandomIntEx(1, 100) > item_luck_chance)
+		if (GetRandomIntEx(1, 100) <= item_luck_chance)
+		{
+			return dummy;
+		}
+		else
 		{
 			if (size < 2)
 			{
@@ -727,13 +797,9 @@ int GetItemRollLuck(ArrayList hArray, int client)
 			hArray.Erase(0);
 			size--;
 		}
-		
-		item_id = dummy;
-		
-		break;
 	}
 	
-	return item_id;
+	return view_as<int>(INVALID_ITEM);
 }
 
 stock bool Functions_AddTargetsToMenu(Menu menu, int filter_client)

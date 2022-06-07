@@ -1,8 +1,8 @@
-/*
+/**
 	Library of the [Shop] Core v3
-	Author: FrozDark
+	Author: FrozDark and FD-Forks team
 	www.hlmod.ru
-*/
+ */
 
 #if defined _shop_included
  #endinput
@@ -23,36 +23,36 @@ enum ItemId
 
 enum ItemType
 {
-	Item_None = 0,		/**< Can not be used */
-	Item_Finite = 1,	/**< Can be used like a medkit */
-	Item_Togglable = 2,	/**< Can be switched on or off */
-	Item_BuyOnly = 3	/**< Only for buy */
+	Item_None = 0,			// For nothing is used.
+	Item_Finite = 1,		// Can only be used, they have quantity.
+	Item_Togglable = 2,		// Can be toggleable, turn on or off.
+	Item_BuyOnly = 3		// Can only be bought.
 }
 
 enum ToggleState
 {
-	Toggle,
-	Toggle_On,
-	Toggle_Off
+	Toggle,					// Toggleable in reverse position.
+	Toggle_On,				// Turn on.
+	Toggle_Off				// Turn off.
 }
 
 enum ShopAction
 {
-	Shop_Raw = 0,
-	Shop_UseOn = 1,
-	Shop_UseOff = 2
+	Shop_Raw = 0,			// Cancel use or toggleable.
+	Shop_UseOn = 1,			// Confirm Item Enablement.
+	Shop_UseOff = 2			// Confirm item deactivation.
 }
 
 enum ShopMenu
 {
-	Menu_Main,
-	Menu_Buy,
-	Menu_Inventory,
-	Menu_Functions,
-	Menu_ExtraFunctions,
-	Menu_AdminPanel,
-	Menu_CreditsTransfer,
-	Menu_ItemTransfer
+	Menu_Main,				// Main menu (first menu by sm_shop command)
+	Menu_Buy,				// Buy Menu.
+	Menu_Inventory,			// Player Inventory.
+	Menu_Functions,			// Shop menu functions.
+	Menu_ExtraFunctions,	// Extra shop menu functions.
+	Menu_AdminPanel,		// Admin panel in the menu.
+	Menu_CreditsTransfer,	// Credit transfer menu.
+	Menu_ItemTransfer		// Item transfer menu.
 }
 
 #define	IGNORE_FORWARD_HOOK	-5				//**< Param to set to avoid calling forward hook */
@@ -69,253 +69,50 @@ enum ShopMenu
 #include <shop/items>
 #include <shop/players>
 #include <shop/register>
+#include <shop/methodmaps>
 
 /**
- *	Called when the shop is ready to register items
- *	
+ *	Called when the shop is ready to register items.
+ *
  *	@noparams
- *	
+ *
  *	@noreturn
-*/
+ */
 forward void Shop_Started();
 
 /**
- *	Called when the plugin has loaded the player's data
- *	
- *	@param client		Client index
- *	
- *	@noreturn
- */
-forward void Shop_OnAuthorized(int client);
-
-/**
- *	Called when a menu is being titled
- *	
- *	@param client			Client index to whom a menu is being titled
- *	@param menu_action		Menu that is being titled
- *	@param title			Current title is being set
- *	@param buffer			New title to set
- *	@param maxlength		Maxlength of the title
- *	
- *	@return true to apply new value and false to ignore
-*/
-forward bool Shop_OnMenuTitle(int client, ShopMenu menu_action, const char[] title, char[] buffer, int maxlength);
-
-/**
- *	Called when credits are being sent to a player
- *	
- *	@param client				Client index who is sending credits
- *	@param target				Client index to whom credits being sent
- *	@param amount_give			Amount of credits being given to a target player. By reference
- *	@param amount_remove		Amount of credits being taken from performing player.
- *	@param amount_commission	Amount of credits the commission was set. By reference
- *	@param bPercent				Whether the commission was set by the percent By reference
- *	
- *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block
-*/
-forward Action Shop_OnCreditsTransfer(int client, int target, int &amount_give, int &amount_remove, int &amount_commission, bool bPercent);
-
-/**
- *	Called when credits has been sent to a player
- *	
- *	@param client				Client index who sent credits
- *	@param target				Client index to whom credits were sent
- *	@param amount_give			Amount of credits has been given to a target player
- *	@param amount_remove		Amount of credits has been taken from a performing player
- *	@param amount_commission	Amount of credits the commission was set
- *	
- *	@noreturn
-*/
-forward void Shop_OnCreditsTransfered(int client, int target, int amount_give, int amount_remove, int amount_commission);
-
-/**
- *	Called when a player is being set credits to
- *	
- *	@param client			Client index who is being set to
- *	@param credits			Amount of credits a client is being set to. By reference
- *	@param by_who			See CREDITS_BY_* definitions for more info and any higher value is the admin index
- *	
- *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block
-*/
-forward Action Shop_OnCreditsSet(int client, int &credits, int by_who);
-
-/**
- *	Called when a player is being given credits to
- *	
- *	@param client			Client index who is being given to
- *	@param credits			Amount of credits a client is being given to. By reference
- *	@param by_who			See CREDITS_BY_* definitions for more info and any higher values is the admin index
- *	
- *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block
-*/
-forward Action Shop_OnCreditsGiven(int client, int &credits, int by_who);
-
-/**
- *	Called when a player is being taken credits from
- *	
- *	@param client			Client index who is being taken from
- *	@param credits			Amount of credits a client is being taken for. By reference
- *	@param by_who			See CREDITS_BY_* definitions for more info and any higher value is the admin index
- *	
- *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block
-*/
-forward Action Shop_OnCreditsTaken(int client, int &credits, int by_who);
-
-/**
- *	Called when a player is being set gold to
- *	
- *	@param client			Client index who is being set to
- *	@param amount			Amount of gold a client is being set to. By reference
- *	@param by_who			See CREDITS_BY_* definitions for more info and any higher value is the admin index
- *	
- *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block
-*/
-forward Action Shop_OnGoldSet(int client, int &amount, int by_who);
-
-/**
- *	Called when a player is being given gold to
- *	
- *	@param client			Client index who is being given to
- *	@param amount			Amount of gold a client is being given to. By reference
- *	@param by_who			See CREDITS_BY_* definitions for more info and any higher values is the admin index
- *	
- *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block
-*/
-forward Action Shop_OnGoldGiven(int client, int &amount, int by_who);
-
-/**
- *	Called when a player is being taken gold from
- *	
- *	@param client			Client index who is being taken from
- *	@param amount			Amount of gold a client is being taken for. By reference
- *	@param by_who			See CREDITS_BY_* definitions for more info and any higher value is the admin index
- *	
- *	@return Plugin_Changed to apply new values. >= Plugin_Handled to block
-*/
-forward Action Shop_OnGoldTaken(int client, int &amount, int by_who);
-
-/**
- *	Called when a player is trying to try a luck
- *	
- *	@param client			Client index who is perfroming
- *	
- *	@return true to allow performing and false to block
-*/
-forward bool Shop_OnClientLuckProcess(int client);
-
-/**
- *	Called when a player is nearly to win an item (deprecated)
- *	-
- *	@param client			client index
- *	@param item_id			Item id
- *	-
- *	@return true to allow and false to block
-*/
-#pragma deprecated This forward will be removed in a future, use Shop_OnClientShouldLuckItemChance instead.
-forward bool Shop_OnClientShouldLuckItem(int client, ItemId item_id);
-
-/**
- *	Called when a player is nearly to win an item
- *	-
- *	@param client			client index
- *	@param item_id			Item id
- *	@param luck_chance		luck chance (by reference)
- *	-
- *	@return Plugin_Changed to apply custom changes. >= Plugin_Handled to block, Plugin_Continue - to proceed without changes.
-*/
-forward Action Shop_OnClientShouldLuckItemChance(int client, ItemId item_id, int &luck_chance);
-
-/**
- *	Called when a player has won an item
- *	
- *	@param client			Client index who has won
- *	@param item_id			Item id of the item
- *	
- *	@noreturn
-*/
-forward void Shop_OnClientItemLucked(int client, ItemId item_id);
-
-/**
- *	Checks whether the shop has been started
- *	
+ *	Checks whether the shop has been started.
+ *
  *	@noparams
- *	
- *	@return	True if the shop is already started, false otherwise
-*/
+ *
+ *	@return	True if the shop is already started, false otherwise.
+ */
 native bool Shop_IsStarted();
 
 /**
- *	This must be called on PluginEnd. Fully unregisters the plugin. Unregisters items, categories and removes them from the shop and players' inventory
- *	
+ *	This must be called on PluginEnd. Fully unregisters the plugin. Unregisters items, categories and removes them from the shop and players' inventory.
+ *
  *	@noparams
- *	
+ *
  *	@noreturn
-*/
+ */
 native void Shop_UnregisterMe();
 
 /**
- *	Shows a player an item's panel
- *	
- *	@param client			Client index
- *	@param item_id			Item id of the item
- *	
- *	@return true if a panel has been shown, false otherwise
-*/
-native bool Shop_ShowItemPanel(int client, ItemId item_id);
-
-/**
- *	Opens main menu for a player
- *	
- *	@param client			Client index
- *	
+ *	Get path to the main config folder of the Shop.
+ *
+ *	@param buffer			Buffer to store the path in.
+ *	@param size				Max buffer length.
+ *	@param file				File to retrieve the path for.
+ *
  *	@noreturn
-*/
-native void Shop_OpenMainMenu(int client);
-
-/**
- *	Shows a player categories of the shop
- *	
- *	@param client			Client index
- *	
- *	@return true if categories has been shown, false otherwise
-*/
-native bool Shop_ShowCategory(int client);
-
-/**
- *	Shows a player his inventory
- *	
- *	@param client			Client index
- *	
- *	@return true if the inventory has been shown, false otherwise
-*/
-native bool Shop_ShowInventory(int client);
-
-/**
- *	Shows a player items of a category
- *	
- *	@param client			Client index
- *	@param category_id		Category id to show
- *	@param inventory		To show items of his inventory
- *	
- *	@return true if the items has been shown, false otherwise
-*/
-native bool Shop_ShowItemsOfCategory(int client, CategoryId category_id, bool inventory = false);
-
-/**
- *	Get path to the main config folder of the Shop
- *	
- *	@param buffer			Buffer to store the path in
- *	@param size				Max buffer length
- *	@param file				File to retrieve the path for
- *	
- *	@noreturn
-*/
+ */
 stock void Shop_GetCfgFile(char[] buffer, int size, const char[] file)
 {
 	BuildPath(Path_SM, buffer, size, "configs/shop/%s", file);
 }
 
-public SharedPlugin __pl_shop = 
+public SharedPlugin __pl_shop =
 {
 	name = "shop",
 	file = "shop.smx",
@@ -331,6 +128,7 @@ public void __pl_shop_SetNTVOptional()
 {
 	MarkNativeAsOptional("Shop_IsStarted");
 	MarkNativeAsOptional("Shop_UnregisterMe");
+	MarkNativeAsOptional("Shop_UnregisterItem");
 	MarkNativeAsOptional("Shop_ShowItemPanel");
 	MarkNativeAsOptional("Shop_OpenMainMenu");
 	MarkNativeAsOptional("Shop_ShowCategory");
@@ -338,15 +136,15 @@ public void __pl_shop_SetNTVOptional()
 	MarkNativeAsOptional("Shop_ShowItemsOfCategory");
 	MarkNativeAsOptional("Shop_GetDatabase");
 	MarkNativeAsOptional("Shop_GetDatabasePrefix");
-	
+
 	MarkNativeAsOptional("Shop_ShowAdminMenu");
 	MarkNativeAsOptional("Shop_AddToAdminMenu");
 	MarkNativeAsOptional("Shop_RemoveFromAdminMenu");
-	
+
 	MarkNativeAsOptional("Shop_ShowFunctionsMenu");
 	MarkNativeAsOptional("Shop_AddToFunctionsMenu");
 	MarkNativeAsOptional("Shop_RemoveFromFunctionsMenu");
-	
+
 	MarkNativeAsOptional("Shop_RegisterCategory");
 	MarkNativeAsOptional("Shop_StartItem");
 	MarkNativeAsOptional("Shop_SetInfo");
@@ -357,7 +155,7 @@ public void __pl_shop_SetNTVOptional()
 	MarkNativeAsOptional("Shop_SetCustomInfoString");
 	MarkNativeAsOptional("Shop_KvCopySubKeysCustomInfo");
 	MarkNativeAsOptional("Shop_EndItem");
-	
+
 	MarkNativeAsOptional("Shop_GetItemCustomInfo");
 	MarkNativeAsOptional("Shop_SetItemCustomInfo");
 	MarkNativeAsOptional("Shop_GetItemCustomInfoFloat");
@@ -388,7 +186,8 @@ public void __pl_shop_SetNTVOptional()
 	MarkNativeAsOptional("Shop_GetCategoryNameById");
 	MarkNativeAsOptional("Shop_FillArrayByItems");
 	MarkNativeAsOptional("Shop_FormatItem");
-	
+	MarkNativeAsOptional("Shop_GetClientItems");
+
 	MarkNativeAsOptional("Shop_GetClientId");
 	MarkNativeAsOptional("Shop_SetClientItemTimeleft");
 	MarkNativeAsOptional("Shop_GetClientItemTimeleft");
@@ -413,5 +212,54 @@ public void __pl_shop_SetNTVOptional()
 	MarkNativeAsOptional("Shop_RemoveClientItem");
 	MarkNativeAsOptional("Shop_GetClientItemCount");
 	MarkNativeAsOptional("Shop_UseClientItem");
+	MarkNativeAsOptional("Shop_SetHide");
+	MarkNativeAsOptional("Shop_GetClientItems");
+
+	MarkNativeAsOptional("CategoryId.CategoryId");
+	MarkNativeAsOptional("CategoryId.NewItem");
+	MarkNativeAsOptional("CategoryId.GetItemId");
+	MarkNativeAsOptional("CategoryId.GetByUnique");
+	MarkNativeAsOptional("CategoryId.GetUniqueName");
+	MarkNativeAsOptional("CategoryId.GetDisplayName");
+	MarkNativeAsOptional("CategoryId.ToggleOff");
+	MarkNativeAsOptional("CategoryId.Exist.get");
+
+	MarkNativeAsOptional("ItemId.GetCustomInfo");
+	MarkNativeAsOptional("ItemId.SetCustomInfo");
+	MarkNativeAsOptional("ItemId.GetCustomInfoFloat");
+	MarkNativeAsOptional("ItemId.SetCustomInfoFloat");
+	MarkNativeAsOptional("ItemId.GetCustomInfoString");
+	MarkNativeAsOptional("ItemId.SetCustomInfoString");
+	MarkNativeAsOptional("ItemId.KvCopyCustomInfo");
+	MarkNativeAsOptional("ItemId.GetUniqueName");
+	MarkNativeAsOptional("ItemId.GetDisplayName");
+	MarkNativeAsOptional("ItemId.Format");
+	MarkNativeAsOptional("ItemId.Give");
+	MarkNativeAsOptional("ItemId.Buy");
+	MarkNativeAsOptional("ItemId.Sell");
+	MarkNativeAsOptional("ItemId.Use");
+	MarkNativeAsOptional("ItemId.Remove");
+	MarkNativeAsOptional("ItemId.GetCount");
+	MarkNativeAsOptional("ItemId.SetCount");
+	MarkNativeAsOptional("ItemId.SetTimeLeft");
+	MarkNativeAsOptional("ItemId.GetTimeLeft");
+	MarkNativeAsOptional("ItemId.GetSellPrice");
+	MarkNativeAsOptional("ItemId.IsToggled");
+	MarkNativeAsOptional("ItemId.IsHas");
+	MarkNativeAsOptional("ItemId.Toggle");
+	MarkNativeAsOptional("ItemId.CategoryId.get");
+	MarkNativeAsOptional("ItemId.Price.get");
+	MarkNativeAsOptional("ItemId.Price.set");
+	MarkNativeAsOptional("ItemId.SellPrice.get");
+	MarkNativeAsOptional("ItemId.SellPrice.set");
+	MarkNativeAsOptional("ItemId.Value.get");
+	MarkNativeAsOptional("ItemId.Value.set");
+	MarkNativeAsOptional("ItemId.LuckChange.get");
+	MarkNativeAsOptional("ItemId.LuckChange.set");
+	MarkNativeAsOptional("ItemId.Hide.get");
+	MarkNativeAsOptional("ItemId.Hide.set");
+	MarkNativeAsOptional("ItemId.ItemType.get");
+	MarkNativeAsOptional("ItemId.Exist.get");
+
 }
 #endif

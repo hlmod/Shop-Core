@@ -48,7 +48,7 @@
 	"ReceiveSuccess"
 	{
 		"ru"		"{green}[Shop]{default} Вы успешно получили {green}{1}{default} кредит(-ов) от игрока {green}{2}{default}!"
-  }
+	}
 
 	"ReceiveCommission"
 	{
@@ -158,7 +158,7 @@
 	"give_item_success"
 	{
 		"ru"		"{green}[Shop]{default} Вы успешно дали предмет!"
-  }
+	}
 
 	"take_item_success"
 	{
@@ -207,7 +207,7 @@
 	"EmptyCategory"
 	{
 		"ru"		"{green}[Shop]{default} Категория пуста!"
-  }
+	}
 
 	"NothingToLuck"
 	{
@@ -296,7 +296,7 @@
 	"Sell Price"
 	{
 		"ru"		"Цена продажи"
-  }
+	}
 
 	"absolute_sellprice"
 	{
@@ -306,7 +306,7 @@
 	"Free"
 	{
 		"ru"		"Бесплатно"
-  }
+	}
 
 	"Unsaleable"
 	{
@@ -395,7 +395,7 @@
 
 	"preview_unavailable"
 	{
-		"ru"		"Превью недоступен"
+		"ru"		"Превью недоступно"
 	}
 
 	"functions"
@@ -446,6 +446,21 @@
 	"DataLoading"
 	{
 		"ru"		"{green}[Shop] {default}Ваши данные загружаются!"
+	}
+
+	"You Buy Sure"
+	{
+		"ru"		"Вы уверены что хотите купить этот предмет?"
+	}
+
+	"You Sell Sure"
+	{
+		"ru"		"Вы уверены что хотите продать этот предмет?"
+	}
+
+	"confirm_luck"
+	{
+		"ru"		"Вы уверены, что хотите испытать удачу за {1} кредитов?"
 	}
 
 	"y."

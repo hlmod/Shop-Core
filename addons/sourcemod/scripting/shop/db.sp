@@ -2,7 +2,13 @@ Database h_db;
 
 ShopDBType db_type;
 
-DataPack backup_dp;
+enum struct backup_struct {
+	SQLQueryCallback CallBack;
+	any Data;
+	DBPriority Prio;
+	char QueryBuffer[512]; 
+}
+ArrayList ar_backups;
 
 int iDays = -1;
 
@@ -36,7 +42,7 @@ void DB_OnPluginStart()
 {
 	RegServerCmd("sm_shop_clear_db", DB_Command_Clear, "Clears database");
 	
-	backup_dp = new DataPack();
+	ar_backups = new ArrayList(sizeof(backup_struct));
 	DB_TryConnect();
 }
 
@@ -222,6 +228,8 @@ public Action DB_ReconnectTimer(Handle timer)
 	{
 		DB_TryConnect();
 	}
+
+	return Plugin_Continue;
 }
 
 DataPack upgrade_dp;
@@ -500,14 +508,7 @@ stock void DB_FastQuery(const char[] query)
 {
 	if (h_db == null)
 	{
-		DataPack dp = new DataPack();
-		dp.WriteFunction(DB_ErrorCheck);
-		dp.WriteString(query);
-		dp.WriteCell(0);
-		dp.WriteCell(view_as<int>(DBPrio_Normal));
-		
-		backup_dp.WriteCell(dp);
-		
+		WriteBackUp(DB_ErrorCheck, query, 0, DBPrio_Normal);
 		return;
 	}
 	
@@ -516,20 +517,26 @@ stock void DB_FastQuery(const char[] query)
 	SQL_UnlockDatabase(h_db);
 }
 
+void WriteBackUp(SQLQueryCallback callback, const char[] query, any data = 0, DBPriority prio)
+{
+	backup_struct backup;
+
+	backup.CallBack = callback;
+	FormatEx(backup.QueryBuffer, sizeof(backup.QueryBuffer), query);
+	backup.Data = data;
+	backup.Prio = prio;
+
+	ar_backups.PushArray(backup);
+}
+
 void DB_TQuery(SQLQueryCallback callback, const char[] query, any data = 0, DBPriority prio = DBPrio_Normal)
 {
 	if (h_db == null)
 	{
-		DataPack dp = new DataPack();
-		dp.WriteFunction(callback);
-		dp.WriteString(query);
-		dp.WriteCell(data);
-		dp.WriteCell(prio);
-		
-		backup_dp.WriteCell(dp);
-		
+		WriteBackUp(callback, query, data, prio);
 		return;
 	}
+
 	h_db.Query(callback, query, data, prio);
 }
 
@@ -537,14 +544,7 @@ void DB_TQueryEx(const char[] query, DBPriority prio = DBPrio_Normal)
 {
 	if (h_db == null)
 	{
-		DataPack dp = new DataPack();
-		dp.WriteFunction(DB_ErrorCheck);
-		dp.WriteString(query);
-		dp.WriteCell(0);
-		dp.WriteCell(prio);
-		
-		backup_dp.WriteCell(dp);
-		
+		WriteBackUp(DB_ErrorCheck, query, 0, prio);
 		return;
 	}
 	h_db.Query(DB_ErrorCheck, query, _, prio);
@@ -557,27 +557,15 @@ void DB_EscapeString(const char[] string, char[] buffer, int maxlength, int &wri
 
 void DB_RunBackup()
 {
-	char buffer[256];
-	DataPack dp;
-	SQLQueryCallback callback;
-	any data;
-	DBPriority prio;
-	
-	backup_dp.Reset();
-	while (IsPackReadable(backup_dp, 1))
+	ArrayList ar = ar_backups.Clone();
+	ar_backups.Clear();
+	backup_struct backup;
+
+	for(int id, length = ar.Length; id < length; id++) 
 	{
-		dp = backup_dp.ReadCell();
-		
-		callback = view_as<SQLQueryCallback>(dp.ReadFunction());
-		dp.ReadString(buffer, sizeof(buffer));
-		data = dp.ReadCell();
-		prio = view_as<DBPriority>(dp.ReadCell());
-		
-		delete dp;
-		
-		DB_TQuery(callback, buffer, data, prio);
+		ar.GetArray(id, backup);
+		DB_TQuery(backup.CallBack, backup.QueryBuffer, backup.Data, backup.Prio);
 	}
-	backup_dp.Reset(true);
 }
 
 stock bool DB_IsConnected()

@@ -286,8 +286,6 @@
 	"luck_credits_chance"
 	{
 		"#format"   "{1:i},{2:i}"
-		"ru"		"[Шанс: {2}%%|Цена: {1}]"
-		"ua"		"[Шанс: {2}%%|Ціна: {1}]"
 		"en"		"[Chance: {2}%%|Price: {1}]"
 	}
 
@@ -477,6 +475,22 @@
 	"DataLoading"
 	{
 		"en"		"{green}[Shop] {default}Your data is being loaded!"
+	}
+
+	"You Buy Sure"
+	{
+		"en"		"Are you sure to purchase this item?"
+	}
+
+	"You Sell Sure"
+	{
+		"en"		"Are you sure to sell this item?"
+	}
+
+	"confirm_luck"
+	{
+		"#format"	"{1:i}"
+		"en"		"Are you sure to spend {1} credits for Try a Luck?"
 	}
 
 	"y."
