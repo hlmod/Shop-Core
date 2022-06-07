@@ -1584,65 +1584,82 @@ bool ItemManager_GetItemDisplay(int item_id, int source_client, char[] buffer, i
 	return true;
 }
 
-bool ItemManager_FillItemsOfCategory(Menu menu, int client, int source_client, int category_id, bool inventory = false, bool showAll = false)
+bool ItemManager_FillItemsOfCategory(Menu menu, int client, int source_client, int category_id, ShopMenu shop_menu, bool showAll = false)
 {
-	bool result = false;
 	h_KvItems.Rewind();
-	if (h_KvItems.GotoFirstSubKey())
+	KeyValues kv = new KeyValues("Temp");
+	kv.Import(h_KvItems);
+
+	char display[SHOP_MAX_STRING_LENGTH];
+
+	if(kv.GotoFirstSubKey())
 	{
-		char sItemId[16], display[SHOP_MAX_STRING_LENGTH], category[SHOP_MAX_STRING_LENGTH], item[SHOP_MAX_STRING_LENGTH];
+		int item_id;
+		Handle plugin;
+		DataPack dpCallback;
+		Action aShouldDisplay;
+		bool bShouldDisplay, disabled;
+		char sItemId[16], category[SHOP_MAX_STRING_LENGTH], item[SHOP_MAX_STRING_LENGTH];
 		h_arCategories.GetString(category_id, category, sizeof(category));
+
 		do
 		{
-			bool isHidden = view_as<bool>(h_KvItems.GetNum("hide", 0));
-			if (h_KvItems.GetNum("category_id", -1) != category_id || !h_KvItems.GetSectionName(sItemId, sizeof(sItemId)) || (inventory && !ClientHasItemEx(client, sItemId)))
+			if((shop_menu != Menu_Inventory || shop_menu != Menu_ItemTransfer) && !showAll && kv.GetNum("hide", 0))
+			{
+				continue;
+			}
+
+			if (kv.GetNum("category_id", -1) != category_id || !kv.GetSectionName(sItemId, sizeof(sItemId)))
+			{
+				continue;
+			}
+
+			if((shop_menu == Menu_Inventory || shop_menu == Menu_ItemTransfer) && !ClientHasItemEx(client, sItemId))
+			{
+				continue;
+			}
+
+			kv.GetString("item", item, sizeof(item));
+			
+			item_id = StringToInt(sItemId);
+			plugin = view_as<Handle>(kv.GetNum("plugin"));
+
+			if ((dpCallback = view_as<DataPack>(kv.GetNum("callbacks", 0))) == null)
+			{
+				ThrowNativeError(SP_ERROR_NATIVE, "Callbacks for this item not found");		
+			}
+			
+			disabled = false;
+			aShouldDisplay = Forward_OnItemDraw(client, shop_menu, category_id, item_id, disabled);
+
+			dpCallback.Position = ITEM_DATAPACKPOS_SHOULD_DISPLAY;
+			bShouldDisplay = ItemManager_OnItemShouldDisplay(plugin, dpCallback.ReadFunction(), source_client, category_id, category, item_id, item, shop_menu);
+
+			if(aShouldDisplay >= Plugin_Handled || !bShouldDisplay) 
 			{
 				continue;
 			}
 			
-			if (!inventory && !showAll && isHidden) continue;
-			
-			h_KvItems.GetString("item", item, sizeof(item));
-			
-			int item_id = StringToInt(sItemId);
-			
-			Handle plugin = view_as<Handle>(h_KvItems.GetNum("plugin"));
-			
-			h_KvItems.GetString("name", display, sizeof(display));
-			
-			DataPack dpCallback = view_as<DataPack>(h_KvItems.GetNum("callbacks", 0));
-			if (dpCallback == null)
-				ThrowNativeError(SP_ERROR_NATIVE, "Callbacks for this item not found");
-			
+			kv.GetString("name", display, sizeof(display));
+
 			dpCallback.Position = ITEM_DATAPACKPOS_DISPLAY;
-			Function callback_display = dpCallback.ReadFunction();
+			ItemManager_OnItemDisplay(plugin, dpCallback.ReadFunction(), source_client, category_id, category, item_id, item, shop_menu, disabled, display, display, sizeof(display));
 			
-			dpCallback.Position = ITEM_DATAPACKPOS_SHOULD_DISPLAY;
-			Function callback_should = dpCallback.ReadFunction();
-			
-			h_KvItems.Rewind();
-			
-			bool bShouldDisplay = ItemManager_OnItemShouldDisplay(plugin, callback_should, source_client, category_id, category, item_id, item, inventory ? Menu_Inventory : Menu_Buy);
-			
-			bool disabled = false;
-			if (!ItemManager_OnItemDisplay(plugin, callback_display, source_client, category_id, category, item_id, item, inventory ? Menu_Inventory : Menu_Buy, disabled, display, display, sizeof(display)))
-			{
-				disabled = false;
-			}
-			
-			h_KvItems.JumpToKey(sItemId);
-			
-			if (bShouldDisplay)
-				menu.AddItem(sItemId, display, disabled ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
-			
-			result = true;
+			menu.AddItem(sItemId, display, disabled ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
 		}
-		while (h_KvItems.GotoNextKey());
-		
-		h_KvItems.Rewind();
+		while (kv.GotoNextKey());
 	}
-	
-	return result;
+
+	delete kv;
+
+	if(!menu.ItemCount) 
+	{
+		FormatEx(display, sizeof(display), "%T", "MenuEmptyCategory", client);
+		menu.AddItem("", display, ITEMDRAW_DISABLED);
+		return false;
+	}
+
+	return true;
 }
 
 Panel ItemManager_CreateItemPanelInfo(int source_client, int item_id, ShopMenu menu_act)
@@ -2344,6 +2361,7 @@ bool ItemManager_OnItemShouldDisplay(Handle plugin, Function callback, int clien
 bool ItemManager_OnItemDisplay(Handle plugin, Function callback, int client, int category_id, const char[] category, int item_id, const char[] item, ShopMenu menu, bool &disabled = false, const char[] name, char[] buffer, int maxlen)
 {
 	bool result = false;
+	bool call_disabled = disabled;
 	
 	if (IsCallValid(plugin, callback))
 	{
@@ -2354,7 +2372,7 @@ bool ItemManager_OnItemDisplay(Handle plugin, Function callback, int client, int
 		Call_PushCell(item_id);
 		Call_PushString(item);
 		Call_PushCell(menu);
-		Call_PushCellRef(disabled);
+		Call_PushCellRef(call_disabled);
 		Call_PushString(name);
 		Call_PushStringEx(buffer, maxlen, SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
 		Call_PushCell(maxlen);
@@ -2364,6 +2382,10 @@ bool ItemManager_OnItemDisplay(Handle plugin, Function callback, int client, int
 	if (!result)
 	{
 		strcopy(buffer, maxlen, name);
+	} 
+	else
+	{
+		disabled = call_disabled;
 	}
 	
 	return result;

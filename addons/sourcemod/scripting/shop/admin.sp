@@ -488,13 +488,8 @@ bool Admin_ShowItemsOfCategory(int client, int category_id, int pos = 0)
 	SetGlobalTransTarget(client);
 	
 	Menu menu = new Menu(Admin_ItemsMenu_Handler, MENU_ACTIONS_DEFAULT|MenuAction_Display|MenuAction_DrawItem|MenuAction_DisplayItem);
-	if (!FillItemsOfCategory(menu, client, client, category_id, true))
-	{
-		CPrintToChat(client, "%t", "EmptyCategory");
-		delete menu;
-		return false;
-	}
-	
+	FillItemsOfCategory(menu, client, client, category_id, Menu_AdminPanel, true);
+
 	menu.ExitButton = true;
 	menu.ExitBackButton = true;
 	
@@ -524,7 +519,13 @@ public int Admin_ItemsMenu_Handler(Menu menu, MenuAction action, int param1, int
 		case MenuAction_DrawItem  :
 		{
 			char info[16];
-			menu.GetItem(param2, info, sizeof(info));
+			int style;
+			menu.GetItem(param2, info, sizeof(info), style);
+			
+			if(!info[0])
+			{
+				return style;
+			} 
 			
 			int target = GetClientOfUserId(g_iOpt[param1].AdminTarget);
 			
@@ -555,6 +556,11 @@ public int Admin_ItemsMenu_Handler(Menu menu, MenuAction action, int param1, int
 		{
 			char info[16], buffer[SHOP_MAX_STRING_LENGTH];
 			menu.GetItem(param2, info, sizeof(info), _, buffer, sizeof(buffer));
+
+			if(!info[0])
+			{
+				return 0;
+			} 
 			
 			ItemType type = GetItemTypeEx(info);
 			

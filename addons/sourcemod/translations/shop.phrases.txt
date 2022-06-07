@@ -229,6 +229,11 @@
 		"en"		"{green}[Shop]{default} The category is empty!"
 	}
 
+	"MenuEmptyCategory"
+	{
+		"en"    	"The category is empty!"
+	}
+
 	"NothingToLuck"
 	{
 		"en"		"{green}[Shop]{default} There is nothing that you can luck!"
