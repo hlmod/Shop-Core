@@ -761,7 +761,8 @@ public int OnItemSelect(Menu menu, MenuAction action, int param1, int param2)
 		case MenuAction_DrawItem :
 		{
 			char info[16];
-			menu.GetItem(param2, info, sizeof(info));
+			int style;
+			menu.GetItem(param2, info, sizeof(info), style);
 			
 			bool disabled;
 			Action result = Forward_OnItemDraw(param1, bInv[param1] ? Menu_Inventory : Menu_Buy, iClCategoryId[param1], StringToInt(info), disabled);
@@ -774,6 +775,7 @@ public int OnItemSelect(Menu menu, MenuAction action, int param1, int param2)
 			{
 				return ITEMDRAW_DISABLED;
 			}
+			return style;
 		}
 		case MenuAction_DisplayItem:
 		{
