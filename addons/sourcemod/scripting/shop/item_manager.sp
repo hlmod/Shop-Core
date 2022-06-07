@@ -1484,7 +1484,7 @@ bool ItemManager_FillCategories(Menu menu, int source_client, ShopMenu shop_menu
 		{
 			continue;
 		}
-		
+
 		trie.GetString("name", buffer, sizeof(buffer));
 		ItemManager_OnCategoryDisplay(on_display_hndl, on_display_func, source_client, index, category, buffer, display, sizeof(display), shop_menu);
 		
