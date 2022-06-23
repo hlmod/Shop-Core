@@ -209,6 +209,11 @@
 		"ua"		"{green}[Shop]{default} Категорія порожня!"
 	}
 
+	"MenuEmptyCategory"
+	{
+		"en"    	"Категорія порожня!"
+	}
+
 	"NothingToLuck"
 	{
 		"ua"		"{green}[Shop]{default} Немає нічого, що ви могли б виграти!"

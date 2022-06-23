@@ -209,6 +209,11 @@
 		"ru"		"{green}[Shop]{default} Категория пуста!"
 	}
 
+	"MenuEmptyCategory"
+	{
+		"ru"		"Категория пуста!"
+	}
+
 	"NothingToLuck"
 	{
 		"ru"		"{green}[Shop]{default} Нет ничего, что вы могли бы выйграть!"

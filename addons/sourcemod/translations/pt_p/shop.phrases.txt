@@ -229,6 +229,11 @@
 		"pt_p"		"{green}[Loja]{default} Categoria vazia!"
 	}
 
+	"MenuEmptyCategory"
+	{
+		"pt_p"		"Categoria vazia!"
+	}
+
 	"NothingToLuck"
 	{
 		"pt_p"		"{green}[Loja]{default} Não há nada que te possa dar sorte!"

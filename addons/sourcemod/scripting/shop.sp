@@ -186,7 +186,7 @@ public int Native_ShowItemsOfCategory(Handle plugin, int params)
 	{
 		ThrowNativeError(1, "Category id %d is invalid!", category_id);
 	}
-	return ShowItemsOfCategory(client, category_id, GetNativeCell(3));
+	return ShowItemsOfCategory(client, category_id, GetNativeCell(3) ? Menu_Inventory : Menu_Buy);
 }
 
 public void OnPluginStart()
@@ -598,11 +598,7 @@ public int OnInventorySelect(Menu menu, MenuAction action, int param1, int param
 				return 0;
 			}
 
-			if (!ShowItemsOfCategory(param1, StringToInt(info), true) && !ShowInventory(param1))
-			{
-				ShowMainMenu(param1);
-				CPrintToChat(param1, "%t", "EmptyInventory");
-			}
+			ShowItemsOfCategory(param1, StringToInt(info), Menu_Inventory);
 		}
 		case MenuAction_Cancel:
 		{
@@ -623,7 +619,7 @@ public int OnInventorySelect(Menu menu, MenuAction action, int param1, int param
 bool ShowCategories(int client)
 {
 	Menu menu = new Menu(OnCategorySelect);
-	
+
 	if (!ItemManager_FillCategories(menu, client, Menu_Buy))
 	{
 		delete menu;
@@ -661,11 +657,7 @@ public int OnCategorySelect(Menu menu, MenuAction action, int param1, int param2
 				return 0;
 			}
 			
-			if (!ShowItemsOfCategory(param1, category_id, false) && !ShowCategories(param1))
-			{
-				ShowMainMenu(param1);
-				CPrintToChat(param1, "%t", "EmptyShop");
-			}
+			ShowItemsOfCategory(param1, category_id, Menu_Buy);
 		}
 		case MenuAction_Cancel :
 		{
@@ -680,40 +672,25 @@ public int OnCategorySelect(Menu menu, MenuAction action, int param1, int param2
 	return 0;
 }
 
-bool ShowItemsOfCategory(int client, int category_id, bool inventory, int pos = 0)
+bool ShowItemsOfCategory(int client, int category_id, ShopMenu shop_menu, int pos = 0)
 {
-	Menu menu = new Menu(OnItemSelect, MENU_ACTIONS_DEFAULT|MenuAction_DrawItem|MenuAction_DisplayItem);
-	if (!ItemManager_FillItemsOfCategory(menu, client, client, category_id, inventory))
-	{
-		delete menu;
-		return false;
-	}
+	Menu menu = new Menu(OnItemSelect, MENU_ACTIONS_DEFAULT|MenuAction_DisplayItem);
+	bool result = ItemManager_FillItemsOfCategory(menu, client, client, category_id, shop_menu);
+
 	char title[128];
-	if (inventory)
-	{
-		FormatEx(title, sizeof(title), "%T\n%T", "inventory", client, "credits", client, PlayerManager_GetCredits(client));
-		OnMenuTitle(client, Menu_Inventory, title, title, sizeof(title));
-		iClMenuId[client] = Menu_Inventory;
-	}
-	else
-	{
-		FormatEx(title, sizeof(title), "%T\n%T", "Shop", client, "credits", client, PlayerManager_GetCredits(client));
-		OnMenuTitle(client, Menu_Buy, title, title, sizeof(title));
-		iClMenuId[client] = Menu_Buy;
-	}
-	
+	FormatEx(title, sizeof(title), "%T\n%T", (shop_menu == Menu_Inventory) ? "inventory" : "Shop", client, "credits", client, PlayerManager_GetCredits(client));
+	OnMenuTitle(client, shop_menu, title, title, sizeof(title));
 	menu.SetTitle(title);
 	
-	bInv[client] = inventory;
-	
-	menu.ExitButton = true;
-	menu.ExitBackButton = true;
-	
+	bInv[client] = (shop_menu == Menu_Inventory);
 	iClCategoryId[client] = category_id;
+	iClMenuId[client] = shop_menu;
+	
+	menu.ExitBackButton = true;
+	menu.ExitButton = true;
 	
 	menu.DisplayAt(client, pos, MENU_TIME_FOREVER);
-	
-	return true;
+	return result;
 }
 
 public int OnItemSelect(Menu menu, MenuAction action, int param1, int param2)
@@ -726,16 +703,14 @@ public int OnItemSelect(Menu menu, MenuAction action, int param1, int param2)
 			menu.GetItem(param2, info, sizeof(info));
 			iPos[param1] = GetMenuSelectionPosition();
 
-			ShopMenu shop_menu = (bInv[param1] ? Menu_Inventory : Menu_Buy);
 			int value = StringToInt(info);
-			
-			Action result = Forward_OnItemSelect(param1, shop_menu, iClCategoryId[param1], value);
+			Action result = Forward_OnItemSelect(param1, iClMenuId[param1], iClCategoryId[param1], value);
 			
 			if (result == Plugin_Handled || 
 			((result == Plugin_Changed || result == Plugin_Continue) && !ShowItemInfo(param1, value)))
 			{
-				ShowItemsOfCategory(param1, iClCategoryId[param1], bInv[param1], iPos[param1]);
-				Forward_OnItemSelected(param1, shop_menu, iClCategoryId[param1], value);
+				Forward_OnItemSelected(param1, iClMenuId[param1], iClCategoryId[param1], value);
+				ShowItemsOfCategory(param1, iClCategoryId[param1], iClMenuId[param1], iPos[param1]);
 			}
 		}
 		case MenuAction_Cancel :
@@ -758,29 +733,15 @@ public int OnItemSelect(Menu menu, MenuAction action, int param1, int param2)
 			}
 		}
 		case MenuAction_End : delete menu;
-		case MenuAction_DrawItem :
-		{
-			char info[16];
-			int style;
-			menu.GetItem(param2, info, sizeof(info), style);
-			
-			bool disabled;
-			Action result = Forward_OnItemDraw(param1, bInv[param1] ? Menu_Inventory : Menu_Buy, iClCategoryId[param1], StringToInt(info), disabled);
-
-			if(result >= Plugin_Handled) 
-			{
-				return ITEMDRAW_IGNORE;
-			} 
-			else if (result == Plugin_Changed && disabled) 
-			{
-				return ITEMDRAW_DISABLED;
-			}
-			return style;
-		}
 		case MenuAction_DisplayItem:
 		{
 			char info[16], sBuffer[SHOP_MAX_STRING_LENGTH];
 			menu.GetItem(param2, info, sizeof(info), _, sBuffer, sizeof(sBuffer));
+
+			if(!info[0])
+			{
+				return 0;
+			} 
 			
 			bool result = Forward_OnItemDisplay(param1, bInv[param1] ? Menu_Inventory : Menu_Buy, iClCategoryId[param1], StringToInt(info), sBuffer, sBuffer, sizeof(sBuffer));
 			
@@ -1176,11 +1137,7 @@ public int ItemPanel_Handler(Menu menu, MenuAction action, int param1, int param
 					}
 					if (bInv[param1] && PlayerManager_GetItemCount(param1, iClItemId[param1]) < 1)
 					{
-						if (!ShowItemsOfCategory(param1, iClCategoryId[param1], true, iPos[param1]) && !ShowInventory(param1))
-						{
-							ShowMainMenu(param1);
-							CPrintToChat(param1, "%t", "EmptyInventory");
-						}
+						ShowItemsOfCategory(param1, iClCategoryId[param1], iClMenuId[param1], iPos[param1]);
 					}
 				}
 				case BUTTON_PREVIEW :
@@ -1226,25 +1183,7 @@ public int ItemPanel_Handler(Menu menu, MenuAction action, int param1, int param
 				{
 					if(param2 == g_iMaxPageItems-2)
 					{
-						switch (iClMenuId[param1])
-						{
-							case Menu_Buy :
-							{
-								if (!ShowItemsOfCategory(param1, iClCategoryId[param1], false, iPos[param1]) && !ShowCategories(param1))
-								{
-									ShowMainMenu(param1);
-									CPrintToChat(param1, "%t", "EmptyShop");
-								}
-							}
-							case Menu_Inventory :
-							{
-								if (!ShowItemsOfCategory(param1, iClCategoryId[param1], true, iPos[param1]) && !ShowInventory(param1))
-								{
-									ShowMainMenu(param1);
-									CPrintToChat(param1, "%t", "EmptyInventory");
-								}
-							}
-						}
+						ShowItemsOfCategory(param1, iClCategoryId[param1], iClMenuId[param1], iPos[param1]);
 					}
 				}
 			}
@@ -2068,9 +2007,9 @@ bool FillCategories(Menu menu, int source_client, ShopMenu shop_menu, bool showA
 	return ItemManager_FillCategories(menu, source_client, shop_menu, showAll);
 }
 
-bool FillItemsOfCategory(Menu menu, int client, int source_client, int category_id, bool showAll = false)
+bool FillItemsOfCategory(Menu menu, int client, int source_client, int category_id, ShopMenu shop_menu, bool showAll = false)
 {
-	return ItemManager_FillItemsOfCategory(menu, client, source_client, category_id, _, showAll);
+	return ItemManager_FillItemsOfCategory(menu, client, source_client, category_id, shop_menu, showAll);
 }
 
 int GetItemCategoryId(int item_id)
