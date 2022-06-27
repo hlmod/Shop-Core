@@ -66,6 +66,34 @@ forward bool Shop_OnItemDisplay(int client, ShopMenu menu_action, CategoryId cat
 forward bool Shop_OnItemDescription(int client, ShopMenu menu_action, CategoryId category_id, ItemId item_id, const char[] description, char[] buffer, int maxlength);
 
 /**
+ *	Called when the player wants to exit the item panel.
+ *
+ *	@param client				Client index that performing this.
+ *	@param menu_action			Menu performing this action.
+ *	@param category_id			Category id of an item.
+ *	@param category				Category unique name.
+ *	@param item_id				Item id of an item.
+ *	@param item					Item's unique name.
+ *
+ *	@return true to continue, false otherwise.
+ */
+forward bool Shop_OnItemPanelExitButton(int client, ShopMenu menu_action, CategoryId category_id, const char[] category, ItemId item_id, const char[] item);
+
+/**
+ *	Called when the player wants to return to a menu earlier from the item panel.
+ *
+ *	@param client				Client index that performing this.
+ *	@param menu_action			Menu performing this action.
+ *	@param category_id			Category id of an item.
+ *	@param category				Category unique name.
+ *	@param item_id				Item id of an item.
+ *	@param item					Item's unique name.
+ *
+ *	@return true to continue, false otherwise.
+ */
+forward bool Shop_OnItemPanelBackButton(int client, ShopMenu menu_action, CategoryId category_id, const char[] category, ItemId item_id, const char[] item);
+
+/**
  *	Called when an item is being bought.
  *
  *	@param client				Client index that performing this.

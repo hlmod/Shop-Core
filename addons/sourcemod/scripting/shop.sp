@@ -1181,9 +1181,28 @@ public int ItemPanel_Handler(Menu menu, MenuAction action, int param1, int param
 				}
 				default:
 				{
-					if(param2 == g_iMaxPageItems-2)
+					char category[SHOP_MAX_STRING_LENGTH], item[SHOP_MAX_STRING_LENGTH];
+					ItemManager_GetCategoryById(iClCategoryId[param1], category, sizeof(category));
+
+					h_KvItems.Rewind();
+					FormatEx(item, sizeof(item), "%i/item", iClItemId[param1]);
+					h_KvItems.GetString(item, item, sizeof(item));
+
+					if(!item[0]) 
 					{
 						ShowItemsOfCategory(param1, iClCategoryId[param1], iClMenuId[param1], iPos[param1]);
+					}
+
+					bool back_button = (param2 == g_iMaxPageItems-2);
+					bool result = Forward_OnItemPanelBackOrExit(param1, iClMenuId[param1], iClCategoryId[param1], category, iClItemId[param1], item, back_button);
+
+					if(back_button && result)
+					{
+						ShowItemsOfCategory(param1, iClCategoryId[param1], iClMenuId[param1], iPos[param1]);
+					} 
+					else if(!result)
+					{
+						ShowItemInfo(param1, iClItemId[param1]);
 					}
 				}
 			}
