@@ -17,6 +17,8 @@ stock DataPackPos ITEM_DATAPACKPOS_BUY					= view_as<DataPackPos>(6);
 stock DataPackPos ITEM_DATAPACKPOS_SELL					= view_as<DataPackPos>(7);
 stock DataPackPos ITEM_DATAPACKPOS_ELAPSE				= view_as<DataPackPos>(8);
 stock DataPackPos ITEM_DATAPACKPOS_SELECT				= view_as<DataPackPos>(9);
+stock DataPackPos ITEM_DATAPACKPOS_EXIT_BUTTON			= view_as<DataPackPos>(10);
+stock DataPackPos ITEM_DATAPACKPOS_BACK_BUTTON			= view_as<DataPackPos>(11);
 
 /**
  * For SM 1.10
@@ -544,6 +546,17 @@ public int ItemManager_SetCallbacks(Handle plugin, int numParams)
 		hPack.WriteFunction(GetNativeFunction(10));
 	else 
 		hPack.WriteFunction(INVALID_FUNCTION);
+
+	if(numParams > 10) 
+	{
+		hPack.WriteFunction(GetNativeFunction(11));
+		hPack.WriteFunction(GetNativeFunction(12));
+	}
+	else 
+	{
+		hPack.WriteFunction(INVALID_FUNCTION);
+		hPack.WriteFunction(INVALID_FUNCTION);
+	}
 
 	plugin_kv.SetNum("callbacks", view_as<int>(hPack));
 	return 0;
@@ -2434,6 +2447,25 @@ bool ItemManager_OnItemDescription(Handle plugin, Function callback, int client,
 		strcopy(buffer, maxlen, description);
 	}
 	
+	return result;
+}
+
+bool ItemManager_OnItemBackOrExitButton(Handle plugin, Function callback, int client, int category_id, const char[] category, int item_id, const char[] item, ShopMenu menu)
+{
+	bool result = true;
+	
+	if (IsCallValid(plugin, callback))
+	{
+		Call_StartFunction(plugin, callback);
+		Call_PushCell(client);
+		Call_PushCell(category_id);
+		Call_PushString(category);
+		Call_PushCell(item_id);
+		Call_PushString(item);
+		Call_PushCell(menu);
+		Call_Finish(result);
+	}
+
 	return result;
 }
 
