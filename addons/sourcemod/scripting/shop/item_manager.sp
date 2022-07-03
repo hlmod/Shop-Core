@@ -207,6 +207,10 @@ void ItemManager_UnregisterMe(Handle plugin = null, bool plugin_end = false)
 						dp = array.Get(j);
 						delete dp;
 					}
+
+					#if defined DEBUG
+						LogToFileEx("addons/sourcemod/shop.log", "[ItemManager_UnregisterMe] Remove category: %s, plugin == null, plugin_array: %x", buffer, array);
+					#endif
 					
 					delete array;
 					delete trie;
@@ -222,12 +226,17 @@ void ItemManager_UnregisterMe(Handle plugin = null, bool plugin_end = false)
 			delete dp;
 			array.Erase(index); // to remove datapack
 			
-			char cName[24];
-			GetPluginFilename(plugin, cName, sizeof(cName));
-			// LogToFileEx("addons/sourcemod/shop.log", "[%s] Deleted %s", cName, buffer);
+			#if defined DEBUG
+			// char cName[24];
+			// GetPluginFilename(plugin, cName, sizeof(cName));
+			// LogToFileEx("addons/sourcemod/shop.log", "[ItemManager_UnregisterMe] [%s] Deleted %s", cName, buffer);
+			#endif
 			
 			if (!array.Length)
 			{
+				#if defined DEBUG
+					LogToFileEx("addons/sourcemod/shop.log", "[ItemManager_UnregisterMe] Remove category: %s, array is empty, plugin_array: %x", buffer, array);
+				#endif
 				delete array;
 				delete trie;
 				
@@ -362,6 +371,18 @@ public int ItemManager_StartItem(Handle plugin, int numParams)
 	h_arCategories.GetString(category_id, buffer, sizeof(buffer)); // category id , category name
 	
 	h_trieCategories.GetValue(buffer, trie); // category name, {}
+	#if defined DEBUG
+		LogToFileEx("addons/sourcemod/shop.log", "[ItemManager_StartItem] Category: %d [%s]", category_id, buffer);
+		StringMapSnapshot snap = trie.Snapshot();
+		char cKey[32];
+		any aValue;
+		for (int i = 0; i < snap.Length; ++i) {
+			snap.GetKey(i, cKey, sizeof(cKey));
+			trie.GetValue(cKey, aValue);
+			LogToFileEx("addons/sourcemod/shop.log", "  - Trie: [%s] -> %x", cKey, aValue);
+		}
+		delete snap;
+	#endif
 	trie.GetValue("plugin_array", array); // all plugins using this category, array = [plugin1, plugin2, ...]
 	
 	if (array.FindValue(plugin) == -1)
@@ -598,6 +619,21 @@ public int ItemManager_EndItem(Handle plugin, int numParams)
 	
 	dpCallback.Position = ITEM_DATAPACKPOS_REGISTER;
 	Function func_register = dpCallback.ReadFunction();
+
+	#if defined DEBUG
+		LogToFileEx("addons/sourcemod/shop.log", "[ItemManager_EndItem] Category: %d [%s]", plugin_category_id, plugin_category);
+		StringMap trie;
+		h_trieCategories.GetValue(plugin_category, trie); // category name, {}
+		StringMapSnapshot snap = trie.Snapshot();
+		char cKey[32];
+		any aValue;
+		for (int i = 0; i < snap.Length; ++i) {
+			snap.GetKey(i, cKey, sizeof(cKey));
+			trie.GetValue(cKey, aValue);
+			LogToFileEx("addons/sourcemod/shop.log", "  - Trie: [%s] -> %x", cKey, aValue);
+		}
+		delete snap;
+	#endif
 	
 	DataPack dp = new DataPack();
 	dp.WriteCell(plugin_category_id);
@@ -606,7 +642,7 @@ public int ItemManager_EndItem(Handle plugin, int numParams)
 	dp.WriteString(plugin_category);
 	dp.WriteString(plugin_item);
 	dp.WriteCell(plugin_kv);
-	dp.WriteCell(plugin_array.Clone());
+	dp.WriteCell(plugin_array);
 	dp.WriteCell(0);
 	
 	plugin_kv.Rewind();
@@ -1545,7 +1581,7 @@ bool ItemManager_GetCategoryDisplay(int category_id, int source_client, char[] b
 	
 	Handle on_display_hndl = null;
 	Function on_display_func = INVALID_FUNCTION;
-	DataPack dp = array.Get(1); // Because we need datapack to get
+	DataPack dp = array.Get(1); // skip plugin handle, Because we need datapack to get
 	
 	if (dp != null)
 	{
