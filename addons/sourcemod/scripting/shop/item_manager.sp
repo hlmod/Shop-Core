@@ -702,9 +702,13 @@ public int ItemManager_OnItemRegistered(Handle owner, Handle hndl, const char[] 
 	ArrayList array = view_as<ArrayList>(dp.ReadCell()); // [pluginId1, pluginDatapack1, pluginId2, pluginDatapack2]
 	#if defined DEBUG
 		LogToFileEx("addons/sourcemod/shop.log", "Item: %s, category: %s, array handle %x", item, category, array);
-		LogToFileEx("addons/sourcemod/shop.log", "Item: %s, category: %s, array len: %d", item, category, array.Length);
+		if (array != null) {
+			LogToFileEx("addons/sourcemod/shop.log", "Item: %s, category: %s, array len: %d", item, category, array.Length);
+		}
 		LogToFileEx("addons/sourcemod/shop.log", "Item: %s, category: %s, plugin_array %x", item, category, plugin_array);
-		LogToFileEx("addons/sourcemod/shop.log", "Item: %s, category: %s, plugin_array len: %d", item, category, plugin_array.Length);
+		if (plugin_array != null) {
+			LogToFileEx("addons/sourcemod/shop.log", "Item: %s, category: %s, plugin_array len: %d", item, category, plugin_array.Length);
+		}
 	#endif
 	int iTry = dp.ReadCell(); // try values: 0, 1
 	
