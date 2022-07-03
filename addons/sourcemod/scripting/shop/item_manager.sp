@@ -653,7 +653,18 @@ public int ItemManager_OnItemRegistered(Handle owner, Handle hndl, const char[] 
 	dp.ReadString(category, sizeof(category));
 	dp.ReadString(item, sizeof(item));
 	KeyValues kv = view_as<KeyValues>(dp.ReadCell()); // plugin info to register in kv
+	#if defined DEBUG
+		char cDebug[512];
+		kv.ExportToString(cDebug, sizeof(cDebug));
+		LogToFileEx("addons/sourcemod/shop.log", "[%x] Item: %s, category: %s, KV: %s", plugin, item, category, cDebug);
+	#endif
 	ArrayList array = view_as<ArrayList>(dp.ReadCell()); // [pluginId1, pluginDatapack1, pluginId2, pluginDatapack2]
+	#if defined DEBUG
+		LogToFileEx("addons/sourcemod/shop.log", "Item: %s, category: %s, array handle %x", item, category, array);
+		LogToFileEx("addons/sourcemod/shop.log", "Item: %s, category: %s, array len: %d", item, category, array.Length);
+		LogToFileEx("addons/sourcemod/shop.log", "Item: %s, category: %s, plugin_array %x", item, category, plugin_array);
+		LogToFileEx("addons/sourcemod/shop.log", "Item: %s, category: %s, plugin_array len: %d", item, category, plugin_array.Length);
+	#endif
 	int iTry = dp.ReadCell(); // try values: 0, 1
 	
 	if (!iTry)
