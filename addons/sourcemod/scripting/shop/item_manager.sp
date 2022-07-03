@@ -606,7 +606,7 @@ public int ItemManager_EndItem(Handle plugin, int numParams)
 	dp.WriteString(plugin_category);
 	dp.WriteString(plugin_item);
 	dp.WriteCell(plugin_kv);
-	dp.WriteCell(plugin_array);
+	dp.WriteCell(plugin_array.Clone());
 	dp.WriteCell(0);
 	
 	plugin_kv.Rewind();
@@ -616,6 +616,11 @@ public int ItemManager_EndItem(Handle plugin, int numParams)
 	
 	
 	TQuery(ItemManager_OnItemRegistered, s_Query, dp);
+	plugin_category_id = -1;
+	plugin_kv = null;
+	plugin_array = null;
+	plugin_category[0] = '\0';
+	plugin_item[0] = '\0';
 
 	return 0;
 }
@@ -671,11 +676,6 @@ public int ItemManager_OnItemRegistered(Handle owner, Handle hndl, const char[] 
 	{
 		if (!IsPluginValid(plugin))
 		{
-			plugin_category_id = -1;
-			plugin_kv = null;
-			plugin_array = null;
-			plugin_category[0] = '\0';
-			plugin_item[0] = '\0';
 			delete kv;
 			delete dp;
 			
@@ -689,11 +689,6 @@ public int ItemManager_OnItemRegistered(Handle owner, Handle hndl, const char[] 
 	}
 	if (hndl == null)
 	{
-		plugin_category_id = -1;
-		plugin_kv = null;
-		plugin_array = null;
-		plugin_category[0] = '\0';
-		plugin_item[0] = '\0';
 		delete dp;
 		LogError("Hmm... connection lost ? Try again after 30 years ;(");
 		return 0;
