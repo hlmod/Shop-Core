@@ -1427,9 +1427,12 @@ public void PlayerManager_GetItemsFromDB(Database owner, DBResultSet hndl, const
 			ToggleItem(client, item_id, Toggle_On, true, true);
 		}
 	}
-	g_bAuthorized[client] = true;
 
-	OnAuthorized(client);
+	if(!g_bAuthorized[client]) 
+	{
+		g_bAuthorized[client] = true;
+		OnAuthorized(client);
+	}
 }
 
 void PlayerManager_ClearPlayer(int client)
