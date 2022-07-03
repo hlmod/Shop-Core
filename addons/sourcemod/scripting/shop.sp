@@ -8,6 +8,7 @@
 
 #define SHOP_VERSION "3.0E6"
 #define SHOP_MYSQL_CHARSET "utf8mb4"
+#define DEBUG 1
 
 #pragma newdecls required
 EngineVersion Engine_Version = Engine_Unknown;

@@ -359,10 +359,10 @@ public int ItemManager_StartItem(Handle plugin, int numParams)
 	StringMap trie;
 	ArrayList array;
 	
-	h_arCategories.GetString(category_id, buffer, sizeof(buffer));
+	h_arCategories.GetString(category_id, buffer, sizeof(buffer)); // category id , category name
 	
-	h_trieCategories.GetValue(buffer, trie);
-	trie.GetValue("plugin_array", array);
+	h_trieCategories.GetValue(buffer, trie); // category name, {}
+	trie.GetValue("plugin_array", array); // all plugins using this category, array = [plugin1, plugin2, ...]
 	
 	if (array.FindValue(plugin) == -1)
 		ThrowNativeError(SP_ERROR_NATIVE, "This plugin didn't register the category id %d", category_id);
@@ -614,13 +614,8 @@ public int ItemManager_EndItem(Handle plugin, int numParams)
 	char s_Query[256];
 	h_db.Format(s_Query, sizeof(s_Query), "SELECT `id` FROM `%sitems` WHERE `category` = '%s' AND `item` = '%s' LIMIT 1;", g_sDbPrefix, plugin_category, plugin_item);
 	
-	TQuery(ItemManager_OnItemRegistered, s_Query, dp);
 	
-	plugin_category_id = -1;
-	plugin_kv = null;
-	plugin_array = null;
-	plugin_category[0] = '\0';
-	plugin_item[0] = '\0';
+	TQuery(ItemManager_OnItemRegistered, s_Query, dp);
 
 	return 0;
 }
@@ -657,14 +652,19 @@ public int ItemManager_OnItemRegistered(Handle owner, Handle hndl, const char[] 
 	Function callback = dp.ReadFunction();
 	dp.ReadString(category, sizeof(category));
 	dp.ReadString(item, sizeof(item));
-	KeyValues kv = view_as<KeyValues>(dp.ReadCell());
-	ArrayList array = view_as<ArrayList>(dp.ReadCell());
-	int iTry = dp.ReadCell();
+	KeyValues kv = view_as<KeyValues>(dp.ReadCell()); // plugin info to register in kv
+	ArrayList array = view_as<ArrayList>(dp.ReadCell()); // [pluginId1, pluginDatapack1, pluginId2, pluginDatapack2]
+	int iTry = dp.ReadCell(); // try values: 0, 1
 	
 	if (!iTry)
 	{
 		if (!IsPluginValid(plugin))
 		{
+			plugin_category_id = -1;
+			plugin_kv = null;
+			plugin_array = null;
+			plugin_category[0] = '\0';
+			plugin_item[0] = '\0';
 			delete kv;
 			delete dp;
 			
@@ -678,7 +678,13 @@ public int ItemManager_OnItemRegistered(Handle owner, Handle hndl, const char[] 
 	}
 	if (hndl == null)
 	{
+		plugin_category_id = -1;
+		plugin_kv = null;
+		plugin_array = null;
+		plugin_category[0] = '\0';
+		plugin_item[0] = '\0';
 		delete dp;
+		LogError("Hmm... connection lost ? Try again after 30 years ;(");
 		return 0;
 	}
 	
@@ -700,7 +706,7 @@ public int ItemManager_OnItemRegistered(Handle owner, Handle hndl, const char[] 
 				dp.WriteString(item);
 				dp.WriteCell(kv);
 				dp.WriteCell(array);
-				dp.WriteCell(1);
+				dp.WriteCell(1); // go through ItemManager_OnItemRegistered again, but already added item into Db
 				
 				TQuery(ItemManager_OnItemRegistered, s_Query, dp);
 				
@@ -715,7 +721,6 @@ public int ItemManager_OnItemRegistered(Handle owner, Handle hndl, const char[] 
 		}
 	}
 	
-	delete dp;
 	
 	char buffer[16];
 	IntToString(id, buffer, sizeof(buffer));
@@ -726,26 +731,33 @@ public int ItemManager_OnItemRegistered(Handle owner, Handle hndl, const char[] 
 	h_KvItems.Rewind();
 	
 	delete kv;
-	
-	int index = array.FindValue(plugin);
-	DataPack tmp = view_as<DataPack>(array.Get(index+1));
+
+	#if defined DEBUG
+		LogToFileEx("addons/sourcemod/shop.log", "ItemId: %s, array len: %d", buffer, array.Length);
+	#endif
+	int index = array.FindValue(plugin); // [pluginId1, pluginCategoryDatapack1, pluginId2, pluginCategoryDatapack2]
+	#if defined DEBUG
+		LogToFileEx("addons/sourcemod/shop.log", "ItemId: %s, index: %d", buffer, index);
+	#endif
+	DataPack tmp = view_as<DataPack>(array.Get(index+1)); // pluginDatapack1
 	if (tmp != null)
 	{
 		tmp.Reset();
 		
 		DataPack new_tmp = new DataPack();
 		
-		new_tmp.WriteCell(tmp.ReadCell());
-		new_tmp.WriteFunction(tmp.ReadFunction());
-		new_tmp.WriteFunction(tmp.ReadFunction());
-		new_tmp.WriteFunction(tmp.ReadFunction());
-		new_tmp.WriteFunction(tmp.ReadFunction());
-		new_tmp.WriteCell(tmp.ReadCell() + 1);
+		new_tmp.WriteCell(tmp.ReadCell());  // Handle of plugin that created category
+		new_tmp.WriteFunction(tmp.ReadFunction()); // Category display
+		new_tmp.WriteFunction(tmp.ReadFunction()); // Category description
+		new_tmp.WriteFunction(tmp.ReadFunction()); // Category should display
+		new_tmp.WriteFunction(tmp.ReadFunction()); // Category select
+		new_tmp.WriteCell(tmp.ReadCell() + 1);  // Count of items in category
 		
 		delete tmp;
 		
-		array.Set(index+1, new_tmp);
+		array.Set(index+1, new_tmp); // overwrite category callbacks by latest loaded plugin?
 	}
+	delete dp;
 	
 	OnItemRegistered(id);
 	
