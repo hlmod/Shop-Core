@@ -1363,6 +1363,7 @@ public void PlayerManager_GetItemsFromDB(Database owner, DBResultSet hndl, const
 			TQueryEx(s_Query);
 
 			PlayerManager_DBToggleItem(client, item_id, false);
+			OnPlayerItemElapsed(client, item_id);
 			continue;
 		}
 		
