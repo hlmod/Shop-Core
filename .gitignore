@@ -8,3 +8,4 @@ site/
 
 *.exe
 .gitlab-ci.yml
+.DS_Store
