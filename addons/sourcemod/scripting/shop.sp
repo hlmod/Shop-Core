@@ -1677,7 +1677,7 @@ bool GiveItemEx(int client, const char[] sItemId)
 		{
 			char category[SHOP_MAX_STRING_LENGTH];
 			ItemManager_GetCategoryById(category_id, category, sizeof(category));
-			if (!ItemManager_OnItemBuyEx(client, category_id, category, StringToInt(sItemId), item, type, price, sell_price, (type == Item_Finite) ? count : duration))
+			if (!ItemManager_OnItemBuyEx(client, category_id, category, StringToInt(sItemId), item, type, price, sell_price, count))
 			{
 				return false;
 			}
