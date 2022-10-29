@@ -1384,7 +1384,7 @@ bool ItemManager_FillCategories(Menu menu, int source_client, ShopMenu shop_menu
 			{
 				g_hSortArray.GetString(i, category, sizeof(category));
 				index = hCategoriesArray.FindString(category);
-				if(index != -1 && index != x)
+				if(index != -1 && index != x && x < hCategoriesArray.Length)
 				{
 					hCategoriesArray.SwapAt(index, x);
 				}
