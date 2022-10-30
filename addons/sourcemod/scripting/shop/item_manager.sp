@@ -1604,7 +1604,7 @@ bool ItemManager_FillItemsOfCategory(Menu menu, int client, int source_client, i
 
 		do
 		{
-			if((shop_menu != Menu_Inventory || shop_menu != Menu_ItemTransfer) && !showAll && kv.GetNum("hide", 0))
+			if((shop_menu != Menu_Inventory && shop_menu != Menu_ItemTransfer) && !showAll && kv.GetNum("hide", 0))
 			{
 				continue;
 			}
