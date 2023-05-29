@@ -143,8 +143,13 @@ public int PlayerManager_GiveClientItem(Handle plugin, int numParams)
 	}
 	
 	int item_id = GetNativeCell(2);
+	int value = 0;
+	if (numParams == 3)
+	{
+		value = GetNativeCell(3);
+	}
 	
-	return GiveItem(client, item_id);
+	return GiveItem(client, item_id, value);
 }
 
 public int PlayerManager_BuyClientItem(Handle plugin, int numParams)

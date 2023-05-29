@@ -1652,15 +1652,15 @@ bool RemoveItemEx(int client, const char[] sItemId, int count = 1)
 	return PlayerManager_RemoveItemEx(client, sItemId, count);
 }
 
-bool GiveItem(int client, int item_id)
+bool GiveItem(int client, int item_id, int value = 0)
 {
 	char sItemId[16];
 	IntToString(item_id, sItemId, sizeof(sItemId));
 	
-	return GiveItemEx(client, sItemId);
+	return GiveItemEx(client, sItemId, value);
 }
 
-bool GiveItemEx(int client, const char[] sItemId)
+bool GiveItemEx(int client, const char[] sItemId, int value = 0)
 {
 	int category_id, price, sell_price, count, duration;
 	ItemType type;
@@ -1669,6 +1669,18 @@ bool GiveItemEx(int client, const char[] sItemId)
 	if (!ItemManager_GetItemInfoEx(sItemId, item, sizeof(item), category_id, price, sell_price, count, duration, type))
 	{
 		return false;
+	}
+	
+	if (value != 0)
+	{
+		if (type == Item_Finite)
+		{
+			count = value;
+		}
+		else
+		{
+			duration = value;
+		}
 	}
 
 	switch (type)
