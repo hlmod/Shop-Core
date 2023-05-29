@@ -1674,9 +1674,13 @@ bool GiveItemEx(int client, const char[] sItemId, int value = 0)
 	if (value != 0)
 	{
 		if (type == Item_Finite)
+		{
 			count = value;
+		}
 		else
+		{
 			duration = value;
+		}
 	}
 
 	switch (type)
