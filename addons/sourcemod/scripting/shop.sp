@@ -1671,7 +1671,7 @@ bool GiveItemEx(int client, const char[] sItemId, int value = 0)
 		return false;
 	}
 	
-	if (value != 0) // if value sent from Native Shop_GiveClientItem, we use it as duration or count instead of defaults from items settings
+	if (value != 0)
 	{
 		if (type == Item_Finite)
 			count = value;

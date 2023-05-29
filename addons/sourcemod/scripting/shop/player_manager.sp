@@ -147,7 +147,7 @@ public int PlayerManager_GiveClientItem(Handle plugin, int numParams)
 	if (numParams == 3)
 		value = GetNativeCell(3);
 	
-	return GiveItem(client, item_id, value); // if native Shop_GiveClientItem called with 3 parameters, we read value and pass it to GiveItems. Otherwise pass 0
+	return GiveItem(client, item_id, value);
 }
 
 public int PlayerManager_BuyClientItem(Handle plugin, int numParams)
