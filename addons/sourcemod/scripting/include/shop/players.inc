@@ -426,13 +426,13 @@ native bool Shop_RemoveClientItem(int client, ItemId item_id, int count = 0);
  *
  *	@param client				Client index.
  *	@param item_id				The item id.
- *	@param value				Count if the item is finite and duration if the item is togglable or non-togglable.
+ *	@param value				Count if the item is finite and duration if the item is togglable or non-togglable, -1 eternal
  *  @error                      Invalid player index.
  *	@error						Invalid ItemId.
  *
  *	@return	True on success, false otherwise.
  */
-native bool Shop_GiveClientItem(int client, ItemId item_id, int value = 1);
+native bool Shop_GiveClientItem(int client, ItemId item_id, int value = 0); //comment delete after check. PlayerManager_GiveClientItem accepts just 2 parameters now, I added third. value=0 means that the native is called with 2 parameters only
 
 /**
  *	Get's count of an item a player has.
