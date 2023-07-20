@@ -1181,9 +1181,38 @@ public int ItemPanel_Handler(Menu menu, MenuAction action, int param1, int param
 				}
 				default:
 				{
-					if(param2 == g_iMaxPageItems-2)
+					char category[SHOP_MAX_STRING_LENGTH], item[SHOP_MAX_STRING_LENGTH];
+					ItemManager_GetCategoryById(iClCategoryId[param1], category, sizeof(category));
+
+					h_KvItems.Rewind();
+					FormatEx(item, sizeof(item), "%i", iClItemId[param1]);
+					h_KvItems.JumpToKey(item);
+					h_KvItems.GetString("item", item, sizeof(item));
+
+					bool cb_result = true, result = true;
+					bool back_button = (param2 == g_iMaxPageItems-2);
+
+					if(item[0]) 
+					{
+						result = Forward_OnItemPanelBackOrExit(param1, iClMenuId[param1], iClCategoryId[param1], category, iClItemId[param1], item, back_button);
+						DataPack dpCallback = view_as<DataPack>(h_KvItems.GetNum("callbacks"));
+
+						if (dpCallback != INVALID_HANDLE)
+						{
+							dpCallback.Position = back_button ? ITEM_DATAPACKPOS_BACK_BUTTON : ITEM_DATAPACKPOS_EXIT_BUTTON;
+							Function callback = dpCallback.ReadFunction();
+							Handle plugin = view_as<Handle>(h_KvItems.GetNum("plugin"));
+							cb_result = ItemManager_OnItemBackOrExitButton(plugin, callback, param1, iClCategoryId[param1], category, iClItemId[param1], item, iClMenuId[param1]);
+						}
+					}
+
+					if(back_button && result && cb_result)
 					{
 						ShowItemsOfCategory(param1, iClCategoryId[param1], iClMenuId[param1], iPos[param1]);
+					} 
+					else if(!result || !cb_result)
+					{
+						ShowItemInfo(param1, iClItemId[param1]);
 					}
 				}
 			}

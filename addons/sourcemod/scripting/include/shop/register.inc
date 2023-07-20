@@ -171,6 +171,20 @@ typedef Shop_ItemDescriptionCallback = function bool (int client, CategoryId cat
  */
 typedef Shop_ItemSelectCallBack = function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ShopMenu menu);
 
+/**
+ *	Callback of pressing the Back or Exit button in the menu panel.
+ *
+ *	@param client				Client index.
+ *	@param category_id			Category id of an item.
+ *	@param category				Category unique name.
+ *	@param item_id				Item id of an item.
+ *	@param item					Item's unique name.
+ *	@param menu					Menu performing this action.
+ *
+ *	@return true - continue, false otherwise.
+ */
+typedef Shop_ItemPanelExitBackButton = function bool (int client, CategoryId category_id, const char[] category, ItemId item_id, const char[] item, ShopMenu menu);
+
 typeset Shop_ItemBuyCallback
 {
 	/**
@@ -336,6 +350,8 @@ native void Shop_SetLuckChance(int luck_chance);
  *	@param sell					Callback called when the item is being sold.
  *	@param elapse				Callback called when the item is elapsed.
  *	@param select				Callback called when the item is selected in menu.
+ *	@param exit_button			Callback when the player in the menu panel presses the Exit button.
+ *	@param back_button			Callback when the player in the menu panel presses the Back button.
  *
  *	@noreturn
  */
@@ -348,7 +364,9 @@ native void Shop_SetCallbacks(Shop_ItemRegister register=INVALID_FUNCTION,
 							Shop_ItemBuyCallback buy=INVALID_FUNCTION,
 							Shop_ItemSellCallback sell=INVALID_FUNCTION,
 							Shop_ItemCommon elapse=INVALID_FUNCTION,
-							Shop_ItemSelectCallBack select=INVALID_FUNCTION);
+							Shop_ItemSelectCallBack select=INVALID_FUNCTION,
+							Shop_ItemPanelExitBackButton exit_button=INVALID_FUNCTION,
+							Shop_ItemPanelExitBackButton back_button=INVALID_FUNCTION);
 
 /**
  *	Allows to hide item in buy panel, givable only by native or admin panel.
