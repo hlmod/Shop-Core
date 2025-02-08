@@ -99,7 +99,7 @@ stock bool Helpers_AddTargetsToMenu(Menu menu, int source_client, bool credits =
 			IntToString(GetClientUserId(i), userid, sizeof(userid));
 			if (credits)
 			{
-				FormatEx(buffer, sizeof(buffer), "%N (%d)", i, GetCredits(i));
+				FormatEx(buffer, sizeof(buffer), "%N (%d|%d)", i, GetCredits(i), GetGold(i));
 			}
 			else
 			{

@@ -22,12 +22,12 @@ stock DataPackPos ITEM_DATAPACKPOS_SELECT				= view_as<DataPackPos>(9);
  * For SM 1.10
  * Categories
  */
-stock DataPackPos CATEGORY_DATAPACKPOS_PLUGIN			= view_as<DataPackPos>(0);
-stock DataPackPos CATEGORY_DATAPACKPOS_DISPLAY			= view_as<DataPackPos>(1);
-stock DataPackPos CATEGORY_DATAPACKPOS_DESCRIPTION		= view_as<DataPackPos>(2);
-stock DataPackPos CATEGORY_DATAPACKPOS_SHOULD_DISPLAY	= view_as<DataPackPos>(3);
-stock DataPackPos CATEGORY_DATAPACKPOS_SELECT			= view_as<DataPackPos>(4);
-stock DataPackPos CATEGORY_DATAPACKPOS_ITEMSCOUNT		= view_as<DataPackPos>(5);
+stock DataPackPos CATEGORY_DATAPACKPOS_PLUGIN			= INVALID_DP_POS;
+stock DataPackPos CATEGORY_DATAPACKPOS_DISPLAY			= INVALID_DP_POS;
+stock DataPackPos CATEGORY_DATAPACKPOS_DESCRIPTION		= INVALID_DP_POS;
+stock DataPackPos CATEGORY_DATAPACKPOS_SHOULD_DISPLAY	= INVALID_DP_POS;
+stock DataPackPos CATEGORY_DATAPACKPOS_SELECT			= INVALID_DP_POS;
+stock DataPackPos CATEGORY_DATAPACKPOS_ITEMSCOUNT		= INVALID_DP_POS;
 
 void ItemManager_CreateNatives()
 {
@@ -73,11 +73,17 @@ void ItemManager_CreateNatives()
 	CreateNative("ItemId.Price.get", ItemManager_GetItemPrice);
 	CreateNative("Shop_SetItemPrice", ItemManager_SetItemPrice);
 	CreateNative("ItemId.Price.set", ItemManager_SetItemPrice);
+
+	CreateNative("Shop_GetItemGoldPrice", ItemManager_GetItemGoldPrice);
+	CreateNative("Shop_SetItemGoldPrice", ItemManager_SetItemGoldPrice);
 	
 	CreateNative("Shop_GetItemSellPrice", ItemManager_GetItemSellPrice);
 	CreateNative("ItemId.SellPrice.get", ItemManager_GetItemSellPrice);
 	CreateNative("Shop_SetItemSellPrice", ItemManager_SetItemSellPrice);
 	CreateNative("ItemId.SellPrice.set", ItemManager_SetItemSellPrice);
+
+	CreateNative("Shop_GetItemGoldSellPrice", ItemManager_GetItemGoldSellPrice);
+	CreateNative("Shop_SetItemGoldSellPrice", ItemManager_SetItemGoldSellPrice);
 	
 	CreateNative("Shop_GetItemValue", ItemManager_GetItemValue);
 	CreateNative("ItemId.Value.get", ItemManager_GetItemValue);
@@ -126,7 +132,66 @@ void ItemManager_CreateNatives()
 
 void ItemManager_OnPluginStart()
 {
-	RegServerCmd("sm_items_dump", ItemManager_Dump);
+	RegServerCmd("sm_items_dump", ItemManager_Dump, "Dump shop items");
+
+	/**
+	 * For SM 1.10
+	 * Items
+	 */
+	DataPack hPack = new DataPack();
+
+	ITEM_DATAPACKPOS_REGISTER = hPack.Position;
+	hPack.WriteCell(0);
+
+	ITEM_DATAPACKPOS_USE = hPack.Position;
+	hPack.WriteCell(0);
+
+	ITEM_DATAPACKPOS_SHOULD_DISPLAY = hPack.Position;
+	hPack.WriteCell(0);
+
+	ITEM_DATAPACKPOS_DISPLAY = hPack.Position;
+	hPack.WriteCell(0);
+
+	ITEM_DATAPACKPOS_DESC = hPack.Position;
+	hPack.WriteCell(0);
+
+	ITEM_DATAPACKPOS_COMMON = hPack.Position;
+	hPack.WriteCell(0);
+
+	ITEM_DATAPACKPOS_BUY = hPack.Position;
+	hPack.WriteCell(0);
+
+	ITEM_DATAPACKPOS_SELL = hPack.Position;
+	hPack.WriteCell(0);
+
+	ITEM_DATAPACKPOS_ELAPSE = hPack.Position;
+	hPack.WriteCell(0);
+
+	hPack.Reset(true);
+
+	/**
+	 * For SM 1.10
+	 * Categories
+	 */
+	CATEGORY_DATAPACKPOS_PLUGIN = hPack.Position;
+	hPack.WriteCell(0);
+
+	CATEGORY_DATAPACKPOS_DISPLAY = hPack.Position;
+	hPack.WriteCell(0);
+
+	CATEGORY_DATAPACKPOS_DESCRIPTION = hPack.Position;
+	hPack.WriteCell(0);
+
+	CATEGORY_DATAPACKPOS_SHOULD_DISPLAY = hPack.Position;
+	hPack.WriteCell(0);
+
+	CATEGORY_DATAPACKPOS_SELECT = hPack.Position;
+	hPack.WriteCell(0);
+
+	CATEGORY_DATAPACKPOS_ITEMSCOUNT = hPack.Position;
+	hPack.WriteCell(0);
+
+	delete hPack;
 }
 
 public Action ItemManager_Dump(int argc)
@@ -222,9 +287,11 @@ void ItemManager_UnregisterMe(Handle plugin = null, bool plugin_end = false)
 			delete dp;
 			array.Erase(index); // to remove datapack
 			
+			/*
 			char cName[24];
 			GetPluginFilename(plugin, cName, sizeof(cName));
-			// LogToFileEx("addons/sourcemod/shop.log", "[%s] Deleted %s", cName, buffer);
+			LogToFileEx("addons/sourcemod/shop.log", "[%s] Deleted %s", cName, buffer);
+			*/
 			
 			if (!array.Length)
 			{
@@ -416,29 +483,49 @@ public int ItemManager_SetInfo(Handle plugin, int numParams)
 	
 	int price = GetNativeCell(3);
 	int sell_price = GetNativeCell(4);
+
+	int gold_price = -1;
+	int gold_sell_price = -1;
 	
-	if (price < 0) price = 0;
+	if (numParams == 8)
+	{
+		gold_price = GetNativeCell(7);
+		gold_sell_price = GetNativeCell(8);
+	}
+	
+	// Credits
+	if (price < -1)
+		price = -1;
 	
 	if (sell_price < -1) sell_price = -1;
 	else if (sell_price > price) sell_price = price;
 	
+	// Gold
+	if (gold_price < -1)
+		gold_price = -1;
+	if (gold_sell_price < -1)
+		gold_sell_price = -1;
+	else if (gold_sell_price > gold_price && gold_price != -1)
+		gold_sell_price = gold_price;
+	
 	ItemType type = GetNativeCell(5);
 	
 	plugin_kv.SetNum("price", price);
+	plugin_kv.SetNum("gold_price", gold_price);
 	plugin_kv.SetNum("type", view_as<int>(type));
 	
 	int value = GetNativeCell(6);
 	
+	plugin_kv.SetNum("sell_price", sell_price);
+	plugin_kv.SetNum("gold_sell_price", gold_sell_price);
 	if (type == Item_Finite || type == Item_BuyOnly)
 	{
 		if (value < 1) value = 1;
-		plugin_kv.SetNum("sell_price", sell_price);
 		plugin_kv.SetNum("count", value);
 	}
 	else
 	{
 		if (value < 0) value = 0;
-		plugin_kv.SetNum("sell_price", sell_price);
 		plugin_kv.SetNum("duration", value);
 		plugin_kv.SetNum("count", 1);
 	}
@@ -531,15 +618,15 @@ public int ItemManager_SetCallbacks(Handle plugin, int numParams)
 		ThrowNativeError(SP_ERROR_NATIVE, "No item is being registered");
 
 	DataPack hPack = new DataPack();
-	hPack.WriteFunction(GetNativeFunction(1));
-	hPack.WriteFunction(GetNativeFunction(2));
-	hPack.WriteFunction(GetNativeFunction(3));
-	hPack.WriteFunction(GetNativeFunction(4));
-	hPack.WriteFunction(GetNativeFunction(5));
-	hPack.WriteFunction(GetNativeFunction(6));
-	hPack.WriteFunction(GetNativeFunction(7));
-	hPack.WriteFunction(GetNativeFunction(8));
-	hPack.WriteFunction(GetNativeFunction(9));
+	hPack.WriteFunction(GetNativeFunction(1)); // ItemRegister
+	hPack.WriteFunction(GetNativeFunction(2)); // ItemUseToggleCallback
+	hPack.WriteFunction(GetNativeFunction(3)); // ItemShouldDisplayCallback
+	hPack.WriteFunction(GetNativeFunction(4)); // ItemDisplayCallback
+	hPack.WriteFunction(GetNativeFunction(5)); // ItemDescriptionCallback
+	hPack.WriteFunction(GetNativeFunction(6)); // ItemCommon
+	hPack.WriteFunction(GetNativeFunction(7)); // ItemBuyCallback
+	hPack.WriteFunction(GetNativeFunction(8)); // ItemSellCallback
+	hPack.WriteFunction(GetNativeFunction(9)); // ItemCommon
 	if(numParams > 9)
 		hPack.WriteFunction(GetNativeFunction(10));
 	else 
@@ -647,7 +734,7 @@ public int ItemManager_UnregisterItem(Handle plugin, int numParams)
 	return 0;
 }
 
-public int ItemManager_OnItemRegistered(Handle owner, Handle hndl, const char[] error, DataPack dp)
+public int ItemManager_OnItemRegistered(Database owner, DBResultSet hndl, const char[] error, DataPack dp)
 {
 	char category[SHOP_MAX_STRING_LENGTH], item[SHOP_MAX_STRING_LENGTH];
 	
@@ -687,7 +774,7 @@ public int ItemManager_OnItemRegistered(Handle owner, Handle hndl, const char[] 
 	{
 		case 0:
 		{
-			if (!SQL_FetchRow(hndl))
+			if (!hndl.FetchRow())
 			{
 				char s_Query[256];
 				h_db.Format(s_Query, sizeof(s_Query), "INSERT INTO `%sitems` (`category`, `item`) VALUES ('%s', '%s');", g_sDbPrefix, category, item);
@@ -707,7 +794,7 @@ public int ItemManager_OnItemRegistered(Handle owner, Handle hndl, const char[] 
 				return 0;
 			}
 			
-			id = SQL_FetchInt(hndl, 0);
+			id = hndl.FetchInt(0);
 		}
 		case 1:
 		{
@@ -946,7 +1033,7 @@ public int ItemManager_GetItemPrice(Handle plugin, int numParams)
 		ThrowNativeError(SP_ERROR_NATIVE, "Item id %s is invalid", buffer);
 	}
 	
-	int result = h_KvItems.GetNum("price", 0);
+	int result = h_KvItems.GetNum("price", -1);
 	
 	h_KvItems.Rewind();
 	
@@ -965,17 +1052,58 @@ public int ItemManager_SetItemPrice(Handle plugin, int numParams)
 	}
 	
 	int price = GetNativeCell(2);
-	if (price < 0)
+	if (price < -1)
 	{
-		price = 0;
+		price = -1;
 	}
-	if (h_KvItems.GetNum("sell_price", -1) > price)
+	if (price != -1 && h_KvItems.GetNum("sell_price", -1) > price)
 	{
 		h_KvItems.SetNum("sell_price", price);
 	}
 	
 	h_KvItems.SetNum("price", price);
 	h_KvItems.Rewind();
+	return 0;
+}
+
+public int ItemManager_GetItemGoldPrice(Handle plugin, int numParams)
+{
+	char buffer[SHOP_MAX_STRING_LENGTH];
+	IntToString(GetNativeCell(1), buffer, sizeof(buffer));
+	
+	h_KvItems.Rewind();
+	if (!h_KvItems.JumpToKey(buffer))
+	{
+		ThrowNativeError(SP_ERROR_NATIVE, "Item id %s is invalid", buffer);
+	}
+	
+	int result = h_KvItems.GetNum("gold_price", -1);
+	
+	h_KvItems.Rewind();
+	
+	return result;
+}
+
+public int ItemManager_SetItemGoldPrice(Handle plugin, int numParams)
+{
+	char buffer[SHOP_MAX_STRING_LENGTH];
+	IntToString(GetNativeCell(1), buffer, sizeof(buffer));
+	
+	h_KvItems.Rewind();
+	if (!h_KvItems.JumpToKey(buffer))
+	{
+		ThrowNativeError(SP_ERROR_NATIVE, "Item id %s is invalid", buffer);
+	}
+	
+	int price = GetNativeCell(2);
+	if (price < -1)
+	{
+		price = -1;
+	}
+	
+	h_KvItems.SetNum("gold_price", price);
+	h_KvItems.Rewind();
+
 	return 0;
 }
 
@@ -1019,6 +1147,51 @@ public int ItemManager_SetItemSellPrice(Handle plugin, int numParams)
 		sell_price = -1;
 	}
 	h_KvItems.SetNum("sell_price", sell_price);
+	
+	h_KvItems.Rewind();
+	return 0;
+}
+
+public int ItemManager_GetItemGoldSellPrice(Handle plugin, int numParams)
+{
+	char buffer[SHOP_MAX_STRING_LENGTH];
+	IntToString(GetNativeCell(1), buffer, sizeof(buffer));
+	
+	h_KvItems.Rewind();
+	if (!h_KvItems.JumpToKey(buffer))
+	{
+		ThrowNativeError(SP_ERROR_NATIVE, "Item id %s is invalid", buffer);
+	}
+	
+	int result = h_KvItems.GetNum("gold_sell_price", -1);
+	
+	h_KvItems.Rewind();
+	
+	return result;
+}
+
+public int ItemManager_SetItemGoldSellPrice(Handle plugin, int numParams)
+{
+	char buffer[SHOP_MAX_STRING_LENGTH];
+	IntToString(GetNativeCell(1), buffer, sizeof(buffer));
+	
+	h_KvItems.Rewind();
+	if (!h_KvItems.JumpToKey(buffer))
+	{
+		ThrowNativeError(SP_ERROR_NATIVE, "Item id %s is invalid", buffer);
+	}
+	
+	int price = h_KvItems.GetNum("gold_price");
+	int sell_price = GetNativeCell(2);
+	if (sell_price > price && price != -1)
+	{
+		sell_price = price;
+	}
+	else if (sell_price < -1)
+	{
+		sell_price = -1;
+	}
+	h_KvItems.SetNum("gold_sell_price", sell_price);
 	
 	h_KvItems.Rewind();
 	return 0;
@@ -1434,7 +1607,6 @@ bool ItemManager_FillCategories(Menu menu, int source_client, ShopMenu shop_menu
 				
 				if (!showAll)
 				{
-					/* Temporary modification */
 					// Count of not hidden items
 					ArrayList items = ItemManager_GetItemIdArrayFromPlugin(cat_plugin);
 					icat_size = 0;
@@ -1714,16 +1886,25 @@ Panel ItemManager_CreateItemPanelInfo(int source_client, int item_id, ShopMenu m
 	
 	int price = h_KvItems.GetNum("price");
 	int sell_price = h_KvItems.GetNum("sell_price");
+
+	int gold_price = h_KvItems.GetNum("gold_price");
+	int gold_sell_price = h_KvItems.GetNum("gold_sell_price");
 	
-	if (price < 1)
+	if (price < 0)
+		FormatEx(buffer, sizeof(buffer), "%t: %t", "Price", "Unbuyable");
+	else if (price == 0)
 		FormatEx(buffer, sizeof(buffer), "%t: %t", "Price", "Free");
 	else
 		FormatEx(buffer, sizeof(buffer), "%t: %d", "Price", price);
+	if (gold_price > -1)
+		Format(buffer, sizeof(buffer), "%s|%t: %d", buffer, "Gold", gold_price);
 	panel.DrawText(buffer);
 	if (sell_price < 0)
 		FormatEx(buffer, sizeof(buffer), "%t: %t", "Sell Price", "Unsaleable");
 	else
 		FormatEx(buffer, sizeof(buffer), "%t: %d", "Sell Price", sell_price);
+	if (gold_sell_price > -1)
+		Format(buffer, sizeof(buffer), "%s|%t: %d", buffer, "Gold", gold_sell_price);
 	panel.DrawText(buffer);
 	
 	switch (view_as<ItemType>(h_KvItems.GetNum("type", 0))) // by default it will be ItemType_None
@@ -1912,7 +2093,7 @@ int ItemManager_GetItemDurationEx(const char[] sItemId)
 	return duration;
 }
 
-bool ItemManager_GetItemInfoEx(const char[] sItemId, char[] item, int maxlength, int &category_id, int &price, int &sell_price, int &count, int &duration, ItemType &type)
+bool ItemManager_GetItemInfoEx(const char[] sItemId, char[] item, int maxlength, int &category_id, int &price, int &sell_price, int &count, int &duration, ItemType &type, int &gold_price, int &gold_sell_price)
 {
 	h_KvItems.Rewind();
 	if (!h_KvItems.JumpToKey(sItemId))
@@ -1922,11 +2103,13 @@ bool ItemManager_GetItemInfoEx(const char[] sItemId, char[] item, int maxlength,
 	
 	h_KvItems.GetString("item", item, maxlength);
 	category_id = h_KvItems.GetNum("category_id", -1);
-	price = h_KvItems.GetNum("price", 0);
+	price = h_KvItems.GetNum("price", -1);
 	sell_price = h_KvItems.GetNum("sell_price", -1);
 	count = h_KvItems.GetNum("count", 1);
 	duration = h_KvItems.GetNum("duration", 0);
 	type = view_as<ItemType>(h_KvItems.GetNum("type", 0));
+	gold_price = h_KvItems.GetNum("gold_price", -1);
+	gold_sell_price = h_KvItems.GetNum("gold_sell_price", -1);
 	
 	h_KvItems.Rewind();
 	
@@ -1963,7 +2146,37 @@ int ItemManager_GetItemPriceEx(const char[] sItemId)
 	if (!h_KvItems.JumpToKey(sItemId))
 		return 0;
 	
-	int result = h_KvItems.GetNum("price", 0);
+	int result = h_KvItems.GetNum("price", -1);
+	
+	h_KvItems.Rewind();
+	
+	return result;
+}
+
+int ItemManager_GetItemGoldPriceInt(int item_id)
+{
+	h_KvItems.Rewind();
+
+	char sItemId[16];
+	IntToString(item_id, sItemId, sizeof(sItemId));
+
+	if (!h_KvItems.JumpToKey(sItemId))
+		return 0;
+	
+	int result = h_KvItems.GetNum("gold_price", -1);
+	
+	h_KvItems.Rewind();
+	
+	return result;
+}
+
+int ItemManager_GetItemGoldPriceEx(const char[] sItemId)
+{
+	h_KvItems.Rewind();
+	if (!h_KvItems.JumpToKey(sItemId))
+		return 0;
+	
+	int result = h_KvItems.GetNum("gold_price", -1);
 	
 	h_KvItems.Rewind();
 	
@@ -2258,7 +2471,7 @@ void ItemManager_SetupPreviewEx(int client, const char[] sItemId)
 	h_KvItems.Rewind();
 }
 
-bool ItemManager_OnItemBuyEx(int client, int category_id, const char[] category, int item_id, const char[] item, ItemType type, int price, int sell_price, int value)
+bool ItemManager_OnItemBuyEx(int client, int category_id, const char[] category, int item_id, const char[] item, ItemType type, int price, int sell_price, int value, int gold_price, int gold_sell_price)
 {
 	char sItemId[16];
 	IntToString(item_id, sItemId, sizeof(sItemId));
@@ -2295,13 +2508,15 @@ bool ItemManager_OnItemBuyEx(int client, int category_id, const char[] category,
 		Call_PushCell(price);
 		Call_PushCell(sell_price);
 		Call_PushCell(value);
+		Call_PushCell(gold_price);
+		Call_PushCell(gold_sell_price);
 		Call_Finish(result);
 	}
 	
 	return result;
 }
 
-bool ItemManager_OnItemSellEx(int client, int category_id, const char[] category, int item_id, const char[] item, ItemType type, int sell_price)
+bool ItemManager_OnItemSellEx(int client, int category_id, const char[] category, int item_id, const char[] item, ItemType type, int sell_price, int gold_sell_price)
 {
 	char sItemId[16];
 	IntToString(item_id, sItemId, sizeof(sItemId));
@@ -2333,6 +2548,7 @@ bool ItemManager_OnItemSellEx(int client, int category_id, const char[] category
 		Call_PushString(item);
 		Call_PushCell(type);
 		Call_PushCell(sell_price);
+		Call_PushCell(gold_sell_price);
 		Call_Finish(result);
 	}
 	

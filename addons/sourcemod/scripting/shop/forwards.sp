@@ -21,6 +21,9 @@ Handle h_fwdOnAuthorized,
 	h_fwdOnCreditsGiven,
 	h_fwdOnCreditsGivenPost,
 	h_fwdOnCreditsTaken,
+	h_fwdOnGoldSet,
+	h_fwdOnGoldGiven,
+	h_fwdOnGoldTaken,
 	h_fwdOnCreditsTakenPost,
 	h_fwdOnCategoryRegistered,
 	h_fwdOnItemRegistered;
@@ -29,13 +32,13 @@ void Forward_OnPluginStart()
 {
 	h_fwdOnAuthorized = CreateGlobalForward("Shop_OnAuthorized", ET_Ignore, Param_Cell);
 	h_fwdOnMenuTitle = CreateGlobalForward("Shop_OnMenuTitle", ET_Hook, Param_Cell, Param_Cell, Param_String, Param_String, Param_Cell);
-	h_fwdOnItemBuy = CreateGlobalForward("Shop_OnItemBuy", ET_Hook, Param_Cell, Param_Cell, Param_String, Param_Cell, Param_String, Param_Cell, Param_CellByRef, Param_CellByRef, Param_CellByRef);
+	h_fwdOnItemBuy = CreateGlobalForward("Shop_OnItemBuy", ET_Hook, Param_Cell, Param_Cell, Param_String, Param_Cell, Param_String, Param_Cell, Param_CellByRef, Param_CellByRef, Param_CellByRef, Param_CellByRef, Param_CellByRef);
 	h_fwdOnItemDraw = CreateGlobalForward("Shop_OnItemDraw", ET_Hook, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_CellByRef);
 	h_fwdOnItemSelect = CreateGlobalForward("Shop_OnItemSelect", ET_Hook, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
 	h_fwdOnItemSelected = CreateGlobalForward("Shop_OnItemSelected", ET_Ignore, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
 	h_fwdOnItemDisplay = CreateGlobalForward("Shop_OnItemDisplay", ET_Hook, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_String, Param_String, Param_Cell);
 	h_fwdOnItemDescription = CreateGlobalForward("Shop_OnItemDescription", ET_Hook, Param_Cell, Param_Cell, Param_Cell, Param_Cell, Param_String, Param_String, Param_Cell);
-	h_fwdOnItemSell = CreateGlobalForward("Shop_OnItemSell", ET_Hook, Param_Cell, Param_Cell, Param_String, Param_Cell, Param_String, Param_Cell, Param_CellByRef);
+	h_fwdOnItemSell = CreateGlobalForward("Shop_OnItemSell", ET_Hook, Param_Cell, Param_Cell, Param_String, Param_Cell, Param_String, Param_Cell, Param_CellByRef, Param_CellByRef);
 	h_fwdOnItemToggled = CreateGlobalForward("Shop_OnItemToggled", ET_Ignore, Param_Cell, Param_Cell, Param_String, Param_Cell, Param_String, Param_Cell);
 	h_fwdOnItemElapsed = CreateGlobalForward("Shop_OnItemElapsed", ET_Ignore, Param_Cell, Param_Cell, Param_String, Param_Cell, Param_String);
 	h_fwdOnClientLuckProcess = CreateGlobalForward("Shop_OnClientLuckProcess", ET_Hook, Param_Cell);
@@ -53,6 +56,9 @@ void Forward_OnPluginStart()
 	h_fwdOnCreditsTakenPost = CreateGlobalForward("Shop_OnCreditsTaken_Post", ET_Ignore, Param_Cell, Param_Cell, Param_Cell);
 	h_fwdOnCategoryRegistered = CreateGlobalForward("Shop_OnCategoryRegistered", ET_Ignore, Param_Cell, Param_String);
 	h_fwdOnItemRegistered = CreateGlobalForward("Shop_OnItemRegistered", ET_Ignore, Param_Cell, Param_String, Param_Cell, Param_String);
+	h_fwdOnGoldSet = CreateGlobalForward("Shop_OnGoldSet", ET_Hook, Param_Cell, Param_CellByRef, Param_Cell);
+	h_fwdOnGoldGiven = CreateGlobalForward("Shop_OnGoldGiven", ET_Hook, Param_Cell, Param_CellByRef, Param_Cell);
+	h_fwdOnGoldTaken = CreateGlobalForward("Shop_OnGoldTaken", ET_Hook, Param_Cell, Param_CellByRef, Param_Cell);
 }
 
 bool Forward_OnItemTransfer(int client, int target, int item_id)
@@ -239,6 +245,19 @@ Action Forward_OnCreditsTaken(int client, int &credits, int by_who)
 	return result;
 }
 
+Action Forward_OnGoldTaken(int client, int &amount, int by_who)
+{
+	Action result = Plugin_Continue;
+	
+	Call_StartForward(h_fwdOnGoldTaken);
+	Call_PushCell(client);
+	Call_PushCellRef(amount);
+	Call_PushCell(by_who);
+	Call_Finish(result);
+	
+	return result;
+}
+
 void Forward_OnCreditsTaken_Post(int client, int credits, int by_who)
 {
 	Call_StartForward(h_fwdOnCreditsTakenPost);
@@ -261,6 +280,19 @@ Action Forward_OnCreditsSet(int client, int &credits, int by_who)
 	return result;
 }
 
+Action Forward_OnGoldSet(int client, int &amount, int by_who)
+{
+	Action result = Plugin_Continue;
+
+	Call_StartForward(h_fwdOnGoldSet);
+	Call_PushCell(client);
+	Call_PushCellRef(amount);
+	Call_PushCell(by_who);
+	Call_Finish(result);
+
+	return result;
+}
+
 void Forward_OnCreditsSet_Post(int client, int credits, int by_who)
 {
 	Call_StartForward(h_fwdOnCreditsSetPost);
@@ -277,6 +309,19 @@ Action Forward_OnCreditsGiven(int client, int &credits, int by_who)
 	Call_StartForward(h_fwdOnCreditsGiven);
 	Call_PushCell(client);
 	Call_PushCellRef(credits);
+	Call_PushCell(by_who);
+	Call_Finish(result);
+	
+	return result;
+}
+
+Action Forward_OnGoldGiven(int client, int &amount, int by_who)
+{
+	Action result = Plugin_Continue;
+	
+	Call_StartForward(h_fwdOnGoldGiven);
+	Call_PushCell(client);
+	Call_PushCellRef(amount);
 	Call_PushCell(by_who);
 	Call_Finish(result);
 	
@@ -368,7 +413,7 @@ void Forward_OnMenuTitle(int client, ShopMenu menu_action, const char[] title, c
 	StrCat(buffer, maxlength, "\n ");
 }
 
-Action Forward_OnItemBuy(int client, int category_id, const char[] category, int item_id, const char[] item, ItemType type, int &price, int &sell_price, int &value)
+Action Forward_OnItemBuy(int client, int category_id, const char[] category, int item_id, const char[] item, ItemType type, int &price, int &sell_price, int &value, int &gold_price, int &gold_sell_price)
 {
 	Action result = Plugin_Continue;
 	
@@ -382,12 +427,14 @@ Action Forward_OnItemBuy(int client, int category_id, const char[] category, int
 	Call_PushCellRef(price);
 	Call_PushCellRef(sell_price);
 	Call_PushCellRef(value);
+	Call_PushCellRef(gold_price);
+	Call_PushCellRef(gold_sell_price);
 	Call_Finish(result);
 	
 	return result;
 }
 
-Action Forward_OnItemSell(int client, int category_id, const char[] category, int item_id, const char[] item, ItemType type, int &sell_price)
+Action Forward_OnItemSell(int client, int category_id, const char[] category, int item_id, const char[] item, ItemType type, int &sell_price, int &gold_sell_price)
 {
 	Action result = Plugin_Continue;
 	
@@ -399,6 +446,7 @@ Action Forward_OnItemSell(int client, int category_id, const char[] category, in
 	Call_PushString(item);
 	Call_PushCell(type);
 	Call_PushCellRef(sell_price);
+	Call_PushCellRef(gold_sell_price);
 	Call_Finish(result);
 	
 	return result;

@@ -4,11 +4,13 @@ StringMap g_hTrieToggles[MAXPLAYERS+1];
 
 int i_Id[MAXPLAYERS+1];
 int iCredits[MAXPLAYERS+1];
+int iGold[MAXPLAYERS+1];
 bool g_bAuthorized[MAXPLAYERS+1];
 
-ConVar g_hTimerMethod, g_hStartCredits;
+ConVar g_hTimerMethod, g_hStartCredits, g_hStartGold;
 bool g_bTimerMethod;
 int g_iStartCredits;
+int g_iStartGold;
 
 void PlayerManager_CreateNatives()
 {
@@ -19,6 +21,10 @@ void PlayerManager_CreateNatives()
 	CreateNative("Shop_SetClientCredits", PlayerManager_SetClientCredits);
 	CreateNative("Shop_GiveClientCredits", PlayerManager_GiveClientCredits);
 	CreateNative("Shop_TakeClientCredits", PlayerManager_TakeClientCredits);
+	CreateNative("Shop_GetClientGold", PlayerManager_GetClientGold);
+	CreateNative("Shop_SetClientGold", PlayerManager_SetClientGold);
+	CreateNative("Shop_GiveClientGold", PlayerManager_GiveClientGold);
+	CreateNative("Shop_TakeClientGold", PlayerManager_TakeClientGold);
 	CreateNative("Shop_GiveClientItem", PlayerManager_GiveClientItem);
 	CreateNative("ItemId.Give", PlayerManager_GiveClientItem);
 	CreateNative("Shop_BuyClientItem", PlayerManager_BuyClientItem);
@@ -99,6 +105,17 @@ public int PlayerManager_GetClientCredits(Handle plugin, int numParams)
 	return PlayerManager_GetCredits(client);
 }
 
+public int PlayerManager_GetClientGold(Handle plugin, int numParams)
+{
+	int client = GetNativeCell(1);
+	
+	char error[64];
+	if (!CheckClient(client, error, sizeof(error)))
+		ThrowNativeError(SP_ERROR_NATIVE, error);
+	
+	return PlayerManager_GetGold(client);
+}
+
 public int PlayerManager_SetClientCredits(Handle plugin, int numParams)
 {
 	int client = GetNativeCell(1);
@@ -108,6 +125,17 @@ public int PlayerManager_SetClientCredits(Handle plugin, int numParams)
 		ThrowNativeError(SP_ERROR_NATIVE, error);
 	
 	return PlayerManager_SetCredits(client, GetNativeCell(2));
+}
+
+public int PlayerManager_SetClientGold(Handle plugin, int numParams)
+{
+	int client = GetNativeCell(1);
+	
+	char error[64];
+	if (!CheckClient(client, error, sizeof(error)))
+		ThrowNativeError(SP_ERROR_NATIVE, error);
+	
+	return PlayerManager_SetGold(client, GetNativeCell(2));
 }
 
 public int PlayerManager_GiveClientCredits(Handle plugin, int numParams)
@@ -121,6 +149,17 @@ public int PlayerManager_GiveClientCredits(Handle plugin, int numParams)
 	return GiveCredits(client, GetNativeCell(2), GetNativeCell(3));
 }
 
+public int PlayerManager_GiveClientGold(Handle plugin, int numParams)
+{
+	int client = GetNativeCell(1);
+	
+	char error[64];
+	if (!CheckClient(client, error, sizeof(error)))
+		ThrowNativeError(SP_ERROR_NATIVE, error);
+	
+	return GiveGold(client, GetNativeCell(2), GetNativeCell(3));
+}
+
 public int PlayerManager_TakeClientCredits(Handle plugin, int numParams)
 {
 	int client = GetNativeCell(1);
@@ -130,6 +169,17 @@ public int PlayerManager_TakeClientCredits(Handle plugin, int numParams)
 		ThrowNativeError(SP_ERROR_NATIVE, error);
 	
 	return RemoveCredits(client, GetNativeCell(2), GetNativeCell(3));
+}
+
+public int PlayerManager_TakeClientGold(Handle plugin, int numParams)
+{
+	int client = GetNativeCell(1);
+	
+	char error[64];
+	if (!CheckClient(client, error, sizeof(error)))
+		ThrowNativeError(SP_ERROR_NATIVE, error);
+	
+	return RemoveGold(client, GetNativeCell(2), GetNativeCell(3));
 }
 
 public int PlayerManager_GiveClientItem(Handle plugin, int numParams)
@@ -143,13 +193,8 @@ public int PlayerManager_GiveClientItem(Handle plugin, int numParams)
 	}
 	
 	int item_id = GetNativeCell(2);
-	int value = 0;
-	if (numParams == 3)
-	{
-		value = GetNativeCell(3);
-	}
 	
-	return GiveItem(client, item_id, value);
+	return GiveItem(client, item_id);
 }
 
 public int PlayerManager_BuyClientItem(Handle plugin, int numParams)
@@ -243,8 +288,12 @@ public int PlayerManager_GetClientItemSellPrice(Handle plugin, int numParams)
 		ThrowNativeError(SP_ERROR_NATIVE, error);
 	
 	int item_id = GetNativeCell(2);
+	bool isGold = view_as<bool>(GetNativeCell(3));
 	
-	return PlayerManager_GetItemSellPrice(client, item_id);
+	if (isGold)
+		return PlayerManager_GetItemGoldSellPrice(client, item_id);
+	else
+		return PlayerManager_GetItemSellPrice(client, item_id);
 }
 
 public int PlayerManager_SetClientItemTimeleft(Handle plugin, int numParams)
@@ -321,6 +370,10 @@ void PlayerManager_OnPluginStart()
 	g_iStartCredits = g_hStartCredits.IntValue;
 	g_hStartCredits.AddChangeHook(PlayerManager_OnConVarChange);
 	
+	g_hStartGold = CreateConVar("sm_shop_start_gold", "0", "Start gold for a new player", 0, true, 0.0);
+	g_iStartGold = g_hStartGold.IntValue;
+	g_hStartGold.AddChangeHook(PlayerManager_OnConVarChange);
+	
 	g_hTimerMethod = CreateConVar("sm_shop_timer_method", "0", "Timing method to use for timed items. 0 time while using and 1 is real time", 0, true, 0.0, true, 1.0);
 	g_bTimerMethod = g_hTimerMethod.BoolValue;
 	g_hTimerMethod.AddChangeHook(PlayerManager_OnConVarChange);
@@ -330,6 +383,8 @@ public void PlayerManager_OnConVarChange(ConVar convar, const char[] oldValue, c
 {
 	if (convar == g_hStartCredits)
 		g_iStartCredits = convar.IntValue;
+	else if (convar == g_hStartGold)
+		g_iStartGold = convar.IntValue;
 	else if (convar == g_hTimerMethod)
 		g_bTimerMethod = convar.BoolValue;
 }
@@ -388,8 +443,8 @@ void PlayerManager_TransferItem(int client, int target, int item_id)
 		}
 	
 		char s_Query[256];
-		h_db.Format(s_Query, sizeof(s_Query), "INSERT INTO `%sboughts` (`player_id`, `item_id`, `count`, `duration`, `timeleft`, `buy_price`, `sell_price`, `buy_time`) VALUES \
-											('%d', '%s', '%d', '%d', '%d', '%d', '%d', '%d');", g_sDbPrefix, i_Id[target], sItemId, h_KvClientItems[target].GetNum("count"), h_KvClientItems[target].GetNum("duration"), timeleft, h_KvClientItems[target].GetNum("price"), h_KvClientItems[target].GetNum("sell_price"), h_KvClientItems[target].GetNum("buy_time"));
+		h_db.Format(s_Query, sizeof(s_Query), "INSERT INTO `%sboughts` (`player_id`, `item_id`, `count`, `duration`, `timeleft`, `buy_price`, `sell_price`, `buy_time`, `gold_buy_price`, `gold_sell_price`) VALUES \
+											('%d', '%s', '%d', '%d', '%d', '%d', '%d', '%d', '%d', '%d');", g_sDbPrefix, i_Id[target], sItemId, h_KvClientItems[target].GetNum("count"), h_KvClientItems[target].GetNum("duration"), timeleft, h_KvClientItems[target].GetNum("price"), h_KvClientItems[target].GetNum("sell_price"), h_KvClientItems[target].GetNum("buy_time"), h_KvClientItems[target].GetNum("gold_price"), h_KvClientItems[target].GetNum("gold_sell_price"));
 		
 		Transaction txn = new Transaction();
 		DataPack dp = new DataPack();
@@ -403,6 +458,8 @@ void PlayerManager_TransferItem(int client, int target, int item_id)
 		dp.WriteCell(h_KvClientItems[target].GetNum("sell_price", -1));
 		dp.WriteCell(h_KvClientItems[target].GetNum("buy_time", global_timer));
 		dp.WriteCell(h_KvClientItems[target].GetNum("category_id", -1));
+		dp.WriteCell(h_KvClientItems[target].GetNum("gold_price", -1));
+		dp.WriteCell(h_KvClientItems[target].GetNum("gold_sell_price", -1));
 		
 		txn.AddQuery(s_Query);
 		h_db.Execute(txn, TxnOnTransferSuccess, TxnOnTransferFailure, dp);
@@ -436,7 +493,7 @@ public void TxnOnTransferFailure(Database db, any data, int numQueries, const ch
 {
 	LogToFileEx("addons/sourcemod/shop.log", "[Item transfer error] transaction error: %s", error);
 	DataPack dp = view_as<DataPack>(data);
-	int client, target, item_id, duration, timeleft, price, sell_price, buy_time, category_id;
+	int client, target, item_id, duration, timeleft, price, sell_price, buy_time, category_id, gold_price, gold_sell_price;
 	if (dp != null)
 	{
 		dp.Reset();
@@ -450,6 +507,8 @@ public void TxnOnTransferFailure(Database db, any data, int numQueries, const ch
 		sell_price = dp.ReadCell();
 		buy_time = dp.ReadCell();
 		category_id = dp.ReadCell();
+		gold_price = dp.ReadCell();
+		gold_sell_price = dp.ReadCell();
 		delete dp;
 		
 		char sItemId[16];
@@ -458,7 +517,7 @@ public void TxnOnTransferFailure(Database db, any data, int numQueries, const ch
 		if (type == Item_Finite)
 		{
 			PlayerManager_RemoveItem(target, item_id); // remove item on target
-			PlayerManager_GiveItemEx(client, sItemId, category_id, price, sell_price, 1, 0, 0, type);
+			PlayerManager_GiveItemEx(client, sItemId, category_id, price, sell_price, 1, 0, 0, type, gold_price, gold_sell_price);
 		}
 		else
 		{
@@ -466,7 +525,7 @@ public void TxnOnTransferFailure(Database db, any data, int numQueries, const ch
 				PlayerManager_ToggleItem(target, item_id, Shop_UseOff);
 			
 			PlayerManager_RemoveItem(target, item_id); // remove item on target
-			PlayerManager_GiveItemEx(client, sItemId, category_id, price, sell_price, 1, duration, timeleft, type);
+			PlayerManager_GiveItemEx(client, sItemId, category_id, price, sell_price, 1, duration, timeleft, type, gold_price, gold_sell_price);
 		}
 		
 		// return original buy date
@@ -739,13 +798,16 @@ stock bool PlayerManager_CanPreviewEx(int client, const char[] sItemId, int &sec
 	return result;
 }
 
-void PlayerManager_GiveItemEx(int client, const char[] sItemId, int category_id, int price, int sell_price, int count, int duration, int timeleft, ItemType type)
+void PlayerManager_GiveItemEx(int client, const char[] sItemId, int category_id, int price, int sell_price, int count, int duration, int timeleft, ItemType type, int gold_price, int gold_sell_price)
 {
 	h_KvClientItems[client].Rewind();
 	h_KvClientItems[client].JumpToKey(sItemId, true);
 	h_KvClientItems[client].SetNum("category_id", category_id);
 	h_KvClientItems[client].SetNum("price", price);
 	h_KvClientItems[client].SetNum("sell_price", sell_price);
+	h_KvClientItems[client].SetNum("gold_price", gold_price);
+	h_KvClientItems[client].SetNum("gold_sell_price", gold_sell_price);
+
 	int has = h_KvClientItems[client].GetNum("count", 0);
 	h_KvClientItems[client].SetNum("count", has+count);
 	h_KvClientItems[client].SetNum("duration", duration);
@@ -779,8 +841,18 @@ void PlayerManager_GiveItemEx(int client, const char[] sItemId, int category_id,
 		StrCat(sCat, sizeof(sCat), "c");
 		h_KvClientItems[client].SetNum(sCat, h_KvClientItems[client].GetNum(sCat, 0)+1);
 		
-		h_db.Format(s_Query, sizeof(s_Query), "INSERT INTO `%sboughts` (`player_id`, `item_id`, `count`, `duration`, `timeleft`, `buy_price`, `sell_price`, `buy_time`) VALUES \
-											('%d', '%s', '%d', '%d', '%d', '%d', '%d', '%d');", g_sDbPrefix, i_Id[client], sItemId, count, duration, timeleft, price, sell_price, global_timer);
+		if (gold_price < -1)
+		{
+			gold_price = -1;
+		}
+		
+		if (gold_sell_price < -1)
+		{
+			gold_sell_price = -1;
+		}
+		
+		h_db.Format(s_Query, sizeof(s_Query), "INSERT INTO `%sboughts` (`player_id`, `item_id`, `count`, `duration`, `timeleft`, `buy_price`, `sell_price`, `buy_time`, `gold_buy_price`, `gold_sell_price`) VALUES \
+											('%d', '%s', '%d', '%d', '%d', '%d', '%d', '%d', '%d', '%d');", g_sDbPrefix, i_Id[client], sItemId, count, duration, duration, price, sell_price, global_timer, gold_price, gold_sell_price);
 		TQueryEx(s_Query);
 	}
 	else
@@ -846,6 +918,64 @@ int PlayerManager_GetItemSellPriceEx(int client, const char[] sItemId)
 	
 	return credits;
 }
+
+int PlayerManager_GetItemGoldSellPrice(int client, int item_id)
+{
+	char sItemId[16];
+	IntToString(item_id, sItemId, sizeof(sItemId));
+	
+	return PlayerManager_GetItemGoldSellPriceEx(client, sItemId);
+}
+
+int PlayerManager_GetItemGoldSellPriceEx(int client, const char[] sItemId)
+{
+	h_KvClientItems[client].Rewind();
+	if (!h_KvClientItems[client].JumpToKey(sItemId))
+		return -1;
+	
+	bool method = view_as<bool>(h_KvClientItems[client].GetNum("method"));
+	
+	int sell_price = h_KvClientItems[client].GetNum("gold_sell_price", -1);
+	if (sell_price < 0)
+	{
+		h_KvClientItems[client].Rewind();
+		return -1;
+	}
+	int duration = h_KvClientItems[client].GetNum("duration", 0);
+	if (duration < 1)
+	{
+		h_KvClientItems[client].Rewind();
+		return sell_price;
+	}
+	
+	int timeleft;
+	if (method == false)
+	{
+		int started = h_KvClientItems[client].GetNum("started", 0);
+		if (started)
+			timeleft = h_KvClientItems[client].GetNum("timeleft", 0)-(global_timer-started);
+		else
+			timeleft = h_KvClientItems[client].GetNum("timeleft", 0);
+	}
+	else
+		timeleft = h_KvClientItems[client].GetNum("buy_time", 0)+duration-global_timer;
+	
+	h_KvClientItems[client].Rewind();
+
+	int gold = sell_price;
+	int dummy = gold;
+	// TODO: There can be check for disable gold refunding.
+	if (timeleft > 0)
+		gold = RoundToNearest(float(gold) * float(timeleft) / float(duration));
+	
+	if (gold > sell_price)
+		gold = sell_price;
+	else if (gold < 0)
+		gold = RoundToNearest(float(dummy) / 2.0 * float(timeleft) / float(duration));
+	
+	return gold;
+}
+
 
 int PlayerManager_GetClientCategorySize(int client, int category_id)
 {
@@ -1130,14 +1260,14 @@ void PlayerManager_OnClientPutInServer(int client)
 		g_hTrieToggles[client] = new StringMap();
 	}
 	
-	char auth[22];
+	char auth[32];
 	GetClientAuthId(client, AuthId_Steam2, auth, sizeof(auth), false);
 	
 	char s_Query[256];
 	if (db_type == DB_MySQL)
-		h_db.Format(s_Query, sizeof(s_Query), "SELECT `money`, `id` FROM `%splayers` WHERE `auth` REGEXP '^STEAM_[0-9]:%s$' LIMIT 1;", g_sDbPrefix, auth[8]);
+		h_db.Format(s_Query, sizeof(s_Query), "SELECT `money`, `gold`, `id` FROM `%splayers` WHERE `auth` REGEXP '^STEAM_[0-9]:%s$' LIMIT 1;", g_sDbPrefix, auth[8]);
 	else
-		h_db.Format(s_Query, sizeof(s_Query), "SELECT `money`, `id` FROM `%splayers` WHERE `auth` = '%s' LIMIT 1;", g_sDbPrefix, auth);
+		h_db.Format(s_Query, sizeof(s_Query), "SELECT `money`, `gold`, `id` FROM `%splayers` WHERE `auth` = '%s' LIMIT 1;", g_sDbPrefix, auth);
 	
 	DataPack dp = new DataPack();
 	dp.WriteCell(GetClientSerial(client));
@@ -1192,8 +1322,9 @@ public void PlayerManager_AuthorizeClient(Database owner, DBResultSet hndl, cons
 				dp.WriteString(auth);
 				dp.WriteCell(1);
 				dp.WriteCell(g_iStartCredits);
+				dp.WriteCell(g_iStartGold);
 				
-				h_db.Format(s_Query, sizeof(s_Query), "INSERT INTO `%splayers` (`name`, `auth`, `money`, `lastconnect`) VALUES ('%s', '%s', '%d', '%d');", g_sDbPrefix, buffer, auth, g_iStartCredits, global_timer);
+				h_db.Format(s_Query, sizeof(s_Query), "INSERT INTO `%splayers` (`name`, `auth`, `money`, `gold`, `lastconnect`) VALUES ('%s', '%s', '%d', '%d', '%d');", g_sDbPrefix, buffer, auth, g_iStartCredits, g_iStartGold, global_timer);
 				TQuery(PlayerManager_AuthorizeClient, s_Query, dp);
 				
 				return;
@@ -1202,7 +1333,8 @@ public void PlayerManager_AuthorizeClient(Database owner, DBResultSet hndl, cons
 			delete dp;
 
 			iCredits[client] = hndl.FetchInt(0);
-			i_Id[client] = hndl.FetchInt(1);
+			iGold[client] = hndl.FetchInt(1);
+			i_Id[client] = hndl.FetchInt(2);
 
 			h_db.Format(s_Query, sizeof(s_Query), "UPDATE `%splayers` SET `name` = '%s', `lastconnect` = '%d' WHERE `id` = '%i';", g_sDbPrefix, buffer, global_timer, i_Id[client]);
 			TQueryEx(s_Query);
@@ -1214,6 +1346,7 @@ public void PlayerManager_AuthorizeClient(Database owner, DBResultSet hndl, cons
 		case 1 :
 		{
 			iCredits[client] = dp.ReadCell();
+			iGold[client] = dp.ReadCell();
 			i_Id[client] = hndl.InsertId;
 			g_bAuthorized[client] = true; // client doesn't have any item, so there are no reason to load them
 		}
@@ -1333,7 +1466,7 @@ public void PlayerManager_GetTogglesFromDB(Database owner, DBResultSet hndl, con
 void PlayerManager_LoadClientItems(int client)
 {
 	char s_Query[256];
-	h_db.Format(s_Query, sizeof(s_Query), "SELECT `item_id`, `count`, `duration`, `timeleft`, `buy_price`, `sell_price`, `buy_time` FROM `%sboughts`, `%sitems` WHERE `id` = `item_id` AND `player_id` = '%i';", g_sDbPrefix, g_sDbPrefix, i_Id[client]);
+	h_db.Format(s_Query, sizeof(s_Query), "SELECT `item_id`, `count`, `duration`, `timeleft`, `buy_price`, `sell_price`, `buy_time`, `gold_buy_price`, `gold_sell_price` FROM `%sboughts`, `%sitems` WHERE `id` = `item_id` AND `player_id` = '%i';", g_sDbPrefix, g_sDbPrefix, i_Id[client]);
 	TQuery(PlayerManager_GetItemsFromDB, s_Query, GetClientSerial(client));
 }
 
@@ -1415,7 +1548,9 @@ public void PlayerManager_GetItemsFromDB(Database owner, DBResultSet hndl, const
 		h_KvClientItems[client].SetNum("duration", duration);
 		h_KvClientItems[client].SetNum("timeleft", timeleft);
 		h_KvClientItems[client].SetNum("price", SQL_FetchInt(hndl, 4));
+		h_KvClientItems[client].SetNum("gold_price", SQL_FetchInt(hndl, 7));
 		h_KvClientItems[client].SetNum("sell_price", SQL_FetchInt(hndl, 5));
+		h_KvClientItems[client].SetNum("gold_sell_price", SQL_FetchInt(hndl, 8));
 		h_KvClientItems[client].SetNum("method", g_bTimerMethod);
 		h_KvClientItems[client].SetNum("buy_time", buy_time);
 		if (duration > 0 && (g_bTimerMethod != false || GetItemTypeEx(sItemId) == Item_None))
@@ -1450,6 +1585,7 @@ void PlayerManager_ClearPlayer(int client)
 	}
 	i_Id[client] = 0;
 	iCredits[client] = 0;
+	iGold[client] = 0;
 	g_bAuthorized[client] = false;
 }
 
@@ -1475,7 +1611,7 @@ void PlayerManager_SaveInfo(int client, bool cleartimer = false)
 	char s_Query[256];
 	int timeleft;
 	char sItemId[16];
-	h_db.Format(s_Query, sizeof(s_Query), "UPDATE `%splayers` SET `money` = '%d' WHERE `id` = '%d';", g_sDbPrefix, iCredits[client], i_Id[client]);
+	h_db.Format(s_Query, sizeof(s_Query), "UPDATE `%splayers` SET `money` = '%d', `gold` = '%d' WHERE `id` = '%d';", g_sDbPrefix, iCredits[client], iGold[client], i_Id[client]);
 	TQueryEx(s_Query);
 	
 	h_KvClientItems[client].Rewind();
@@ -1507,7 +1643,7 @@ void PlayerManager_SaveInfo(int client, bool cleartimer = false)
 				}
 			}
 			
-			h_db.Format(s_Query, sizeof(s_Query), "UPDATE `%sboughts` SET `count` = '%d', `duration` = '%d', `timeleft` = '%d', `buy_price` = '%d', `sell_price` = '%d' WHERE `player_id` = '%d' AND `item_id` = '%s';", g_sDbPrefix, h_KvClientItems[client].GetNum("count", 1), duration, timeleft, h_KvClientItems[client].GetNum("price"), h_KvClientItems[client].GetNum("sell_price"), i_Id[client], sItemId);
+			h_db.Format(s_Query, sizeof(s_Query), "UPDATE `%sboughts` SET `count` = '%d', `duration` = '%d', `timeleft` = '%d', `buy_price` = '%d', `gold_buy_price` = '%d', `sell_price` = '%d', `gold_sell_price` = '%d' WHERE `player_id` = '%d' AND `item_id` = '%s';", g_sDbPrefix, h_KvClientItems[client].GetNum("count", 1), duration, timeleft, h_KvClientItems[client].GetNum("price"), h_KvClientItems[client].GetNum("gold_price"), h_KvClientItems[client].GetNum("sell_price"), h_KvClientItems[client].GetNum("gold_sell_price"), i_Id[client], sItemId);
 			TQueryEx(s_Query);
 		}
 		while (h_KvClientItems[client].GotoNextKey());
@@ -1523,7 +1659,7 @@ void PlayerManager_OnItemRegistered(int item_id)
 	{
 		if (!i_Id[client]) continue;
 		
-		h_db.Format(s_Query, sizeof(s_Query), "SELECT `item_id`, `count`, `duration`, `timeleft`, `buy_price`, `sell_price`, `buy_time` FROM `%sboughts` WHERE `item_id` = '%i' AND `player_id` = '%i';", g_sDbPrefix, item_id, i_Id[client]);
+		h_db.Format(s_Query, sizeof(s_Query), "SELECT `item_id`, `count`, `duration`, `timeleft`, `buy_price`, `sell_price`, `buy_time`, `gold_buy_price`, `gold_sell_price` FROM `%sboughts` WHERE `item_id` = '%i' AND `player_id` = '%i';", g_sDbPrefix, item_id, i_Id[client]);
 		TQuery(PlayerManager_GetItemsFromDB, s_Query, GetClientSerial(client));
 	}
 }
@@ -1559,7 +1695,7 @@ void PlayerManager_OnItemUnregistered(int item_id)
 				}
 			}
 			
-			h_db.Format(s_Query, sizeof(s_Query), "UPDATE `%sboughts` SET `count` = '%d', `duration` = '%d', `timeleft` = '%d', `buy_price` = '%d', `sell_price` = '%d' WHERE `player_id` = '%d' AND `item_id` = '%s';", g_sDbPrefix, h_KvClientItems[client].GetNum("count", 1), duration, timeleft, h_KvClientItems[client].GetNum("price"), h_KvClientItems[client].GetNum("sell_price"), i_Id[client], sItemId);
+			h_db.Format(s_Query, sizeof(s_Query), "UPDATE `%sboughts` SET `count` = '%d', `duration` = '%d', `timeleft` = '%d', `buy_price` = '%d', `gold_buy_price` = '%d', `sell_price` = '%d', 'gold_sell_price' = '%d' WHERE `player_id` = '%d' AND `item_id` = '%s';", g_sDbPrefix, h_KvClientItems[client].GetNum("count", 1), duration, timeleft, h_KvClientItems[client].GetNum("price"), h_KvClientItems[client].GetNum("gold_price"), h_KvClientItems[client].GetNum("sell_price"), h_KvClientItems[client].GetNum("gold_sell_price"), i_Id[client], sItemId);
 			TQueryEx(s_Query);
 			
 			category_id = h_KvClientItems[client].GetNum("category_id", -1);
@@ -1581,6 +1717,11 @@ int PlayerManager_GetCredits(int client)
 	return iCredits[client];
 }
 
+int PlayerManager_GetGold(int client)
+{
+	return iGold[client];
+}
+
 stock int PlayerManager_SetCredits(int client, int credits)
 {
 	if (credits < 0)
@@ -1595,12 +1736,35 @@ stock int PlayerManager_SetCredits(int client, int credits)
 	return iCredits[client];
 }
 
+stock int PlayerManager_SetGold(int client, int amount)
+{
+	if (amount < 0)
+		amount = 0;
+	
+	iGold[client] = amount;
+	
+	char s_Query[256];
+	h_db.Format(s_Query, sizeof(s_Query), "UPDATE `%splayers` SET `gold` = '%d' WHERE `id` = '%d';", g_sDbPrefix, iGold[client], i_Id[client]);
+	TQueryEx(s_Query);
+	
+	return iGold[client];
+}
+
 void PlayerManager_GiveCredits(int client, int credits)
 {
 	iCredits[client] += credits;
 	
 	char s_Query[256];
 	h_db.Format(s_Query, sizeof(s_Query), "UPDATE `%splayers` SET `money` = '%d' WHERE `id` = '%d';", g_sDbPrefix, iCredits[client], i_Id[client]);
+	TQueryEx(s_Query);
+}
+
+void PlayerManager_GiveGold(int client, int amount)
+{
+	iGold[client] += amount;
+	
+	char s_Query[256];
+	h_db.Format(s_Query, sizeof(s_Query), "UPDATE `%splayers` SET `gold` = '%d' WHERE `id` = '%d';", g_sDbPrefix, iGold[client], i_Id[client]);
 	TQueryEx(s_Query);
 }
 
@@ -1612,5 +1776,16 @@ void PlayerManager_RemoveCredits(int client, int credits)
 	
 	char s_Query[256];
 	h_db.Format(s_Query, sizeof(s_Query), "UPDATE `%splayers` SET `money` = '%d' WHERE `id` = '%d';", g_sDbPrefix, iCredits[client], i_Id[client]);
+	TQueryEx(s_Query);
+}
+
+void PlayerManager_RemoveGold(int client, int amount)
+{
+	iGold[client] -= amount;
+	if (iGold[client] < 0)
+		iGold[client] = 0;
+	
+	char s_Query[256];
+	h_db.Format(s_Query, sizeof(s_Query), "UPDATE `%splayers` SET `gold` = '%d' WHERE `id` = '%d';", g_sDbPrefix, iGold[client], i_Id[client]);
 	TQueryEx(s_Query);
 }

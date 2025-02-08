@@ -5,9 +5,9 @@ int g_iTransCredits;
 /**
  * For SM 1.10
  */
-stock DataPackPos FUNCTIONS_DP_PLUGIN 		= view_as<DataPackPos>(0);
-stock DataPackPos FUNCTIONS_DP_FUNCDISPLAY	= view_as<DataPackPos>(1);
-stock DataPackPos FUNCTIONS_DP_FUNCSELECT		= view_as<DataPackPos>(2);
+stock DataPackPos FUNCTIONS_DP_PLUGIN 		= INVALID_DP_POS;
+stock DataPackPos FUNCTIONS_DP_FUNCDISPLAY	= INVALID_DP_POS;
+stock DataPackPos FUNCTIONS_DP_FUNCSELECT		= INVALID_DP_POS;
 
 bool g_bListenChat[MAXPLAYERS+1];
 int g_iCreditsTransferTarget[MAXPLAYERS+1],
@@ -95,6 +95,22 @@ void Functions_OnPluginStart()
 	
 	g_hLuckCredits = CreateConVar("sm_shop_luck_credits", "500", "How many credits the luck cost", 0, true, 0.0);
 	g_hLuckChance = CreateConVar("sm_shop_luck_chance", "20", "How many chance the luck can be succeded", 0, true, 1.0, true, 100.0);
+
+	/**
+	 * For SM 1.10
+	 */
+	DataPack hPack = new DataPack();
+
+	FUNCTIONS_DP_PLUGIN = hPack.Position;
+	hPack.WriteCell(0);
+
+	FUNCTIONS_DP_FUNCDISPLAY = hPack.Position;
+	hPack.WriteCell(0);
+
+	FUNCTIONS_DP_FUNCSELECT = hPack.Position;
+	hPack.WriteCell(0);
+
+	delete hPack;
 }
 
 public void Functions_OnConVarChange(ConVar convar, const char[] oldValue, const char[] newValue)
@@ -157,11 +173,12 @@ void Functions_ShowMenu(int client, int pos = 0)
 	SetGlobalTransTarget(client);
 	
 	int credits = GetCredits(client);
+	int gold = GetGold(client);
 	
 	Menu menu = CreateMenu(Functions_Menu_Handler);
 	
 	char buffer[128];
-	FormatEx(buffer, sizeof(buffer), "%t\n%t", "functions", "credits", credits);
+	FormatEx(buffer, sizeof(buffer), "%t\n%t|%t: %d", "functions", "credits", credits, "Gold", gold);
 	OnMenuTitle(client, Menu_Functions, buffer, buffer, sizeof(buffer));
 	menu.SetTitle(buffer);
 	menu.ExitButton = true;
@@ -722,10 +739,13 @@ int FilterItemsInLuckArray(ArrayList hArray, int client, bool &wasOverriden)
 {
 	int dummy, iLuckChance, iNewLuckValue;
 	ItemType type;
+	int gold_price; // To remove gold items from randomizer
+	
 	Action luckAction;
 	for (int i = 0; i < hArray.Length; ++i)
 	{
 		dummy = hArray.Get(i);
+		gold_price = ItemManager_GetItemGoldPriceInt(dummy);
 		type = GetItemType(dummy);
 		iLuckChance = GetItemLuckChance(dummy);
 		iNewLuckValue = iLuckChance;
@@ -740,7 +760,7 @@ int FilterItemsInLuckArray(ArrayList hArray, int client, bool &wasOverriden)
 			wasOverriden = true;
 		}
 		
-		if (type != Item_Finite && type != Item_BuyOnly && ClientHasItem(client, dummy) || iLuckChance == 0 || luckAction == Plugin_Handled)
+		if (type != Item_Finite && type != Item_BuyOnly && ClientHasItem(client, dummy) || iLuckChance == 0 || luckAction == Plugin_Handled || gold_price > 0)
 		{
 			//PrintToChatAll("Item %d removed from luck. Type = %d, Client = %N, ClientHasItem = %d, iLuckChance = %d, luckAction = %d, bShouldLuck = %d, gold_price = %d", dummy, type, client, ClientHasItem(client, dummy), iLuckChance, luckAction, bShouldLuck, gold_price);
 			hArray.Erase(i--);
@@ -812,7 +832,7 @@ stock bool Functions_AddTargetsToMenu(Menu menu, int filter_client)
 		if (i != filter_client && IsAuthorizedIn(i))
 		{
 			IntToString(GetClientUserId(i), userid, sizeof(userid));
-			FormatEx(buffer, sizeof(buffer), "%N (%d)", i, GetCredits(i));
+			FormatEx(buffer, sizeof(buffer), "%N (%d|%d)", i, GetCredits(i), GetGold(i));
 			
 			menu.AddItem(userid, buffer);
 			

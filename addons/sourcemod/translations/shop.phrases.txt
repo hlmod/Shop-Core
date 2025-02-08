@@ -157,7 +157,18 @@
 	{
 		"en"		"Set credits"
 	}
-
+	"give_gold"
+	{
+		"en"		"Give gold"
+	}
+	"take_gold"
+	{
+		"en"		"Take gold"
+	}
+	"set_gold"
+	{
+		"en"		"Set gold"
+	}
 	"give_items"
 	{
 		"en"		"Give items"
@@ -212,6 +223,68 @@
 	{
 		"#format"   "{1:i}"
 		"en"		"{green}[Shop]{default} Admin has gave you {green}{1}{default} credits!"
+	}
+	
+	"give_gold_success"
+	{
+		"#format"   "{1:i},{2:s}"
+		"en"		"{green}[Shop]{default} You have sent {1} gold to {green}{2}{default}!"
+	}
+	"remove_gold_success"
+	{
+		"#format"   "{1:i},{2:s}"
+		"en"		"{green}[Shop]{default} You have took {1} gold from {green}{2}{default}!"
+	}
+	"set_gold_success"
+	{
+		"#format"   "{1:i},{2:s}"
+		"en"		"{green}[Shop]{default} You have set {1} gold to {green}{2}{default}!"
+	}
+	"set_you_gold"
+	{
+		"#format"   "{1:i}"
+		"en"		"{green}[Shop]{default} Admin has set your gold to {green}{1}{default}!"
+	}
+	"take_you_gold"
+	{
+		"#format"   "{1:i}"
+		"en"		"{green}[Shop]{default} Admin has took {green}{1}{default} gold!"
+	}
+	"give_you_gold"
+	{
+		"#format"   "{1:i}"
+		"en"		"{green}[Shop]{default} Admin has gave you {green}{1}{default} gold!"
+	}
+
+	"give_gold_success"
+	{
+		"#format"   "{1:i},{2:s}"
+		"en"		"{green}[Shop]{default} You have sent {1} gold to {green}{2}{default}!"
+	}
+	"remove_gold_success"
+	{
+		"#format"   "{1:i},{2:s}"
+		"en"		"{green}[Shop]{default} You have took {1} gold from {green}{2}{default}!"
+	}
+	"set_gold_success"
+	{
+		"#format"   "{1:i},{2:s}"
+		"en"		"{green}[Shop]{default} You have set {1} gold to {green}{2}{default}!"
+	}
+	"set_you_gold"
+	{
+		"#format"   "{1:i}"
+		"en"		"{green}[Shop]{default} Admin has set your gold to {green}{1}{default}!"
+	}
+	"take_you_gold"
+	{
+		"#format"   "{1:i}"
+		"en"		"{green}[Shop]{default} Admin has took {green}{1}{default} gold!"
+	}
+	"give_you_gold"
+	{
+		"#format"   "{1:i}"
+		"en"		"{green}[Shop]{default} Admin has gave you {green}{1}{default} gold!"
 	}
 
 	"EmptyInventory"
@@ -323,7 +396,10 @@
 	{
 		"en"		"Price"
 	}
-
+	"Gold"
+	{
+		"en"		"Gold"
+	}
 	"Sell Price"
 	{
 		"en"		"Sell price"
@@ -389,7 +465,10 @@
 	{
 		"en"		"Buy"
 	}
-
+	"Unbuyable"
+	{
+		"en"		"Unbuyable"
+	}
 	"buy_not"
 	{
 		"en"		"Buy [Insufficient credits]"
@@ -459,7 +538,10 @@
 	{
 		"en"		"{green}[Shop] {default}Insufficient credits!"
 	}
-
+	"NotEnoughGold"
+	{
+		"en"		"{green}[Shop] {default}Insufficient gold!"
+	}
 	"PreviewIn"
 	{
 		"#format"   "{1:i}"
@@ -480,6 +562,11 @@
 	"DataLoading"
 	{
 		"en"		"{green}[Shop] {default}Your data is being loaded!"
+	}
+
+	"Gold Suffix"
+	{
+		"en"		"G"
 	}
 
 	"You Buy Sure"

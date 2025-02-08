@@ -1,8 +1,12 @@
 #define GIVE_CREDITS	0
 #define TAKE_CREDITS	1
 #define SET_CREDITS		2
-#define GIVE_ITEMS		3
-#define TAKE_ITEMS		4
+#define GIVE_GOLD		3
+#define TAKE_GOLD		4
+#define SET_GOLD		5
+#define GIVE_ITEMS		6
+#define TAKE_ITEMS		7
+#define ADD_PLAYERS		8
 
 enum struct AdminEnum
 {
@@ -18,9 +22,9 @@ Menu count_menu;
 /**
  * For SM 1.10
  */
-stock DataPackPos ADMIN_DP_PLUGIN			= view_as<DataPackPos>(0);
-stock DataPackPos ADMIN_DP_FUNCDISPLAY	= view_as<DataPackPos>(1);
-stock DataPackPos ADMIN_DP_FUNCSELECT		= view_as<DataPackPos>(2);
+stock DataPackPos ADMIN_DP_PLUGIN			= INVALID_DP_POS;
+stock DataPackPos ADMIN_DP_FUNCDISPLAY	= INVALID_DP_POS;
+stock DataPackPos ADMIN_DP_FUNCSELECT		= INVALID_DP_POS;
 
 ArrayList g_hAdminArray;
 
@@ -31,6 +35,24 @@ void Admin_CreateNatives()
 	CreateNative("Shop_AddToAdminMenu", Admin_AddToMenuNative);
 	CreateNative("Shop_RemoveFromAdminMenu", Admin_RemoveFromMenuNative);
 	CreateNative("Shop_ShowAdminMenu", Admin_ShowAdminMenu);
+}
+
+void Admin_OnPluginStart() {
+	/**
+	 * For SM 1.10
+	 */
+	DataPack hPack = new DataPack();
+
+	ADMIN_DP_PLUGIN = hPack.Position;
+	hPack.WriteCell(0);
+
+	ADMIN_DP_FUNCDISPLAY = hPack.Position;
+	hPack.WriteCell(0);
+
+	ADMIN_DP_FUNCSELECT = hPack.Position;
+	hPack.WriteCell(0);
+
+	delete hPack;
 }
 
 public int Admin_AddToMenuNative(Handle plugin, int numParams)
@@ -53,7 +75,8 @@ public int Admin_RemoveFromMenuNative(Handle plugin, int numParams)
 	while ((index = g_hAdminArray.FindValue(plugin)) != -1)
 	{
 		dp = g_hAdminArray.Get(index+1);
-		dp.Position = ADMIN_DP_FUNCDISPLAY; // jump to func display
+		dp.Reset();
+		dp.Position = ADMIN_DP_FUNCDISPLAY; // skip Handle plugin
 		Function func_disp = dp.ReadFunction();
 		Function func_select = dp.ReadFunction();
 		if (func_disp == GetNativeFunction(1) && func_select == GetNativeFunction(2))
@@ -153,13 +176,25 @@ public int Admin_MenuCount_Handler(Menu menu, MenuAction action, int param1, int
 				{
 					menu.SetTitle("%T\n%N (%d)\n ", "give_credits", param1, target, GetCredits(target));
 				}
+				case GIVE_GOLD :
+				{
+					menu.SetTitle("%T\n%N (%d)\n ", "give_gold", param1, target, GetGold(target));
+				}
 				case TAKE_CREDITS :
 				{
 					menu.SetTitle("%T\n%N (%d)\n ", "take_credits", param1, target, GetCredits(target));
 				}
+				case TAKE_GOLD :
+				{
+					menu.SetTitle("%T\n%N (%d)\n ", "take_gold", param1, target, GetGold(target));					
+				}
 				case SET_CREDITS :
 				{
 					menu.SetTitle("%T\n%N (%d)\n ", "set_credits", param1, target, GetCredits(target));
+				}
+				case SET_GOLD :
+				{
+					menu.SetTitle("%T\n%N (%d)\n ", "set_gold", param1, target, GetGold(target));					
 				}
 			}
 		}
@@ -182,16 +217,31 @@ public int Admin_MenuCount_Handler(Menu menu, MenuAction action, int param1, int
 				case GIVE_CREDITS :
 				{
 					GiveCredits(target, StringToInt(info), param1);
-					Admin_ShowCreditsAmount(param1, GetMenuSelectionPosition());
+					Admin_ShowAmount(param1, GetMenuSelectionPosition());
+				}
+				case GIVE_GOLD :
+				{
+					GiveGold(target, StringToInt(info), param1);
+					Admin_ShowAmount(param1, GetMenuSelectionPosition());
 				}
 				case TAKE_CREDITS :
 				{
 					RemoveCredits(target, StringToInt(info), param1);
-					Admin_ShowCreditsAmount(param1, GetMenuSelectionPosition());
+					Admin_ShowAmount(param1, GetMenuSelectionPosition());
+				}
+				case TAKE_GOLD :
+				{
+					RemoveGold(target, StringToInt(info), param1);
+					Admin_ShowAmount(param1, GetMenuSelectionPosition());
 				}
 				case SET_CREDITS :
 				{
 					SetCredits(target, StringToInt(info), param1);
+					Admin_ShowMenu(param1);
+				}
+				case SET_GOLD :
+				{
+					SetGold(target, StringToInt(info), param1);
 					Admin_ShowMenu(param1);
 				}
 			}
@@ -228,10 +278,16 @@ void Admin_ShowMenu(int client, int pos = 0)
 	menu.AddItem("b", buffer);
 	FormatEx(buffer, sizeof(buffer), "%t\n ", "set_credits");
 	menu.AddItem("c", buffer);
-	FormatEx(buffer, sizeof(buffer), "%t", "give_items");
+	FormatEx(buffer, sizeof(buffer), "%t", "give_gold");
 	menu.AddItem("d", buffer);
-	FormatEx(buffer, sizeof(buffer), "%t", "take_items");
+	FormatEx(buffer, sizeof(buffer), "%t", "take_gold");
 	menu.AddItem("e", buffer);
+	FormatEx(buffer, sizeof(buffer), "%t\n ", "set_gold");
+	menu.AddItem("f", buffer);
+	FormatEx(buffer, sizeof(buffer), "%t", "give_items");
+	menu.AddItem("g", buffer);
+	FormatEx(buffer, sizeof(buffer), "%t", "take_items");
+	menu.AddItem("h", buffer);
 	
 	int size = g_hAdminArray.Length;
 	
@@ -294,9 +350,21 @@ public int Admin_Menu_Handler(Menu menu, MenuAction action, int param1, int para
 				}
 				case 'd' :
 				{
-					g_iOpt[param1].AdminOption = GIVE_ITEMS;
+					g_iOpt[param1].AdminOption = GIVE_GOLD;
 				}
 				case 'e' :
+				{
+					g_iOpt[param1].AdminOption = TAKE_GOLD;
+				}
+				case 'f' :
+				{
+					g_iOpt[param1].AdminOption = SET_GOLD;
+				}
+				case 'g' :
+				{
+					g_iOpt[param1].AdminOption = GIVE_ITEMS;
+				}
+				case 'h' :
 				{
 					g_iOpt[param1].AdminOption = TAKE_ITEMS;
 				}
@@ -395,7 +463,12 @@ public int Admin_TargetsMenu_Handler(Menu menu, MenuAction action, int param1, i
 			{
 				case GIVE_CREDITS, TAKE_CREDITS, SET_CREDITS :
 				{
-					Admin_ShowCreditsAmount(param1);
+					Admin_ShowAmount(param1);
+				}
+				case GIVE_GOLD, TAKE_GOLD, SET_GOLD :
+				{
+					Admin_ShowAmount(param1);
+					
 				}
 				case GIVE_ITEMS, TAKE_ITEMS :
 				{
@@ -419,7 +492,7 @@ public int Admin_TargetsMenu_Handler(Menu menu, MenuAction action, int param1, i
 	return 0;
 }
 
-void Admin_ShowCreditsAmount(int client, int pos = 0)
+void Admin_ShowAmount(int client, int pos = 0)
 {
 	count_menu.DisplayAt(client, pos, MENU_TIME_FOREVER);
 }

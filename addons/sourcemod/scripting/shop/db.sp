@@ -331,6 +331,13 @@ public void DB_CheckTable(Database db, DBResultSet results, const char[] error, 
 			
 			return;
 		}
+		else if (results.FetchInt(0) <= 8)
+		{
+			h_db.Format(s_Query, sizeof(s_Query), "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '%splayers';", g_sDbPrefix);
+			DB_TQuery(DB_CheckTable3, s_Query);
+			
+			return;
+		}
 	}
 	else if (!results.RowCount)
 	{
@@ -339,10 +346,14 @@ public void DB_CheckTable(Database db, DBResultSet results, const char[] error, 
 		
 		return;
 	}
+	else if (results.RowCount <= 8) {
+		h_db.Format(s_Query, sizeof(s_Query), "PRAGMA TABLE_INFO(%splayers);", g_sDbPrefix);
+		DB_TQuery(DB_CheckTable3, s_Query);
+		
+		return;
+	}
 	
 	DB_RunBackup();
-	
-//	OnReadyToStart();
 	DB_CreateTables();
 }
 
@@ -389,6 +400,51 @@ public void DB_CheckTable2(Database db, DBResultSet results, const char[] error,
 	DB_CreateTables();
 }
 
+public void DB_CheckTable3(Database db, DBResultSet results, const char[] error, any data)
+{
+	if (error[0])
+	{
+		LogError("DB_CheckTable3: %s", error);
+		delete h_db;
+		h_db = null;
+		CreateTimer(15.0, DB_ReconnectTimer);
+		isLoading = false;
+		return;
+	}
+	
+	if (results.RowCount < 6)
+	{
+		char s_Query[256];
+		PrintToServer("[Shop] Started upgrading to version 3!");
+		if (db_type == DB_MySQL)
+		{
+			h_db.Format(s_Query, sizeof(s_Query), "ALTER TABLE `%sboughts` ADD `gold_buy_price` int(10) NOT NULL DEFAULT '0' AFTER `buy_price`;", g_sDbPrefix);
+			DB_TQueryEx(s_Query);
+			
+			h_db.Format(s_Query, sizeof(s_Query), "ALTER TABLE `%sboughts` ADD `gold_sell_price` int(10) NOT NULL DEFAULT '0' AFTER `sell_price`;", g_sDbPrefix);
+			DB_TQueryEx(s_Query);
+			
+			h_db.Format(s_Query, sizeof(s_Query), "ALTER TABLE `%splayers` ADD `gold` int(10) NOT NULL DEFAULT '0' AFTER `money`;", g_sDbPrefix);
+			DB_TQueryEx(s_Query);
+		}
+		else
+		{
+			h_db.Format(s_Query, sizeof(s_Query), "ALTER TABLE `%sboughts` ADD `gold_buy_price` NUMERIC NOT NULL DEFAULT '0'", g_sDbPrefix);
+			DB_TQueryEx(s_Query);
+			
+			h_db.Format(s_Query, sizeof(s_Query), "ALTER TABLE `%sboughts` ADD `gold_sell_price` NUMERIC NOT NULL DEFAULT '0'", g_sDbPrefix);
+			DB_TQueryEx(s_Query);
+			
+			h_db.Format(s_Query, sizeof(s_Query), "ALTER TABLE `%splayers` ADD `gold` NUMERIC NOT NULL DEFAULT '0'", g_sDbPrefix);
+			DB_TQueryEx(s_Query);
+		}
+		
+		PrintToServer("[Shop] Upgrade to version 3 completed!");
+	}
+	
+	DB_CreateTables();
+}
+
 void DB_CreateTables()
 {
 	char s_Query[512];
@@ -401,7 +457,9 @@ void DB_CreateTables()
 							  `duration` int NOT NULL,\
 							  `timeleft` int NOT NULL,\
 							  `buy_price` int NOT NULL,\
+							  `gold_buy_price` int NOT NULL,\
 							  `sell_price` int NOT NULL,\
+							  `gold_sell_price` int NOT NULL,\
 							  `buy_time` int\
 							) ENGINE=InnoDB DEFAULT CHARSET=" ... SHOP_MYSQL_CHARSET ... ";", g_sDbPrefix);
 		DB_TQuery(DB_OnPlayersTableLoad, s_Query, 1);
@@ -419,6 +477,7 @@ void DB_CreateTables()
 							  `name` varchar(32) NOT NULL DEFAULT 'unknown',\
 							  `auth` varchar(22) NOT NULL,\
 							  `money` int NOT NULL,\
+							  `gold` int NOT NULL,\
 							  `lastconnect` int,\
 							  PRIMARY KEY (`id`), \
 								UNIQUE KEY `auth` (`auth`) \
@@ -443,7 +502,9 @@ void DB_CreateTables()
 							  `duration` INTEGER NOT NULL,\
 							  `timeleft` NUMERIC NOT NULL,\
 							  `buy_price` INTEGER NOT NULL,\
+							  `gold_buy_price` INTEGER NOT NULL,\
 							  `sell_price` NUMERIC NOT NULL,\
+							  `gold_sell_price` NUMERIC NOT NULL,\
 							  `buy_time` NUMERIC NOT NULL);", g_sDbPrefix);
 		DB_TQuery(DB_OnPlayersTableLoad, s_Query, 1);
 		
@@ -458,6 +519,7 @@ void DB_CreateTables()
 							  `name` VARCHAR DEFAULT 'unknown',\
 							  `auth` VARCHAR UNIQUE ON CONFLICT IGNORE,\
 							  `money` NUMERIC DEFAULT '0',\
+							  `gold` NUMERIC DEFAULT '0',\
 							  `lastconnect` INTEGER NOT NULL);", g_sDbPrefix);
 		DB_TQuery(DB_OnPlayersTableLoad, s_Query, 3);
 		
@@ -677,8 +739,8 @@ public void DB_UgradeState_1(Database db, DBResultSet results, const char[] erro
 			
 			for (int x = 0; x < num; x++)
 			{
-				h_db.Format(buffer, sizeof(buffer), "INSERT INTO `%sboughts` (`player_id`, `item_id`, `count`, `duration`, `timeleft`, `buy_price`, `sell_price`, `buy_time`) VALUES \
-												('%d', (SELECT `id` FROM `%sitems` WHERE `category` = '%s' AND `item` = (SELECT `item` FROM `%s` WHERE `id` = '%d')), '%d', '%d', '%d', '0', '-1', '%d');", 
+				h_db.Format(buffer, sizeof(buffer), "INSERT INTO `%sboughts` (`player_id`, `item_id`, `count`, `duration`, `timeleft`, `buy_price`,`gold_buy_price`, `sell_price`, `gold_sell_price`, `buy_time`) VALUES \
+												('%d', (SELECT `id` FROM `%sitems` WHERE `category` = '%s' AND `item` = (SELECT `item` FROM `%s` WHERE `id` = '%d')), '%d', '%d', '%d', '0', '0', '-1', '-1', '%d');", 
 												g_sDbPrefix, id, g_sDbPrefix, category, category, itemId[x], count[itemId[x]], duration[itemId[x]], duration[itemId[x]], global_timer);
 				upgrade_dp.WriteString(buffer);
 			}

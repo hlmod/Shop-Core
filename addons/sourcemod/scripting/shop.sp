@@ -6,13 +6,14 @@
 #tryinclude <SteamWorks>
 #define REQUIRE_EXTENSIONS
 
-#define SHOP_VERSION "3.0E9"
+#define SHOP_VERSION "3.0G28"
 #define SHOP_MYSQL_CHARSET "utf8mb4"
 
 #pragma newdecls required
 EngineVersion Engine_Version = Engine_Unknown;
 
 int g_iMaxPageItems = 10;
+#define INVALID_DP_POS	view_as<DataPackPos>(-1)
 
 int global_timer;
 Panel panel_info;
@@ -50,13 +51,10 @@ ConVar g_hHideCategoriesItemsCount;
 #include "shop/functions.sp"
 #include "shop/item_manager.sp"
 #include "shop/player_manager.sp"
-#if defined _SteamWorks_Included
-#include "shop/stats.sp"
-#endif
 
 public Plugin myinfo =
 {
-	name = "[Shop] Core",
+	name = "[Shop] Core (Premium)",
 	description = "An advanced in game market",
 	author = "Shop Core Team",
 	version = SHOP_VERSION,
@@ -83,7 +81,6 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 	MarkNativeAsOptional("GetUserMessageType");
 	MarkNativeAsOptional("SQL_SetCharset");
 
-	MarkNativeAsOptional("GuessSDKVersion"); 
 	MarkNativeAsOptional("GetEngineVersion");
 	MarkNativeAsOptional("GetUserMessageType");
 	MarkNativeAsOptional("BfWriteByte");
@@ -192,8 +189,9 @@ public int Native_ShowItemsOfCategory(Handle plugin, int params)
 public void OnPluginStart()
 {
 	g_iMaxPageItems = GetMaxPageItems(GetMenuStyleHandle(MenuStyle_Default));
-
+	Engine_Version = GetEngineVersion();
 	InitChat();
+	Admin_OnPluginStart();
 	DB_OnPluginStart();
 	Forward_OnPluginStart();
 	Functions_OnPluginStart();
@@ -293,11 +291,8 @@ public void OnConVarChange(ConVar convar, const char[] oldValue, const char[] ne
 
 public void OnMapStart()
 {
-#if defined _SteamWorks_Included
 	// Stats work
-	if (LibraryExists("SteamWorks"))
-		SteamWorks_SteamServersConnected();
-#endif
+	SteamWorks_SteamServersConnected();
 
 	DB_OnMapStart();
 	
@@ -483,7 +478,7 @@ void ShowMainMenu(int client, int pos = 0)
 	menu.ExitBackButton =  false;
 	
 	char sBuffer[192];
-	FormatEx(sBuffer, sizeof(sBuffer), "%T\n%T", "MainMenuTitle", client, "credits", client, PlayerManager_GetCredits(client));
+	FormatEx(sBuffer, sizeof(sBuffer), "%T\n%T\n%T: %d", "MainMenuTitle", client, "credits", client, PlayerManager_GetCredits(client), "Gold", client, PlayerManager_GetGold(client));
 	OnMenuTitle(client, Menu_Main, sBuffer, sBuffer, sizeof(sBuffer));
 	menu.SetTitle(sBuffer);
 	
@@ -502,7 +497,7 @@ void ShowMainMenu(int client, int pos = 0)
 		menu.AddItem("4", sBuffer);
 	}
 	
-	if (g_iAdminFlags != 0 && (GetUserFlagBits(client) & g_iAdminFlags) && GetUserAdmin(client) != INVALID_ADMIN_ID)
+	if (g_iAdminFlags != 0 && IsAdmin(client) && GetUserAdmin(client) != INVALID_ADMIN_ID)
 	{
 		FormatEx(sBuffer, sizeof(sBuffer), "%T", "admin_panel", client);
 		menu.AddItem("5", sBuffer);
@@ -568,7 +563,7 @@ bool ShowInventory(int client)
 	}
 	
 	char title[128];
-	FormatEx(title, sizeof(title), "%T\n%T", "inventory", client, "credits", client, PlayerManager_GetCredits(client));
+	FormatEx(title, sizeof(title), "%T\n%T\n%T: %d", "inventory", client, "credits", client, PlayerManager_GetCredits(client), "Gold", client, PlayerManager_GetGold(client));
 	OnMenuTitle(client, Menu_Inventory, title, title, sizeof(title));
 	menu.SetTitle(title);
 	
@@ -627,7 +622,7 @@ bool ShowCategories(int client)
 	}
 	
 	char title[128];
-	FormatEx(title, sizeof(title), "%T\n%T", "Shop", client, "credits", client, PlayerManager_GetCredits(client));
+	FormatEx(title, sizeof(title), "%T\n%T\n%T: %d", "Shop", client, "credits", client, PlayerManager_GetCredits(client), "Gold", client, PlayerManager_GetGold(client));
 	OnMenuTitle(client, Menu_Buy, title, title, sizeof(title));
 	menu.SetTitle(title);
 	
@@ -678,7 +673,7 @@ bool ShowItemsOfCategory(int client, int category_id, ShopMenu shop_menu, int po
 	bool result = ItemManager_FillItemsOfCategory(menu, client, client, category_id, shop_menu);
 
 	char title[128];
-	FormatEx(title, sizeof(title), "%T\n%T", (shop_menu == Menu_Inventory) ? "inventory" : "Shop", client, "credits", client, PlayerManager_GetCredits(client));
+	FormatEx(title, sizeof(title), "%T\n%T\n%T", (shop_menu == Menu_Inventory) ? "inventory" : "Shop", client, "credits", client, PlayerManager_GetCredits(client), "Gold", client, PlayerManager_GetGold(client));
 	OnMenuTitle(client, shop_menu, title, title, sizeof(title));
 	menu.SetTitle(title);
 	
@@ -733,6 +728,41 @@ public int OnItemSelect(Menu menu, MenuAction action, int param1, int param2)
 			}
 		}
 		case MenuAction_End : delete menu;
+		case MenuAction_DrawItem :
+		{
+			char info[16];
+			menu.GetItem(param2, info, sizeof(info));
+			
+			bool disabled;
+
+			int item_price = ItemManager_GetItemPriceEx(info);
+			int item_gold_price = ItemManager_GetItemGoldPriceEx(info);
+			int price_mode = 0; // 0x0 item is unbuyable, 0x1 has credits price, 0x2 has gold price
+			if (item_price != -1)
+				price_mode |= 0x1;
+			if (item_gold_price != -1)
+				price_mode |= 0x2;
+			
+			switch (Forward_OnItemDraw(param1, bInv[param1] ? Menu_Inventory : Menu_Buy, iClCategoryId[param1], StringToInt(info), disabled))
+			{
+				case Plugin_Continue:
+				{
+					disabled = false;
+					if (price_mode & 0x0 && !bInv[param1]) // Item is not buyable and not in inventory, so it is in Menu_Buy, disable it.
+						disabled = true;
+				}
+				case Plugin_Handled, Plugin_Stop:
+				{
+					//menu.RemoveItem(param2);
+					return (menu.ItemCount == 1) ? ITEMDRAW_SPACER : ITEMDRAW_RAWLINE;
+				}
+			}
+			if (disabled)
+			{
+				return ITEMDRAW_DISABLED;
+			}
+			return ITEMDRAW_DEFAULT;
+		}
 		case MenuAction_DisplayItem:
 		{
 			char info[16], sBuffer[SHOP_MAX_STRING_LENGTH];
@@ -745,6 +775,14 @@ public int OnItemSelect(Menu menu, MenuAction action, int param1, int param2)
 			
 			bool result = Forward_OnItemDisplay(param1, bInv[param1] ? Menu_Inventory : Menu_Buy, iClCategoryId[param1], StringToInt(info), sBuffer, sBuffer, sizeof(sBuffer));
 			
+			int item_price = ItemManager_GetItemPriceEx(info);
+			int item_gold_price = ItemManager_GetItemGoldPriceEx(info);
+			int price_mode = 0; // 0x0 item is unbuyable, 0x1 has credits price, 0x2 has gold price
+			if (item_price != -1)
+				price_mode |= 0x1;
+			if (item_gold_price != -1)
+				price_mode |= 0x2;
+
 			switch (ItemManager_GetItemTypeEx(info))
 			{
 				case Item_Finite :
@@ -755,7 +793,14 @@ public int OnItemSelect(Menu menu, MenuAction action, int param1, int param2)
 					}
 					else
 					{
-						Format(sBuffer, sizeof(sBuffer), "[%d] %s (%d)", ItemManager_GetItemPriceEx(info), sBuffer, PlayerManager_GetItemCountEx(param1, info));
+						if (price_mode & 0x1 && price_mode & 0x2)
+							Format(sBuffer, sizeof(sBuffer), "[%d+%d%T] %s (%d)", item_price, item_gold_price, "Gold Suffix", param1, sBuffer, PlayerManager_GetItemCountEx(param1, info));
+						else if (price_mode & 0x1)
+							Format(sBuffer, sizeof(sBuffer), "[%d] %s (%d)", item_price, sBuffer, PlayerManager_GetItemCountEx(param1, info));
+						else if (price_mode & 0x2)
+							Format(sBuffer, sizeof(sBuffer), "[%d%T] %s (%d)", item_gold_price, "Gold Suffix", param1, sBuffer, PlayerManager_GetItemCountEx(param1, info));
+						else
+							Format(sBuffer, sizeof(sBuffer), "[%T] %s (%d)", "Unbuyable", param1, sBuffer, PlayerManager_GetItemCountEx(param1, info));
 					}
 					result = true;
 				}
@@ -763,7 +808,14 @@ public int OnItemSelect(Menu menu, MenuAction action, int param1, int param2)
 				{
 					if (!bInv[param1])
 					{
-						Format(sBuffer, sizeof(sBuffer), "[%d] %s", ItemManager_GetItemPriceEx(info), sBuffer);
+						if (price_mode & 0x1 && price_mode & 0x2)
+							Format(sBuffer, sizeof(sBuffer), "[%d+%d%T] %s", item_price, item_gold_price, "Gold Suffix", param1, sBuffer);
+						else if (price_mode & 0x1)
+							Format(sBuffer, sizeof(sBuffer), "[%d] %s", item_price, sBuffer);
+						else if (price_mode & 0x2)
+							Format(sBuffer, sizeof(sBuffer), "[%d%T] %s", item_gold_price, "Gold Suffix", param1, sBuffer);
+						else
+							Format(sBuffer, sizeof(sBuffer), "[%T] %s", "Unbuyable", param1, sBuffer);
 						result = true;
 					}
 				}
@@ -786,7 +838,14 @@ public int OnItemSelect(Menu menu, MenuAction action, int param1, int param2)
 						}
 						else
 						{
-							Format(sBuffer, sizeof(sBuffer), "[%d] %s", ItemManager_GetItemPriceEx(info), sBuffer);
+							if (price_mode & 0x1 && price_mode & 0x2)
+								Format(sBuffer, sizeof(sBuffer), "[%d+%d%T] %s", item_price, item_gold_price, "Gold Suffix", param1, sBuffer);
+							else if (price_mode & 0x1)
+								Format(sBuffer, sizeof(sBuffer), "[%d] %s", item_price, sBuffer);
+							else if (price_mode & 0x2)
+								Format(sBuffer, sizeof(sBuffer), "[%d%T] %s", item_gold_price, "Gold Suffix", param1, sBuffer);
+							else
+								Format(sBuffer, sizeof(sBuffer), "[%T] %s", "Unbuyable", param1, sBuffer);
 						}
 						result = true;
 					}
@@ -838,8 +897,9 @@ bool ShowItemInfo(int client, int item_id)
 		SetGlobalTransTarget(client);
 		
 		int credits = GetCredits(client);
+		int gold = GetGold(client);
 		
-		FormatEx(sBuffer, sizeof(sBuffer), "%t\n ", "credits", credits);
+		FormatEx(sBuffer, sizeof(sBuffer), "%t|%t: %d\n ", "credits", credits, "Gold", gold);
 		panel.SetTitle(sBuffer, false);
 		
 		ItemType type = ItemManager_GetItemTypeEx(sItemId);
@@ -854,22 +914,46 @@ bool ShowItemInfo(int client, int item_id)
 				{
 					int timeleft = PlayerManager_GetItemTimeleftEx(client, sItemId);
 					int sell_price = PlayerManager_GetItemSellPriceEx(client, sItemId);
+					int gold_sell_price = PlayerManager_GetItemGoldSellPriceEx(client, sItemId);
+
+					int sell_mode = 0; // 0x1 sell by credits, 0x2 sell by gold
+					if (sell_price != -1)
+						sell_mode |= 0x1;
+					if (gold_sell_price != -1)
+						sell_mode |= 0x2;
+
 					if (timeleft > 0)
 					{
 						GetTimeFromStamp(sBuffer, sizeof(sBuffer), timeleft, client);
 						Format(sBuffer, sizeof(sBuffer), "%t: %s", "timeleft", sBuffer);
 						panel.DrawText(sBuffer);
 						
-						if (sell_price > -1)
+						switch (sell_mode)
 						{
-							FormatEx(sBuffer, sizeof(sBuffer), "%t: %d", "absolute_sellprice", sell_price);
-							panel.DrawText(sBuffer);
+							case 0x1:
+								FormatEx(sBuffer, sizeof(sBuffer), "%t: %d", "absolute_sellprice", sell_price);
+							case 0x2:
+								FormatEx(sBuffer, sizeof(sBuffer), "%t: %d %t", "absolute_sellprice", gold_sell_price, "Gold");
+							case 0x1|0x2:
+								FormatEx(sBuffer, sizeof(sBuffer), "%t: %d + %d %t", "absolute_sellprice", sell_price, gold_sell_price, "Gold");
 						}
+						
+						if (sell_mode != 0)
+							panel.DrawText(sBuffer);
 						panel.DrawItem(" ", ITEMDRAW_SPACER|ITEMDRAW_RAWLINE);
 					}
-					if (sell_price > -1)
+					if (sell_mode != 0)
 					{
-						FormatEx(sBuffer, sizeof(sBuffer), "%t [+%d]", "sell", sell_price);
+						switch (sell_mode)
+						{
+							case 0x1:
+								FormatEx(sBuffer, sizeof(sBuffer), "%t [+%d]", "sell", sell_price);
+							case 0x2:
+								FormatEx(sBuffer, sizeof(sBuffer), "%t [+%d %t]", "sell", gold_sell_price, "Gold");
+							case 0x1|0x2:
+								FormatEx(sBuffer, sizeof(sBuffer), "%t [+%d|%d %t]", "sell", sell_price, gold_sell_price, "Gold");
+						}
+						
 						panel.DrawItem(sBuffer);
 						iButton[client][button++] = BUTTON_SELL;
 					}
@@ -940,10 +1024,26 @@ bool ShowItemInfo(int client, int item_id)
 					iButton[client][button++] = BUTTON_USE;
 					
 					int sell_price = PlayerManager_GetItemSellPriceEx(client, sItemId);
+					int gold_sell_price = PlayerManager_GetItemGoldSellPriceEx(client, sItemId);
+
+					int sell_mode = 0; // 0x1 sell by credits, 0x2 sell by gold
+					if (sell_price != -1)
+						sell_mode |= 0x1;
+					if (gold_sell_price != -1)
+						sell_mode |= 0x2;
 					
-					if (sell_price > -1)
+					if (sell_mode != 0)
 					{
-						FormatEx(sBuffer, sizeof(sBuffer), "%t [+%d]", "sell", sell_price);
+						switch (sell_mode)
+						{
+							case 0x1:
+								FormatEx(sBuffer, sizeof(sBuffer), "%t [+%d]", "sell", sell_price);
+							case 0x2:
+								FormatEx(sBuffer, sizeof(sBuffer), "%t [+%d %t]", "sell", gold_sell_price, "Gold");
+							case 0x1|0x2:
+								FormatEx(sBuffer, sizeof(sBuffer), "%t [+%d|%d %t]", "sell", sell_price, gold_sell_price, "Gold");
+						}
+						
 						panel.DrawItem(sBuffer);
 						iButton[client][button++] = BUTTON_SELL;
 					}
@@ -976,17 +1076,30 @@ bool ShowItemInfo(int client, int item_id)
 				{
 					int timeleft = PlayerManager_GetItemTimeleftEx(client, sItemId);
 					int sell_price = PlayerManager_GetItemSellPriceEx(client, sItemId);
+					int gold_sell_price = PlayerManager_GetItemGoldSellPriceEx(client, sItemId);
+
+					int sell_mode = 0; // 0x1 sell by credits, 0x2 sell by gold
+					if (sell_price != -1)
+						sell_mode |= 0x1;
+					if (gold_sell_price != -1)
+						sell_mode |= 0x2;
+					
 					if (timeleft > 0)
 					{
 						GetTimeFromStamp(sBuffer, sizeof(sBuffer), timeleft, client);
 						Format(sBuffer, sizeof(sBuffer), "%t: %s", "timeleft", sBuffer);
 						panel.DrawText(sBuffer);
-						
-						if (sell_price > -1)
+						switch (sell_mode)
 						{
-							FormatEx(sBuffer, sizeof(sBuffer), "%t: %d", "absolute_sellprice", sell_price);
-							panel.DrawText(sBuffer);
+							case 0x1:
+								FormatEx(sBuffer, sizeof(sBuffer), "%t: %d", "absolute_sellprice", sell_price);
+							case 0x2:
+								FormatEx(sBuffer, sizeof(sBuffer), "%t: %d %t", "absolute_sellprice", gold_sell_price, "Gold");
+							case 0x1|0x2:
+								FormatEx(sBuffer, sizeof(sBuffer), "%t: %d + %d %t", "absolute_sellprice", sell_price, gold_sell_price, "Gold");
 						}
+						if (sell_mode)
+							panel.DrawText(sBuffer);
 						panel.DrawItem(" ", ITEMDRAW_SPACER|ITEMDRAW_RAWLINE);
 					}
 					if (PlayerManager_IsItemToggledEx(client, sItemId))
@@ -1000,9 +1113,18 @@ bool ShowItemInfo(int client, int item_id)
 					panel.DrawItem(sBuffer);
 					iButton[client][button++] = BUTTON_TOGGLE;
 					
-					if (sell_price > -1)
+					if (sell_mode != 0)
 					{
-						FormatEx(sBuffer, sizeof(sBuffer), "%t [+%d]", "sell", sell_price);
+						switch (sell_mode)
+						{
+							case 0x1:
+								FormatEx(sBuffer, sizeof(sBuffer), "%t [+%d]", "sell", sell_price);
+							case 0x2:
+								FormatEx(sBuffer, sizeof(sBuffer), "%t [+%d %t]", "sell", gold_sell_price, "Gold");
+							case 0x1|0x2:
+								FormatEx(sBuffer, sizeof(sBuffer), "%t [+%d|%d %t]", "sell", sell_price, gold_sell_price, "Gold");
+						}
+						
 						panel.DrawItem(sBuffer);
 						iButton[client][button++] = BUTTON_SELL;
 					}
@@ -1565,34 +1687,34 @@ bool BuyItem(int client, int item_id, bool by_native)
 {
 	char sItemId[16];
 	IntToString(item_id, sItemId, sizeof(sItemId));
-	int category_id, price, sell_price, count, duration;
+	int category_id, price, sell_price, gold_price, gold_sell_price, count, duration;
 	ItemType type;
 	char item[SHOP_MAX_STRING_LENGTH];
 	
-	if (!ItemManager_GetItemInfoEx(sItemId, item, sizeof(item), category_id, price, sell_price, count, duration, type))
+	if (!ItemManager_GetItemInfoEx(sItemId, item, sizeof(item), category_id, price, sell_price, count, duration, type, gold_price, gold_sell_price))
 	{
 		return false;
 	}
-	
+
 	char category[SHOP_MAX_STRING_LENGTH];
 	ItemManager_GetCategoryById(category_id, category, sizeof(category));
 	
 	Action result;
 	
-	int default_price = price;
-	int default_sellprice = sell_price;
+	int default_price = price, default_gold_price = gold_price;
+	int default_sellprice = sell_price, default_gold_sell_price = gold_sell_price;
 	int default_value;
 	switch (type)
 	{
 		case Item_None, Item_Togglable :
 		{
 			default_value = duration;
-			result = Forward_OnItemBuy(client, category_id, category, item_id, item, type, price, sell_price, duration);
+			result = Forward_OnItemBuy(client, category_id, category, item_id, item, type, price, sell_price, duration, gold_price, gold_sell_price);
 		}
 		default:
 		{
 			default_value = count;
-			result = Forward_OnItemBuy(client, category_id, category, item_id, item, type, price, sell_price, count);
+			result = Forward_OnItemBuy(client, category_id, category, item_id, item, type, price, sell_price, count, gold_price, gold_sell_price);
 		}
 	}
 	switch (result)
@@ -1601,6 +1723,8 @@ bool BuyItem(int client, int item_id, bool by_native)
 		{
 			price = default_price;
 			sell_price = default_sellprice;
+			gold_price = default_gold_price;
+			gold_sell_price = default_gold_sell_price;
 			switch (type)
 			{
 				case Item_None, Item_Togglable :
@@ -1618,27 +1742,45 @@ bool BuyItem(int client, int item_id, bool by_native)
 			return false;
 		}
 	}
+
+	int iNotEnough = 0; // 0x1 not enough credits, 0x2 not enough gold
 	
-	if (GetCredits(client) < price)
+	if (price != -1 && GetCredits(client) < price)
+		iNotEnough |= 0x1;
+
+	if (gold_price != -1 && GetGold(client) < gold_price)
+		iNotEnough |= 0x2;
+
+	if (iNotEnough && !by_native)
 	{
-		if (!by_native)
+		switch (iNotEnough)
 		{
-			CPrintToChat(client, "%t", "NotEnoughCredits");
+			case 0x1:
+				CPrintToChat(client, "%t", "NotEnoughCredits");
+			case 0x2:
+				CPrintToChat(client, "%t", "NotEnoughGold");
+			case 0x1|0x2: {
+				CPrintToChat(client, "%t", "NotEnoughCredits");
+				CPrintToChat(client, "%t", "NotEnoughGold");				
+			}
 		}
 		return false;
 	}
 	
-	if (!ItemManager_OnItemBuyEx(client, category_id, category, item_id, item, type, price, sell_price, (type == Item_Finite) ? count : duration))
+	if (!ItemManager_OnItemBuyEx(client, category_id, category, item_id, item, type, price, sell_price, (type == Item_Finite) ? count : duration, gold_price, gold_sell_price))
 	{
 		return false;
 	}
 	
 	if (type != Item_BuyOnly)
 	{
-		PlayerManager_GiveItemEx(client, sItemId, category_id, price, sell_price, count, duration, duration, type);
+		PlayerManager_GiveItemEx(client, sItemId, category_id, price, sell_price, count, duration, duration, type, gold_price, gold_sell_price);
 	}
 	
-	RemoveCredits(client, price, CREDITS_BY_BUY_OR_SELL);
+	if (price != -1)
+		RemoveCredits(client, price, CREDITS_BY_BUY_OR_SELL);
+	if (gold_price != -1)
+		RemoveGold(client, gold_price, CREDITS_BY_BUY_OR_SELL);
 	
 	return true;
 }
@@ -1652,35 +1794,23 @@ bool RemoveItemEx(int client, const char[] sItemId, int count = 1)
 	return PlayerManager_RemoveItemEx(client, sItemId, count);
 }
 
-bool GiveItem(int client, int item_id, int value = 0)
+bool GiveItem(int client, int item_id)
 {
 	char sItemId[16];
 	IntToString(item_id, sItemId, sizeof(sItemId));
 	
-	return GiveItemEx(client, sItemId, value);
+	return GiveItemEx(client, sItemId);
 }
 
-bool GiveItemEx(int client, const char[] sItemId, int value = 0)
+bool GiveItemEx(int client, const char[] sItemId)
 {
-	int category_id, price, sell_price, count, duration;
+	int category_id, price, sell_price, gold_price, gold_sell_price, count, duration;
 	ItemType type;
 	char item[SHOP_MAX_STRING_LENGTH];
 	
-	if (!ItemManager_GetItemInfoEx(sItemId, item, sizeof(item), category_id, price, sell_price, count, duration, type))
+	if (!ItemManager_GetItemInfoEx(sItemId, item, sizeof(item), category_id, price, sell_price, count, duration, type, gold_price, gold_sell_price))
 	{
 		return false;
-	}
-	
-	if (value != 0)
-	{
-		if (type == Item_Finite)
-		{
-			count = value;
-		}
-		else
-		{
-			duration = value;
-		}
 	}
 
 	switch (type)
@@ -1689,7 +1819,7 @@ bool GiveItemEx(int client, const char[] sItemId, int value = 0)
 		{
 			char category[SHOP_MAX_STRING_LENGTH];
 			ItemManager_GetCategoryById(category_id, category, sizeof(category));
-			if (!ItemManager_OnItemBuyEx(client, category_id, category, StringToInt(sItemId), item, type, price, sell_price, count))
+			if (!ItemManager_OnItemBuyEx(client, category_id, category, StringToInt(sItemId), item, type, price, sell_price, (type == Item_Finite) ? count : duration, gold_price, gold_sell_price))
 			{
 				return false;
 			}
@@ -1704,7 +1834,7 @@ bool GiveItemEx(int client, const char[] sItemId, int value = 0)
 		}
 	}
 	
-	PlayerManager_GiveItemEx(client, sItemId, category_id, price, sell_price, count, duration, duration, type);
+	PlayerManager_GiveItemEx(client, sItemId, category_id, price, sell_price, count, duration, duration, type, gold_price, gold_sell_price);
 	
 	return true;
 }
@@ -1718,18 +1848,19 @@ bool SellItem(int client, int item_id)
 	
 	char sItemId[16];
 	IntToString(item_id, sItemId, sizeof(sItemId));
-	int category_id, price, sell_price, count, duration;
+	int category_id, price, sell_price, gold_price, gold_sell_price, count, duration;
 	ItemType type;
 	char item[SHOP_MAX_STRING_LENGTH];
 	
-	if (!ItemManager_GetItemInfoEx(sItemId, item, sizeof(item), category_id, price, sell_price, count, duration, type))
+	if (!ItemManager_GetItemInfoEx(sItemId, item, sizeof(item), category_id, price, sell_price, count, duration, type, gold_price, gold_sell_price))
 	{
 		return false;
 	}
 	
 	sell_price = PlayerManager_GetItemSellPriceEx(client, sItemId);
+	gold_sell_price = PlayerManager_GetItemGoldSellPriceEx(client, sItemId);
 	
-	if (sell_price < 0)
+	if (sell_price < 0 && gold_sell_price < 0)
 	{
 		return false;
 	}
@@ -1737,12 +1868,13 @@ bool SellItem(int client, int item_id)
 	char category[SHOP_MAX_STRING_LENGTH];
 	ItemManager_GetCategoryById(category_id, category, sizeof(category));
 	
-	int default_sellprice = sell_price;
-	switch (Forward_OnItemSell(client, category_id, category, item_id, item, type, sell_price))
+	int default_sellprice = sell_price, default_gold_sell_price = gold_sell_price;
+	switch (Forward_OnItemSell(client, category_id, category, item_id, item, type, sell_price, gold_sell_price))
 	{
 		case Plugin_Continue :
 		{
 			sell_price = default_sellprice;
+			gold_sell_price = default_gold_sell_price;
 		}
 		case Plugin_Handled, Plugin_Stop:
 		{
@@ -1750,7 +1882,7 @@ bool SellItem(int client, int item_id)
 		}
 	}
 	
-	if (!ItemManager_OnItemSellEx(client, category_id, category, item_id, item, type, sell_price))
+	if (!ItemManager_OnItemSellEx(client, category_id, category, item_id, item, type, sell_price, gold_sell_price))
 	{
 		return false;
 	}
@@ -1765,7 +1897,10 @@ bool SellItem(int client, int item_id)
 		}
 	}
 	
-	GiveCredits(client, sell_price, CREDITS_BY_BUY_OR_SELL);
+	if (sell_price != -1)
+		GiveCredits(client, sell_price, CREDITS_BY_BUY_OR_SELL);
+	if (gold_sell_price != -1)
+		GiveGold(client, gold_sell_price, CREDITS_BY_BUY_OR_SELL);
 	
 	return true;
 }
@@ -1888,6 +2023,11 @@ int GetCredits(int client)
 	return PlayerManager_GetCredits(client);
 }
 
+int GetGold(int client)
+{
+	return PlayerManager_GetGold(client);
+}
+
 bool SetCredits(int client, int credits, int by_who)
 {
 	if (credits < 1)
@@ -1919,6 +2059,40 @@ bool SetCredits(int client, int credits, int by_who)
 	if (by_who > 0)
 	{
 		CPrintToChat(client, "%t", "set_you_credits", credits);
+	}
+	
+	return true;
+}
+
+bool SetGold(int client, int amount, int by_who)
+{
+	if (amount < 1)
+	{
+		return false;
+	}
+
+	if (by_who != IGNORE_FORWARD_HOOK)
+	{
+		int dummy = amount;
+		
+		switch (Forward_OnGoldSet(client, amount, by_who))
+		{
+			case Plugin_Continue :
+			{
+				amount = dummy;
+			}
+			case Plugin_Handled, Plugin_Stop :
+			{
+				return false;
+			}
+		}
+	}
+	
+	PlayerManager_SetGold(client, amount);
+	
+	if (by_who > 0)
+	{
+		CPrintToChat(client, "%t", "set_you_gold", amount);
 	}
 	
 	return true;
@@ -1964,6 +2138,44 @@ int RemoveCredits(int client, int credits, int by_who)
 	return credits;
 }
 
+int RemoveGold(int client, int amount, int by_who)
+{
+	if (!PlayerManager_IsAuthorizedIn(client))
+	{
+		return -1;
+	}
+	if (amount < 1)
+	{
+		return 0;
+	}
+	
+	if (by_who != IGNORE_FORWARD_HOOK)
+	{
+		int dummy = amount;
+		
+		switch (Forward_OnGoldTaken(client, amount, by_who))
+		{
+			case Plugin_Continue :
+			{
+				amount = dummy;
+			}
+			case Plugin_Handled, Plugin_Stop :
+			{
+				return 0;
+			}
+		}
+	}
+	
+	PlayerManager_RemoveGold(client, amount);
+	
+	if (by_who > 0)
+	{
+		CPrintToChat(client, "%t", "take_you_gold", amount);
+	}
+	
+	return amount;
+}
+
 int GiveCredits(int client, int credits, int by_who)
 {
 	if (!PlayerManager_IsAuthorizedIn(client))
@@ -2002,6 +2214,44 @@ int GiveCredits(int client, int credits, int by_who)
 	}
 	
 	return credits;
+}
+
+int GiveGold(int client, int amount, int by_who)
+{
+	if (!PlayerManager_IsAuthorizedIn(client))
+	{
+		return -1;
+	}
+	if (amount < 1)
+	{
+		return 0;
+	}
+	
+	if (by_who != IGNORE_FORWARD_HOOK)
+	{
+		int dummy = amount;
+		
+		switch (Forward_OnGoldGiven(client, amount, by_who))
+		{
+			case Plugin_Continue :
+			{
+				amount = dummy;
+			}
+			case Plugin_Handled, Plugin_Stop :
+			{
+				return 0;
+			}
+		}
+	}
+	
+	PlayerManager_GiveGold(client, amount);
+	
+	if (by_who > 0)
+	{
+		CPrintToChat(client, "%t", "give_you_gold", amount);
+	}
+	
+	return amount;
 }
 
 bool IsAuthorizedIn(int client)
@@ -2112,10 +2362,10 @@ void OnItemEquipped(int client, int item_id)
 {
 	char sItemId[16];
 	IntToString(item_id, sItemId, sizeof(sItemId));
-	int category_id, price, sell_price, count, duration;
+	int category_id, price, sell_price, gold_price, gold_sell_price, count, duration;
 	ItemType type;
 	char item[SHOP_MAX_STRING_LENGTH];
-	if (!ItemManager_GetItemInfoEx(sItemId, item, sizeof(item), category_id, price, sell_price, count, duration, type))
+	if (!ItemManager_GetItemInfoEx(sItemId, item, sizeof(item), category_id, price, sell_price, count, duration, type, gold_price, gold_sell_price))
 	{
 		return;
 	}
@@ -2129,10 +2379,10 @@ void OnItemDequipped(int client, int item_id)
 {
 	char sItemId[16];
 	IntToString(item_id, sItemId, sizeof(sItemId));
-	int category_id, price, sell_price, count, duration;
+	int category_id, price, sell_price, gold_price, gold_sell_price, count, duration;
 	ItemType type;
 	char item[SHOP_MAX_STRING_LENGTH];
-	if (!ItemManager_GetItemInfoEx(sItemId, item, sizeof(item), category_id, price, sell_price, count, duration, type))
+	if (!ItemManager_GetItemInfoEx(sItemId, item, sizeof(item), category_id, price, sell_price, count, duration, type, gold_price, gold_sell_price))
 	{
 		return;
 	}
